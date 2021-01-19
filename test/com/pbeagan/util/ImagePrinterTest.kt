@@ -1,10 +1,10 @@
 package com.pbeagan.util
 
 import com.pbeagan.demo.ImagePrinter
-import com.pbeagan.demo.convertToBufferedImage
+import com.pbeagan.demo.getScaleToBoundBy80
+import com.pbeagan.demo.scale
 import org.junit.Before
 import org.junit.Test
-import java.awt.Image
 import java.io.File
 import javax.imageio.ImageIO
 
@@ -37,24 +37,12 @@ internal class ImagePrinterTest {
     @Test
     fun `sizedown sampling comparison`() {
         val read = ImageIO.read(File(IMAGE_SAMPLE2))
-        listOf(
-            Image.SCALE_DEFAULT,
-            Image.SCALE_FAST,
-            Image.SCALE_SMOOTH,
-            Image.SCALE_REPLICATE,
-            Image.SCALE_AREA_AVERAGING
-        ).forEach {
-            val width = read.width
-            val height = read.height
-            val aspectRatio = width.toDouble() / height.toDouble()
-            val maxDimen = 100
-            read.getScaledInstance((maxDimen * aspectRatio).toInt(), maxDimen, it)
-                .convertToBufferedImage()
-                ?.also { bufferedImage ->
-                    imagePrinter.printImageCompressed(bufferedImage,
-                        ImagePrinter.CompressionStyle.DOTS)
-                }
-        }
+
+        val (scale, transformOp) = read.getScaleToBoundBy80()
+        imagePrinter.printImageCompressed(
+            read.scale(scale, transformOp),
+            ImagePrinter.CompressionStyle.UP_DOWN
+        )
     }
 
     companion object {

@@ -9,7 +9,6 @@ import io.humble.video.MediaDescriptor
 import io.humble.video.MediaPacket
 import io.humble.video.MediaPicture
 import io.humble.video.Rational
-import io.humble.video.awt.ImageFrame
 import io.humble.video.awt.MediaPictureConverter
 import io.humble.video.awt.MediaPictureConverterFactory
 import java.awt.image.BufferedImage
@@ -27,46 +26,29 @@ class DecodeAndPlayVideo(private val filename: String?, palette: String?) {
                 colorSet.add(it.getRGB(x, y))
             }
         }
-
         colorSet
     }
-    //    private val paletteColors by lazy {
-//        paletteImage?.let {
-////        val colorSet = mutableSetOf<Int>()
-////        (it.minY..it.height).forEach { y ->
-////            (it.minX..it.width).forEach { x ->
-////                colorSet.add(it.getRGB(x, y))
-////            }
-////        }
-//            it.getRGB(
-//                0,
-//                0,
-//                it.width,
-//                it.height,
-//                null,
-//                0,
-//                1
-//            ).toSet()
-////        colorSet
-//        }
-//    }
+
+    private val scaleTransform by lazy {
+        image.getScaleToBoundBy80()
+    }
+
     private val numStreams: Int = demuxer.numStreams
     var videoStreamId = -1
     var streamStartTime: Long = Global.NO_PTS
     lateinit var videoDecoder: Decoder
 
-    var image: BufferedImage? = null
+    private var _image: BufferedImage? = null
+    private var image: BufferedImage
+        get() = _image!!
+        set(value) {
+            _image = value
+        }
 
-//    private val window: ImageFrame = ImageFrame.make()
-//        ?: throw RuntimeException("Attempting this demo on a headless machine, and that will not work. Sad day for you.")
-
-    val systemStartTime = System.nanoTime()
+    private val systemStartTime = System.nanoTime()
     private val systemTimeBase: Rational = Rational.make(1, 1_000_000_000)
     private val streamTimebase: Rational by lazy { videoDecoder.timeBase }
 
-    /**
-     * Opens a file, and plays the video from it on a screen at the right rate.
-     */
     @Throws(InterruptedException::class, IOException::class)
     fun playVideo() {
         initializeDecoder()
@@ -83,7 +65,6 @@ class DecodeAndPlayVideo(private val filename: String?, palette: String?) {
         runDecodingLoop(picture, converter)
         flushDecoder(picture, converter)
         demuxer.close()
-//        window.dispose()
     }
 
     private fun initializeDecoder() {
@@ -106,15 +87,6 @@ class DecodeAndPlayVideo(private val filename: String?, palette: String?) {
         picture: MediaPicture,
         converter: MediaPictureConverter
     ) {
-        /**
-         * Now, we start walking through the container looking at each packet. This
-         * is a decoding loop, and as you work with Humble you'll write a lot
-         * of these.
-         *
-         * Notice how in this loop we reuse all of our objects to avoid
-         * reallocating them. Each call to Humble resets objects to avoid
-         * unnecessary reallocation.
-         */
         val packet: MediaPacket = MediaPacket.make()
         while (demuxer.read(packet) >= 0) {
             /**
@@ -175,40 +147,22 @@ class DecodeAndPlayVideo(private val filename: String?, palette: String?) {
     @Throws(InterruptedException::class)
     private fun displayVideoAtCorrectTime(
         picture: MediaPicture, converter: MediaPictureConverter
-    ): BufferedImage? {
-        var image: BufferedImage? = image
+    ): BufferedImage {
         var streamTimestamp: Long = picture.timeStamp
-        // convert streamTimestamp into system units (i.e. nano-seconds)
         streamTimestamp = systemTimeBase.rescale(streamTimestamp - streamStartTime, streamTimebase)
-        // get the current clock time, with our most accurate clock
         var systemTimestamp = System.nanoTime()
-        // loop in a sleeping loop until we're within 1 ms of the time for that video frame.
-        // a real video player needs to be much more sophisticated than this.
         while (streamTimestamp > (systemTimestamp - systemStartTime) * 1_000_000) {
-//        Thread.sleep(1000 / 20)
             systemTimestamp = System.nanoTime()
         }
-        // finally, convert the image from Humble format into Java images.
+
+        _image ?: run { _image = converter.toImage(null, picture) }
         image = converter.toImage(image, picture)
-        // And ask the UI thread to repaint with the new image.
-//        window.setImage(image)
-        val width = image.width
-        val height = image.height
-        val aspectRatio = width.toDouble() / height.toDouble()
-        val maxDimenAny = 80.0
-        val maxDimen = minOf(maxDimenAny / height, maxDimenAny / height)
 
         print(CURSOR_TO_START)
-        image.scale(maxDimen)
-            .also { bufferedImage ->
-//                imagePrinter.printImageCompressed(bufferedImage)
-
-
-                imagePrinter.printImageReducedPalette(bufferedImage, paletteColors)
-            }
-
+        imagePrinter.printImageReducedPalette(image.scale(
+            scaleTransform.first, scaleTransform.second
+        ), paletteColors)
         return image
     }
-
 }
 

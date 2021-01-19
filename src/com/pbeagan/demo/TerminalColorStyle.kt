@@ -89,6 +89,11 @@ object TerminalColorStyle {
         this and 255
     )
 
+    /**
+     * Masks just the last 3 color spaces - assumes ARGB
+     */
+    fun Int.colorIntStripAlpha(): Int = this and 0xFFFFFF
+
     fun ARGB.argbToColorInt(withAlpha: Boolean = true): Int =
         (a shl 24).takeIf { withAlpha } ?: 0
             .or(r shl 16)

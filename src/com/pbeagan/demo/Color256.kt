@@ -355,8 +355,6 @@ enum class Color256(val color: Int, val number: Int) {
             return toSortedMap?.value?.number ?: 0
         }
     }
-
-
 }
 
 fun distance(

@@ -3,10 +3,9 @@ package com.pbeagan.demo
 import com.pbeagan.demo.ImagePrinter.CompressionStyle.DOTS
 import com.pbeagan.demo.ImagePrinter.CompressionStyle.UP_DOWN
 import com.pbeagan.demo.TerminalColorStyle.Colors
-import com.pbeagan.demo.TerminalColorStyle.argbToColorInt
+import com.pbeagan.demo.TerminalColorStyle.colorIntStripAlpha
 import com.pbeagan.demo.TerminalColorStyle.colorIntToARGB
 import com.pbeagan.demo.TerminalColorStyle.style
-import java.awt.Image
 import java.awt.geom.AffineTransform
 import java.awt.image.AffineTransformOp
 import java.awt.image.BufferedImage
@@ -48,14 +47,11 @@ class ImagePrinter {
     fun printImageReducedPalette(read: BufferedImage, paletteColors: Set<Int>?) {
         (read.minY until read.height).chunked(2).forEach { y ->
             (read.minX until read.width).forEach { x ->
-                val rgb = read.getRGB(x, y[0])
-                val colorBackground = applyPalette(rgb, paletteColors)
-
-                val b = read.getRGB(x, y[1]).colorIntToARGB().argbToColorInt(false)
-                val colorForeground = Colors.Custom((paletteColors?.reduce(b) ?: b).colorIntToARGB())
+                val i = y.getOrNull(0) ?: 0
+                val i1 = y.getOrNull(1) ?: 0
                 "▄".style(
-                    colorBackground = colorBackground,
-                    colorForeground = colorForeground
+                    colorBackground = this.applyPalette(read.getRGB(x, i), paletteColors),
+                    colorForeground = this.applyPalette(read.getRGB(x, i1), paletteColors)
                 ).also { print(it) }
                 Unit
             }
@@ -64,7 +60,7 @@ class ImagePrinter {
     }
 
     private val applyPalette = { rgb: Int, paletteColors: Set<Int>? ->
-        val a = rgb.colorIntToARGB().argbToColorInt(false)
+        val a = rgb.colorIntStripAlpha()
         val colorBackground = Colors.Custom((paletteColors?.reduce(a) ?: a).colorIntToARGB())
         colorBackground
     }.memoize()
@@ -86,33 +82,24 @@ class ImagePrinter {
     }
 }
 
-fun BufferedImage.scale(scale: Double): BufferedImage {
+fun BufferedImage.scale(scale: Double, affineTransformOp: AffineTransformOp): BufferedImage {
     val w = width
     val h = height
     val w2 = (w * scale).toInt()
     val h2 = (h * scale).toInt()
     val after = BufferedImage(w2, h2, type)
-    val scaleInstance = AffineTransform.getScaleInstance(scale, scale)
-    val scaleOp = AffineTransformOp(scaleInstance, AffineTransformOp.TYPE_BICUBIC)
-    scaleOp.filter(this, after)
+    affineTransformOp.filter(this, after)
     return after
 }
 
-fun Image.convertToBufferedImage(): BufferedImage? {
-    if (this is BufferedImage) {
-        return this
-    }
-
-    // Create a buffered image with transparency
-    val bi = BufferedImage(
-        getWidth(null), getHeight(null),
-        BufferedImage.TYPE_INT_ARGB
-    )
-    val graphics2D = bi.createGraphics()
-    graphics2D.drawImage(this, 0, 0, null)
-    graphics2D.dispose()
-    return bi
+fun BufferedImage.getScaleToBoundBy80(): Pair<Double, AffineTransformOp> {
+    val maxDimenAny = 90.0
+    val scale = minOf(maxDimenAny / width, maxDimenAny / height)
+    return scale to generateScaledownTransform(scale)
 }
+
+private fun generateScaledownTransform(scale: Double) =
+    AffineTransformOp(AffineTransform.getScaleInstance(scale, scale), AffineTransformOp.TYPE_BICUBIC)
 
 class Memoize1<in T, out R>(val f: (T) -> R) : (T) -> R {
     private val values = mutableMapOf<T, R>()
