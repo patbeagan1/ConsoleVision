@@ -21,6 +21,7 @@ fun main(args: Array<String>) {
     val options = Options()
     options.addOption("h", "help", false, "displays help")
     options.addOption("v", "version", false, "version of this library")
+    options.addOption("r", "reduced", false, "requests to use the reduced ansi color set")
     val parser: CommandLineParser = BasicParser()
     try {
         val cmd: CommandLine = parser.parse(options, args)

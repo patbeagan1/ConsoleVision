@@ -33,7 +33,7 @@ class ImagePrinter {
         }
     }
 
-    private fun Set<Int>.reduce(color: Int) = associateBy { each ->
+    private fun Set<Int>.reduce(color: Int) = this.minBy { each ->
         distance(
             color shr 16 and 255,
             color shr 8 and 255,
@@ -42,28 +42,68 @@ class ImagePrinter {
             each shr 8 and 255,
             each and 255
         )
-    }.minBy { it.key }?.value
+    }
 
     fun printImageReducedPalette(read: BufferedImage, paletteColors: Set<Int>?) {
+
+        val applyPalette = { rgb: Int, palette: Set<Int>? ->
+            val a = rgb.colorIntStripAlpha()
+            palette?.reduce(a) ?: a
+        }.memoize()
+
+        val set = Color256.values().toSet().drop(16).sortedBy { it.color }
+        val reducedSetApplicator = { color: Int ->
+            set
+//                .associateBy { each ->
+//
+//            }
+                .minBy { each ->
+                    distance(
+                        color shr 16 and 255,
+                        color shr 8 and 255,
+                        color and 255,
+                        each.color shr 16 and 255,
+                        each.color shr 8 and 255,
+                        each.color and 255
+                    )
+                }
+
+//            set.binarySearch { each ->
+//                val x1 = color shr 16 and 255
+//                val x2 = color shr 8 and 255
+//                val x3 = color and 255
+//                val y1 = each.color shr 16 and 255
+//                val y2 = each.color shr 8 and 255
+//                val y3 = each.color and 255
+//
+//                ((x1 + x2 + x3) / 3) - ((y1 + y2 + y3) / 3)
+//            }.let { if (it < 0) -it else it }.let { set[it] }
+        }.memoize()
+
+        val toColor = { i: Color256? -> Colors.CustomPreset(i?.number ?: 0) }.memoize()
+
         (read.minY until read.height).chunked(2).forEach { y ->
             (read.minX until read.width).forEach { x ->
                 val i = y.getOrNull(0) ?: 0
                 val i1 = y.getOrNull(1) ?: 0
-                "▄".style(
-                    colorBackground = this.applyPalette(read.getRGB(x, i), paletteColors),
-                    colorForeground = this.applyPalette(read.getRGB(x, i1), paletteColors)
-                ).also { print(it) }
+                val colorBackground = applyPalette(read.getRGB(x, i), paletteColors)
+                val colorForeground = applyPalette(read.getRGB(x, i1), paletteColors)
+                if (false) {
+                    "▄".style(
+                        colorBackground = reducedSetApplicator(colorBackground).let(toColor),
+                        colorForeground = reducedSetApplicator(colorForeground).let(toColor)
+                    ).also { print(it) }
+                } else {
+                    "▄".style(
+                        colorBackground = colorBackground.let { Colors.Custom(it.colorIntToARGB()) },
+                        colorForeground = colorForeground.let { Colors.Custom(it.colorIntToARGB()) }
+                    ).also { print(it) }
+                }
                 Unit
             }
             println()
         }
     }
-
-    private val applyPalette = { rgb: Int, paletteColors: Set<Int>? ->
-        val a = rgb.colorIntStripAlpha()
-        val colorBackground = Colors.Custom((paletteColors?.reduce(a) ?: a).colorIntToARGB())
-        colorBackground
-    }.memoize()
 
     fun printImage(read: BufferedImage) {
         (read.minY until read.height).forEach { y ->

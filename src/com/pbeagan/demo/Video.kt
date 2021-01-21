@@ -28,6 +28,7 @@ class DecodeAndPlayVideo(private val filename: String?, palette: String?) {
         }
         colorSet
     }
+    private val imagePrinter = ImagePrinter()
 
     private val scaleTransform by lazy {
         image.getScaleToBoundBy80()
@@ -139,7 +140,6 @@ class DecodeAndPlayVideo(private val filename: String?, palette: String?) {
         return demuxer
     }
 
-    private val imagePrinter = ImagePrinter()
 
     /**
      * Takes the video picture and displays it at the right time.
