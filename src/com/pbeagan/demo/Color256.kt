@@ -306,7 +306,6 @@ enum class Color256(val color: Int, val number: Int) {
     Color254(0xe4e4e4, 254),
     Color255(0xeeeeee, 255);
 
-
     companion object {
         val greyscale = listOf(
             Color232,
@@ -370,6 +369,15 @@ fun distance(
     val d3 = (z2 - z1).toDouble().pow(2)
     return sqrt(d1 * d2 * d3)
 }
+
+fun Int.colorDistance(other: Int) = distance(
+    this shr 16 and 255,
+    this shr 8 and 255,
+    this and 255,
+    other shr 16 and 255,
+    other shr 8 and 255,
+    other and 255
+)
 
 inline fun <T1 : Any, T2 : Any, R : Any> safeLet(
     p1: T1?,

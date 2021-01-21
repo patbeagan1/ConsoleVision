@@ -1,14 +1,17 @@
 package com.pbeagan.util
 
+import com.pbeagan.demo.Color256
 import com.pbeagan.demo.TerminalColorStyle
 import com.pbeagan.demo.TerminalColorStyle.Colors.Blue
 import com.pbeagan.demo.TerminalColorStyle.Colors.Custom
 import com.pbeagan.demo.TerminalColorStyle.Colors.CustomPreset
 import com.pbeagan.demo.TerminalColorStyle.Colors.Green
 import com.pbeagan.demo.TerminalColorStyle.Colors.Red
+import com.pbeagan.demo.TerminalColorStyle.DOTS_MED
 import com.pbeagan.demo.TerminalColorStyle.ESC
 import com.pbeagan.demo.TerminalColorStyle.SGR
 import com.pbeagan.demo.TerminalColorStyle.style
+import com.pbeagan.demo.colorDistance
 import com.pbeagan.demo.safeLet
 import org.junit.Test
 
@@ -72,6 +75,22 @@ internal class TerminalColorStyleTest {
     fun testGreyscaleColors() {
         (0..255).forEach {
             println("${ESC}[38;2;$it;$it;${it}m test" + " ".style(colorBackground = Custom(it, it, it)))
+        }
+    }
+
+    @Test
+    fun testColorDistance() {
+        val set = Color256.values().toSet()//.sortedBy { it.color }//.colorDistance(0) }
+        val set2 = Color256.values().toSet().sortedBy { it.color.colorDistance(0) }
+        set.forEachIndexed { index, it ->
+            val s = "▄"
+            print(
+                " ".style(
+                    colorBackground = CustomPreset(it.number),
+                    colorForeground = CustomPreset(set2[index].number)
+                )
+            )
+            if (index % 8 == 7) println()
         }
     }
 }
