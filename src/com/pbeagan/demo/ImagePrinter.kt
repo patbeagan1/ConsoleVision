@@ -56,16 +56,15 @@ class ImagePrinter (
         CustomPreset(i?.number ?: 0)
     }.memoize()
 
-    private fun Int.reduceColorSpace(reduceBy: Int): Int {
+    private fun Int.reduceColorSpace(factor: Int): Int {
         /**
          * Used to increase the likelihood of a collision with the memo
          * Improves performance drastically as soon as cache heats
          */
-        if (reduceBy < 1) return this // don't want to divide by 0
+        if (factor < 1) return this // don't want to divide by 0
         val r = this shr 16 and 0xff
         val g = this shr 8 and 0xff
         val b = this and 0xff
-        val factor = 0xff / reduceBy
         val r2 = (r / factor) * factor
         val g2 = (g / factor) * factor
         val b2 = (b / factor) * factor
