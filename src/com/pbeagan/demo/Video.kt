@@ -16,7 +16,12 @@ import java.io.File
 import java.io.IOException
 import javax.imageio.ImageIO
 
-class DecodeAndPlayVideo(private val filename: String?, palette: String?) {
+class DecodeAndPlayVideo(
+    private val filename: String?,
+    palette: String?,
+    reductionRate: Int,
+    isCompatPalette: Boolean
+) {
     private val demuxer: Demuxer = getDemuxer(filename!!)
     private val paletteImage = palette?.let { ImageIO.read(File(palette)) }
     private val paletteColors = paletteImage?.let {
@@ -28,7 +33,7 @@ class DecodeAndPlayVideo(private val filename: String?, palette: String?) {
         }
         colorSet
     }
-    private val imagePrinter = ImagePrinter()
+    private val imagePrinter = ImagePrinter(reductionRate, isCompatPalette)
 
     private val scaleTransform by lazy {
         image.getScaleToBoundBy80()
@@ -61,7 +66,8 @@ class DecodeAndPlayVideo(private val filename: String?, palette: String?) {
         )
         val converter: MediaPictureConverter = MediaPictureConverterFactory.createConverter(
             MediaPictureConverterFactory.HUMBLE_BGR_24,
-            picture)
+            picture
+        )
 
         runDecodingLoop(picture, converter)
         flushDecoder(picture, converter)
@@ -159,9 +165,11 @@ class DecodeAndPlayVideo(private val filename: String?, palette: String?) {
         image = converter.toImage(image, picture)
 
         print(CURSOR_TO_START)
-        imagePrinter.printImageReducedPalette(image.scale(
-            scaleTransform.first, scaleTransform.second
-        ), paletteColors)
+        imagePrinter.printImageReducedPalette(
+            image.scale(
+                scaleTransform.first, scaleTransform.second
+            ), paletteColors
+        )
         return image
     }
 }

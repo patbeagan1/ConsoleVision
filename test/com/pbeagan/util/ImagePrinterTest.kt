@@ -13,7 +13,7 @@ internal class ImagePrinterTest {
 
     @Before
     fun setup() {
-        imagePrinter = ImagePrinter()
+        imagePrinter = ImagePrinter(0, false)
     }
 
     @Test

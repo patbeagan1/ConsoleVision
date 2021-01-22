@@ -13,7 +13,10 @@ import java.awt.image.AffineTransformOp
 import java.awt.image.BufferedImage
 
 
-class ImagePrinter {
+class ImagePrinter (
+    private val reductionRate: Int,
+    private val isCompatPalette: Boolean
+){
     enum class CompressionStyle {
         UP_DOWN, DOTS
     }
@@ -83,9 +86,9 @@ class ImagePrinter {
             (read.minX until read.width).forEach { x ->
                 val i = y.getOrNull(0) ?: 0
                 val i1 = y.getOrNull(1) ?: 0
-                val colorBackground = applyPalette(read.getRGB(x, i).reduceColorSpace(0), paletteColors)
-                val colorForeground = applyPalette(read.getRGB(x, i1).reduceColorSpace(0), paletteColors)
-                if (false) {
+                val colorBackground = applyPalette(read.getRGB(x, i).reduceColorSpace(reductionRate), paletteColors)
+                val colorForeground = applyPalette(read.getRGB(x, i1).reduceColorSpace(reductionRate), paletteColors)
+                if (isCompatPalette) {
                     "▄".style(
                         colorBackground = reducedSetApplicator(colorBackground).let(toColorPreset),
                         colorForeground = reducedSetApplicator(colorForeground).let(toColorPreset)
