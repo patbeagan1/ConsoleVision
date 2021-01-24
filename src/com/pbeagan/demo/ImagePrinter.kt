@@ -8,17 +8,52 @@ import com.pbeagan.demo.TerminalColorStyle.Colors.CustomPreset
 import com.pbeagan.demo.TerminalColorStyle.colorIntStripAlpha
 import com.pbeagan.demo.TerminalColorStyle.colorIntToARGB
 import com.pbeagan.demo.TerminalColorStyle.style
-import java.awt.geom.AffineTransform
-import java.awt.image.AffineTransformOp
+import com.pbeagan.demo.util.colorDistance
+import com.pbeagan.demo.util.memoize
 import java.awt.image.BufferedImage
 
 
-class ImagePrinter (
+class ImagePrinter(
     private val reductionRate: Int,
     private val isCompatPalette: Boolean
-){
-    enum class CompressionStyle {
-        UP_DOWN, DOTS
+) {
+
+    val set = Color256.values().toSet()
+    val applyPalette = { rgb: Int, palette: Set<Int>? ->
+        val color = rgb.colorIntStripAlpha()
+        palette?.minBy { color.colorDistance(it) } ?: color
+    }.memoize()
+
+    val reducedSetApplicator = { color: Int ->
+        set.minBy { color.colorDistance(it.color) }
+    }.memoize()
+
+    private val toColorPreset = { i: Color256? ->
+        CustomPreset(i?.number ?: 0)
+    }.memoize()
+
+    private val toColor = { i: Int? ->
+        if (i == null) Black
+        else Custom(
+            i shr 16 and 0xff,
+            i shr 8 and 0xff,
+            i and 0xff
+        )
+    }.memoize()
+
+    private fun Int.reduceColorSpace(factor: Int): Int {
+        /**
+         * Used to increase the likelihood of a collision with the memo
+         * Improves performance drastically as soon as cache heats
+         */
+        if (factor < 1) return this // don't want to divide by 0
+        val r = this shr 16 and 0xff
+        val g = this shr 8 and 0xff
+        val b = this and 0xff
+        val r2 = (r / factor) * factor
+        val g2 = (g / factor) * factor
+        val b2 = (b / factor) * factor
+        return (r2 shl 16) + (g2 shl 8) + b2
     }
 
     fun printImageCompressed(read: BufferedImage, compressionStyle: CompressionStyle = UP_DOWN) {
@@ -37,48 +72,6 @@ class ImagePrinter (
             println()
         }
     }
-
-    private fun Set<Int>.reduce(color: Int) = this.minBy { each ->
-        color.colorDistance(each)
-    }
-
-    val set = Color256.values().toSet() //.sortedBy { it.color.colorDistance(0) }
-    val applyPalette = { rgb: Int, palette: Set<Int>? ->
-        val a = rgb.colorIntStripAlpha()
-        palette?.reduce(a) ?: a
-    }.memoize()
-
-    val reducedSetApplicator = { color: Int ->
-        set.minBy { color.colorDistance(it.color) }
-    }.memoize()
-
-    private val toColorPreset = { i: Color256? ->
-        CustomPreset(i?.number ?: 0)
-    }.memoize()
-
-    private fun Int.reduceColorSpace(factor: Int): Int {
-        /**
-         * Used to increase the likelihood of a collision with the memo
-         * Improves performance drastically as soon as cache heats
-         */
-        if (factor < 1) return this // don't want to divide by 0
-        val r = this shr 16 and 0xff
-        val g = this shr 8 and 0xff
-        val b = this and 0xff
-        val r2 = (r / factor) * factor
-        val g2 = (g / factor) * factor
-        val b2 = (b / factor) * factor
-        return (r2 shl 16) + (g2 shl 8) + b2
-    }
-
-    private val toColor = { i: Int? ->
-        if (i == null) Black
-        else Custom(
-            i shr 16 and 0xff,
-            i shr 8 and 0xff,
-            i and 0xff
-        )
-    }.memoize()
 
     fun printImageReducedPalette(read: BufferedImage, paletteColors: Set<Int>?) {
         (read.minY until read.height).chunked(2).forEach { y ->
@@ -119,24 +112,8 @@ class ImagePrinter (
             println()
         }
     }
+
+    enum class CompressionStyle {
+        UP_DOWN, DOTS
+    }
 }
-
-fun BufferedImage.scale(scale: Double, affineTransformOp: AffineTransformOp): BufferedImage {
-    val w = width
-    val h = height
-    val w2 = (w * scale).toInt()
-    val h2 = (h * scale).toInt()
-    val after = BufferedImage(w2, h2, type)
-    affineTransformOp.filter(this, after)
-    return after
-}
-
-fun BufferedImage.getScaleToBoundBy80(): Pair<Double, AffineTransformOp> {
-    val maxDimenAny = 90.0
-    val scale = minOf(maxDimenAny / width, maxDimenAny / height)
-    return scale to generateScaledownTransform(scale)
-}
-
-private fun generateScaledownTransform(scale: Double) =
-    AffineTransformOp(AffineTransform.getScaleInstance(scale, scale), AffineTransformOp.TYPE_BICUBIC)
-

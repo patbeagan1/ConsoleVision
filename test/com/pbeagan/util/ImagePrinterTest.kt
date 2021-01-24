@@ -1,8 +1,8 @@
 package com.pbeagan.util
 
 import com.pbeagan.demo.ImagePrinter
-import com.pbeagan.demo.getScaleToBoundBy80
-import com.pbeagan.demo.scale
+import com.pbeagan.demo.util.getScaleToBoundBy
+import com.pbeagan.demo.util.scale
 import org.junit.Before
 import org.junit.Test
 import java.io.File
@@ -38,7 +38,7 @@ internal class ImagePrinterTest {
     fun `sizedown sampling comparison`() {
         val read = ImageIO.read(File(IMAGE_SAMPLE2))
 
-        val (scale, transformOp) = read.getScaleToBoundBy80()
+        val (scale, transformOp) = read.getScaleToBoundBy(90, 90)
         imagePrinter.printImageCompressed(
             read.scale(scale, transformOp),
             ImagePrinter.CompressionStyle.UP_DOWN

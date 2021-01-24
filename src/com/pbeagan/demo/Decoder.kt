@@ -1,6 +1,8 @@
 package com.pbeagan.demo
 
 import com.pbeagan.demo.TerminalColorStyle.CURSOR_TO_START
+import com.pbeagan.demo.util.getScaleToBoundBy
+import com.pbeagan.demo.util.scale
 import io.humble.video.Decoder
 import io.humble.video.Demuxer
 import io.humble.video.DemuxerStream
@@ -16,13 +18,25 @@ import java.io.File
 import java.io.IOException
 import javax.imageio.ImageIO
 
-class DecodeAndPlayVideo(
+class Decoder(
     private val filename: String?,
     palette: String?,
     reductionRate: Int,
-    isCompatPalette: Boolean
+    isCompatPalette: Boolean,
+    width: Int?,
+    height: Int?
 ) {
-    private val demuxer: Demuxer = getDemuxer(filename!!)
+    private val demuxer: Demuxer = Demuxer.make().apply {
+        open(
+            filename!!,
+            null,
+            false,
+            true,
+            null,
+            null
+        )
+    }
+
     private val paletteImage = palette?.let { ImageIO.read(File(palette)) }
     private val paletteColors = paletteImage?.let {
         val colorSet = mutableSetOf<Int>()
@@ -34,12 +48,10 @@ class DecodeAndPlayVideo(
         colorSet
     }
     private val imagePrinter = ImagePrinter(reductionRate, isCompatPalette)
-
     private val scaleTransform by lazy {
-        image.getScaleToBoundBy80()
+        image.getScaleToBoundBy(width, height)
     }
 
-    private val numStreams: Int = demuxer.numStreams
     var videoStreamId = -1
     var streamStartTime: Long = Global.NO_PTS
     lateinit var videoDecoder: Decoder
@@ -75,7 +87,7 @@ class DecodeAndPlayVideo(
     }
 
     private fun initializeDecoder() {
-        for (i in 0 until numStreams) {
+        for (i in 0 until demuxer.numStreams) {
             val stream: DemuxerStream = demuxer.getStream(i)
             streamStartTime = stream.startTime
             val decoder: Decoder = stream.decoder
@@ -133,36 +145,14 @@ class DecodeAndPlayVideo(
         } while (picture.isComplete)
     }
 
-    private fun getDemuxer(filename: String): Demuxer {
-        val demuxer: Demuxer = Demuxer.make()
-        demuxer.open(
-            filename,
-            null,
-            false,
-            true,
-            null,
-            null
-        )
-        return demuxer
-    }
-
-
-    /**
-     * Takes the video picture and displays it at the right time.
-     */
     @Throws(InterruptedException::class)
     private fun displayVideoAtCorrectTime(
         picture: MediaPicture, converter: MediaPictureConverter
     ): BufferedImage {
-        var streamTimestamp: Long = picture.timeStamp
-        streamTimestamp = systemTimeBase.rescale(streamTimestamp - streamStartTime, streamTimebase)
-        var systemTimestamp = System.nanoTime()
-        while (streamTimestamp > (systemTimestamp - systemStartTime) * 1_000_000) {
-            systemTimestamp = System.nanoTime()
-        }
-
         _image ?: run { _image = converter.toImage(null, picture) }
         image = converter.toImage(image, picture)
+
+        waitForPictureTimeStamp(picture)
 
         print(CURSOR_TO_START)
         imagePrinter.printImageReducedPalette(
@@ -171,6 +161,15 @@ class DecodeAndPlayVideo(
             ), paletteColors
         )
         return image
+    }
+
+    private fun waitForPictureTimeStamp(picture: MediaPicture) {
+        var streamTimestamp: Long = picture.timeStamp
+        streamTimestamp = systemTimeBase.rescale(streamTimestamp - streamStartTime, streamTimebase)
+        var systemTimestamp = System.nanoTime()
+        while (streamTimestamp > (systemTimestamp - systemStartTime) * 1_000_000) {
+            systemTimestamp = System.nanoTime()
+        }
     }
 }
 

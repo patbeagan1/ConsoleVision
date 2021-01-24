@@ -7,12 +7,11 @@ import com.pbeagan.demo.TerminalColorStyle.Colors.Custom
 import com.pbeagan.demo.TerminalColorStyle.Colors.CustomPreset
 import com.pbeagan.demo.TerminalColorStyle.Colors.Green
 import com.pbeagan.demo.TerminalColorStyle.Colors.Red
-import com.pbeagan.demo.TerminalColorStyle.DOTS_MED
 import com.pbeagan.demo.TerminalColorStyle.ESC
 import com.pbeagan.demo.TerminalColorStyle.SGR
 import com.pbeagan.demo.TerminalColorStyle.style
-import com.pbeagan.demo.colorDistance
-import com.pbeagan.demo.safeLet
+import com.pbeagan.demo.util.colorDistance
+import com.pbeagan.demo.util.safeLet
 import org.junit.Test
 
 internal class TerminalColorStyleTest {

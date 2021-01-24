@@ -1,8 +1,7 @@
 package com.pbeagan.demo
 
+import com.pbeagan.demo.util.distance
 import kotlin.math.abs
-import kotlin.math.pow
-import kotlin.math.sqrt
 
 enum class Color256(val color: Int, val number: Int) {
 
@@ -355,54 +354,3 @@ enum class Color256(val color: Int, val number: Int) {
         }
     }
 }
-
-fun distance(
-    x1: Int,
-    y1: Int,
-    z1: Int,
-    x2: Int,
-    y2: Int,
-    z2: Int
-): Double {
-    val d1 = (x2 - x1).toDouble().pow(2)
-    val d2 = (y2 - y1).toDouble().pow(2)
-    val d3 = (z2 - z1).toDouble().pow(2)
-    return sqrt(d1 * d2 * d3)
-}
-
-fun Int.colorDistance(other: Int) = distance(
-    this shr 16 and 255,
-    this shr 8 and 255,
-    this and 255,
-    other shr 16 and 255,
-    other shr 8 and 255,
-    other and 255
-)
-
-inline fun <T1 : Any, T2 : Any, R : Any> safeLet(
-    p1: T1?,
-    p2: T2?,
-    block: (T1, T2) -> R?
-): R? = if (p1 != null && p2 != null) block(p1, p2) else null
-
-inline fun <T1 : Any, T2 : Any, T3 : Any, R : Any> safeLet(
-    p1: T1?,
-    p2: T2?,
-    p3: T3?,
-    block: (T1, T2, T3) -> R?
-): R? =
-    if (p1 != null && p2 != null && p3 != null) block(p1, p2, p3) else null
-
-inline fun <T1 : Any, T2 : Any, T3 : Any, T4 : Any, R : Any> safeLet(
-    p1: T1?,
-    p2: T2?,
-    p3: T3?,
-    p4: T4?,
-    block: (T1, T2, T3, T4) -> R?
-): R? = if (
-    p1 != null &&
-    p2 != null &&
-    p3 != null &&
-    p4 != null
-) block(p1, p2, p3, p4) else null
-
