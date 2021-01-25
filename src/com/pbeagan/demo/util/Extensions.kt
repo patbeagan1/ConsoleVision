@@ -53,3 +53,17 @@ fun Int.colorDistance(other: Int) = distance(
     other and 255
 )
 
+fun Int.reduceColorSpace(factor: Int): Int {
+    /**
+     * Used to increase the likelihood of a collision with the memo
+     * Improves performance drastically as soon as cache heats
+     */
+    if (factor < 1) return this // don't want to divide by 0
+    val r = this shr 16 and 0xff
+    val g = this shr 8 and 0xff
+    val b = this and 0xff
+    val r2 = (r / factor) * factor
+    val g2 = (g / factor) * factor
+    val b2 = (b / factor) * factor
+    return (r2 shl 16) + (g2 shl 8) + b2
+}

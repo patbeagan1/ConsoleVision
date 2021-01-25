@@ -2,6 +2,7 @@ package com.pbeagan.demo
 
 import com.pbeagan.demo.TerminalColorStyle.CURSOR_TO_START
 import com.pbeagan.demo.util.getScaleToBoundBy
+import com.pbeagan.demo.util.reduceColorSpace
 import com.pbeagan.demo.util.scale
 import io.humble.video.Decoder
 import io.humble.video.Demuxer
@@ -22,6 +23,7 @@ class Decoder(
     private val filename: String?,
     palette: String?,
     reductionRate: Int,
+    paletteReductionRate: Int,
     isCompatPalette: Boolean,
     width: Int?,
     height: Int?
@@ -42,7 +44,8 @@ class Decoder(
         val colorSet = mutableSetOf<Int>()
         (it.minY until it.height).forEach { y ->
             (it.minX until it.width).forEach { x ->
-                colorSet.add(it.getRGB(x, y))
+                val element = it.getRGB(x, y).reduceColorSpace(paletteReductionRate)
+                colorSet.add(element)
             }
         }
         colorSet
