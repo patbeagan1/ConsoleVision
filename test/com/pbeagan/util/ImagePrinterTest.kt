@@ -5,6 +5,7 @@ import com.pbeagan.demo.util.getScaleToBoundBy
 import com.pbeagan.demo.util.scale
 import org.junit.Before
 import org.junit.Test
+import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
 
@@ -13,7 +14,7 @@ internal class ImagePrinterTest {
 
     @Before
     fun setup() {
-        imagePrinter = ImagePrinter(0, false)
+        imagePrinter = ImagePrinter(0, false, shouldNormalize = false)
     }
 
     @Test
@@ -22,15 +23,36 @@ internal class ImagePrinterTest {
     }
 
     @Test
+    fun `sample image fullsize normalized`() {
+        ImagePrinter(0, false, shouldNormalize = true).printImage(ImageIO.read(File(IMAGE_SAMPLE)))
+    }
+
+    @Test
+    fun `sample image reduced normalized`() {
+        val read = ImageIO.read(File(IMAGE_SAMPLE2))
+
+        val read1 = getScaledImage(read)
+        val read2 = getScaledImage(read)
+
+        ImagePrinter(0, false, shouldNormalize = true).printImage(read1)
+        ImagePrinter(0, false, shouldNormalize = false).printImage(read2)
+    }
+
+    private fun getScaledImage(read: BufferedImage): BufferedImage {
+        val (scale, transformOp) = read.getScaleToBoundBy(40, 40)
+        val read1 = read.scale(scale, transformOp)
+        return read1
+    }
+
+    @Test
     fun `sample image compressed`() {
-        imagePrinter.printImageCompressed(ImageIO.read(File(IMAGE_SAMPLE)))
+        imagePrinter.printImage(ImageIO.read(File(IMAGE_SAMPLE)), compressionStyle = ImagePrinter.CompressionStyle.DOTS)
     }
 
     @Test
     fun `sample image compressed dots`() {
-        imagePrinter.printImageCompressed(
-            ImageIO.read(File(IMAGE_SAMPLE)),
-            ImagePrinter.CompressionStyle.DOTS
+        imagePrinter.printImage(
+            ImageIO.read(File(IMAGE_SAMPLE))
         )
     }
 
@@ -39,9 +61,8 @@ internal class ImagePrinterTest {
         val read = ImageIO.read(File(IMAGE_SAMPLE2))
 
         val (scale, transformOp) = read.getScaleToBoundBy(90, 90)
-        imagePrinter.printImageCompressed(
-            read.scale(scale, transformOp),
-            ImagePrinter.CompressionStyle.UP_DOWN
+        imagePrinter.printImage(
+            read.scale(scale, transformOp)
         )
     }
 

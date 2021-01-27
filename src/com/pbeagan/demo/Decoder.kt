@@ -26,7 +26,8 @@ class Decoder(
     paletteReductionRate: Int,
     isCompatPalette: Boolean,
     width: Int?,
-    height: Int?
+    height: Int?,
+    shouldNormalize: Boolean
 ) {
     private val demuxer: Demuxer = Demuxer.make().apply {
         open(
@@ -50,7 +51,13 @@ class Decoder(
         }
         colorSet
     }
-    private val imagePrinter = ImagePrinter(reductionRate, isCompatPalette)
+
+    private val imagePrinter = ImagePrinter(
+        reductionRate,
+        isCompatPalette,
+        shouldNormalize
+    )
+
     private val scaleTransform by lazy {
         image.getScaleToBoundBy(width, height)
     }
@@ -158,7 +165,7 @@ class Decoder(
         waitForPictureTimeStamp(picture)
 
         print(CURSOR_TO_START)
-        imagePrinter.printImageReducedPalette(
+        imagePrinter.printImage(
             image.scale(
                 scaleTransform.first, scaleTransform.second
             ), paletteColors

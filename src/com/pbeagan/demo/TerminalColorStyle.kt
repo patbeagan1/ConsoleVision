@@ -1,5 +1,9 @@
 package com.pbeagan.demo
 
+import com.pbeagan.demo.util.colorAlpha
+import com.pbeagan.demo.util.colorBlue
+import com.pbeagan.demo.util.colorGreen
+import com.pbeagan.demo.util.colorRed
 import kotlin.random.Random
 
 object TerminalColorStyle {
@@ -26,6 +30,8 @@ object TerminalColorStyle {
     const val DOTS_MED = '▒'
     const val DOTS_HIGH = '▓'
 
+    fun getCursorToPosition(x: Int, y: Int): String = "CSI${y};${x}H"
+
     sealed class Colors(val foreground: String, val background: String) {
         object Default : Colors("39", "49")
         object White : Colors("30", "40")
@@ -44,7 +50,7 @@ object TerminalColorStyle {
         object RedBright : Colors("91", "101")
         object Yellow : Colors("33", "43")
         object YellowBright : Colors("93", "103")
-        class Custom(
+        class Custom (
             private val r: Int = 0,
             private val g: Int = 0,
             private val b: Int = 0
@@ -83,10 +89,10 @@ object TerminalColorStyle {
     }
 
     fun Int.colorIntToARGB(): ARGB = ARGB(
-        this shr 24 and 255,
-        this shr 16 and 255,
-        this shr 8 and 255,
-        this and 255
+        colorAlpha,
+        colorRed,
+        colorGreen,
+        colorBlue
     )
 
     /**

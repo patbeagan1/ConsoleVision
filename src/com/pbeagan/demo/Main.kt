@@ -17,6 +17,8 @@ fun main(args: Array<String>) {
             "reduces the color space by the given amount, 256/x")
         addOption("c", "compat", false,
             "requests to use the reduced ansi color set")
+        addOption("n", "normalize", false,
+            "normalizes the color value so it will use the maximum amount of the color palette.")
         addOption("f", "file", true,
             "the file to be read")
         addOption("p", "palette", true,
@@ -48,6 +50,7 @@ fun main(args: Array<String>) {
                     reductionRate = cmd.getOptionValue("r")?.toInt() ?: 0,
                     paletteReductionRate = cmd.getOptionValue("P")?.toInt() ?: 0,
                     isCompatPalette = cmd.hasOption("c"),
+                    shouldNormalize = cmd.hasOption("n"),
                     width = cmd.getOptionValue("w")?.toInt(),
                     height = cmd.getOptionValue("h")?.toInt()
                 ).playVideo()
