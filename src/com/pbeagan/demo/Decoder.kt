@@ -170,6 +170,7 @@ class Decoder(
                 scaleTransform.first, scaleTransform.second
             ), paletteColors
         )
+
         return image
     }
 

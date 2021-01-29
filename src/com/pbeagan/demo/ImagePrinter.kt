@@ -6,11 +6,10 @@ import com.pbeagan.demo.TerminalColorStyle.Colors.Black
 import com.pbeagan.demo.TerminalColorStyle.Colors.Custom
 import com.pbeagan.demo.TerminalColorStyle.Colors.CustomPreset
 import com.pbeagan.demo.TerminalColorStyle.colorIntStripAlpha
-import com.pbeagan.demo.TerminalColorStyle.colorIntToARGB
 import com.pbeagan.demo.TerminalColorStyle.style
+import com.pbeagan.demo.util.applyColorNormalization
 import com.pbeagan.demo.util.colorDistance
 import com.pbeagan.demo.util.memoize
-import com.pbeagan.demo.util.applyColorNormalization
 import com.pbeagan.demo.util.reduceColorSpace
 import com.pbeagan.demo.util.withDoubledLine
 import java.awt.image.BufferedImage
