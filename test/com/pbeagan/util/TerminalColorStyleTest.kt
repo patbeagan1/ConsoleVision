@@ -73,13 +73,13 @@ internal class TerminalColorStyleTest {
     @Test
     fun testGreyscaleColors() {
         (0..255).forEach {
-            println("${ESC}[38;2;$it;$it;${it}m test" + " ".style(colorBackground = Custom(it, it, it)))
+            println("$ESC[38;2;$it;$it;${it}m test" + " ".style(colorBackground = Custom(it, it, it)))
         }
     }
 
     @Test
     fun testColorDistance() {
-        val set = Color256.values().toSet()//.sortedBy { it.color }//.colorDistance(0) }
+        val set = Color256.values().toSet() // .sortedBy { it.color }//.colorDistance(0) }
         val set2 = Color256.values().toSet().sortedBy { it.color.colorDistance(0) }
         set.forEachIndexed { index, it ->
             val s = "▄"

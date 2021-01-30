@@ -123,7 +123,6 @@ fun BufferedImage.applyColorNormalization() {
     }
 }
 
-
 fun Int.reduceColorSpace(factor: Int): Int {
     /**
      * Used to increase the likelihood of a collision with the memo

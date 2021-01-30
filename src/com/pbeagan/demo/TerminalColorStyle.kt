@@ -30,7 +30,7 @@ object TerminalColorStyle {
     const val DOTS_MED = '▒'
     const val DOTS_HIGH = '▓'
 
-    fun getCursorToPosition(x: Int, y: Int): String = "CSI${y};${x}H"
+    fun getCursorToPosition(x: Int, y: Int): String = "CSI$y;${x}H"
 
     sealed class Colors(val foreground: String, val background: String) {
         object Default : Colors("39", "49")
@@ -50,7 +50,7 @@ object TerminalColorStyle {
         object RedBright : Colors("91", "101")
         object Yellow : Colors("33", "43")
         object YellowBright : Colors("93", "103")
-        class Custom (
+        class Custom(
             private val r: Int = 0,
             private val g: Int = 0,
             private val b: Int = 0

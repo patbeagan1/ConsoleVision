@@ -14,7 +14,6 @@ import com.pbeagan.demo.util.reduceColorSpace
 import com.pbeagan.demo.util.withDoubledLine
 import java.awt.image.BufferedImage
 
-
 class ImagePrinter(
     private val reductionRate: Int,
     private val isCompatPalette: Boolean,

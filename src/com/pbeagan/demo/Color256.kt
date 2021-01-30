@@ -23,7 +23,6 @@ enum class Color256(val color: Int, val number: Int) {
     Color14(0x00ffffC, 14),
     Color15(0xffffff, 15),
 
-
     Color16(0x000000, 16),
     Color17(0x00005f, 17),
     Color18(0x000087, 18),
@@ -275,7 +274,6 @@ enum class Color256(val color: Int, val number: Int) {
     Color229(0xffffaf, 229),
     Color230(0xffffd7, 230),
     Color231(0xffffff, 231),
-
 
     Color232(0x080808, 232),
     Color233(0x121212, 233),

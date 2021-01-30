@@ -157,7 +157,8 @@ class Decoder(
 
     @Throws(InterruptedException::class)
     private fun displayVideoAtCorrectTime(
-        picture: MediaPicture, converter: MediaPictureConverter
+        picture: MediaPicture,
+        converter: MediaPictureConverter
     ): BufferedImage {
         _image ?: run { _image = converter.toImage(null, picture) }
         image = converter.toImage(image, picture)
@@ -167,8 +168,10 @@ class Decoder(
         print(CURSOR_TO_START)
         imagePrinter.printImage(
             image.scale(
-                scaleTransform.first, scaleTransform.second
-            ), paletteColors
+                scaleTransform.first,
+                scaleTransform.second
+            ),
+            paletteColors
         )
 
         return image
@@ -183,4 +186,3 @@ class Decoder(
         }
     }
 }
-
