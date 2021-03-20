@@ -30,6 +30,19 @@ fun BufferedImage.getScaleToBoundBy(w: Int?, h: Int?): Pair<Double, AffineTransf
     )
 }
 
+fun BufferedImage.createColorPalette(
+    paletteReductionRate: Int
+): Set<Int> {
+    val colorSet = mutableSetOf<Int>()
+    (minY until height).forEach { y ->
+        (minX until width).forEach { x ->
+            val element = getRGB(x, y).reduceColorSpace(paletteReductionRate)
+            colorSet.add(element)
+        }
+    }
+    return colorSet
+}
+
 fun distance(
     x1: Int,
     y1: Int,

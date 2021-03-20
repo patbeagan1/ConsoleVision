@@ -17,7 +17,7 @@ import java.awt.image.BufferedImage
 class ImagePrinter(
     private val reductionRate: Int,
     private val isCompatPalette: Boolean,
-    private val shouldNormalize: Boolean
+    private val shouldNormalizeColors: Boolean
 ) {
 
     val set = Color256.values().toSet()
@@ -44,7 +44,7 @@ class ImagePrinter(
     }.memoize()
 
     fun printImage(read: BufferedImage, paletteColors: Set<Int>? = null, compressionStyle: CompressionStyle = UP_DOWN) {
-        if (shouldNormalize) {
+        if (shouldNormalizeColors) {
             read.applyColorNormalization()
         }
         read.withDoubledLine({ println() }) { y, x ->

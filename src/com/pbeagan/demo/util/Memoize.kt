@@ -2,16 +2,37 @@ package com.pbeagan.demo.util
 
 class Memoize1<in T, out R>(val f: (T) -> R) : (T) -> R {
     private val values = mutableMapOf<T, R>()
+
     override fun invoke(x: T): R {
+        if (values.size > SIZE_LIMIT) {
+            val first = values.entries.first()
+            values.remove(first.key)
+        }
         return values.getOrPut(x, { f(x) })
+    }
+
+    companion object {
+        const val SIZE_LIMIT = 500
     }
 }
 
 class Memoize2<in S, in T, out R>(val f: (S, T) -> R) : (S, T) -> R {
     private val values = mutableMapOf<Pair<S, T>, R>()
+    private val cache = Array<Pair<S, T>?>(SIZE_LIMIT) { null }
+    private var counter = 0
 
     override fun invoke(p1: S, p2: T): R {
-        return values.getOrPut(p1 to p2, { f(p1, p2) })
+        if (counter > cache.size) {
+            values.remove(cache[counter % cache.size])
+        }
+        val pair = p1 to p2
+        cache[counter++] = pair
+        counter %= cache.size
+        return values.getOrPut(pair, { f(p1, p2) })
+    }
+
+    companion object {
+        const val SIZE_LIMIT = 500
     }
 }
 

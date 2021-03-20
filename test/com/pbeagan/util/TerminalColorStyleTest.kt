@@ -32,11 +32,13 @@ internal class TerminalColorStyleTest {
     fun demoInlineUsage() {
         println("Todd wanted a ${"blue".style(Blue)} car")
         println(
-            "Todd ${"wanted".style(sgr = SGR.Italic)} a ${"redOnGreen".style(
+            "Todd ${"wanted".style(sgr = SGR.Italic)} a ${
+            "redOnGreen".style(
                 Red,
                 Green,
                 SGR.Bold
-            )} car"
+            )
+            } car"
         )
     }
 
@@ -82,7 +84,7 @@ internal class TerminalColorStyleTest {
         val set = Color256.values().toSet() // .sortedBy { it.color }//.colorDistance(0) }
         val set2 = Color256.values().toSet().sortedBy { it.color.colorDistance(0) }
         set.forEachIndexed { index, it ->
-            val s = "▄"
+            "▄".also { println(it) }
             print(
                 " ".style(
                     colorBackground = CustomPreset(it.number),
