@@ -7,6 +7,7 @@ import org.apache.commons.cli.Options
 import org.apache.commons.cli.ParseException
 import org.apache.commons.cli.PosixParser
 import java.io.IOException
+import kotlin.system.exitProcess
 
 @Throws(InterruptedException::class, IOException::class)
 fun main(args: Array<String>) {
@@ -65,12 +66,22 @@ fun main(args: Array<String>) {
             true,
             "the maximum height of the generated video"
         )
+        addOption(
+            "H",
+            "help",
+            false,
+            "prints this help text and exits."
+        )
     }
     val parser: CommandLineParser = PosixParser()
 
     try {
         val cmd: CommandLine = parser.parse(options, args)
         when {
+            cmd.hasOption("H") -> {
+                HelpFormatter().printHelp("CMD", options)
+                exitProcess(0)
+            }
             cmd.hasOption("v") -> {
                 val version: String = io.humble.video_native.Version.getVersionInfo()
                 println("Humble Version: $version")
