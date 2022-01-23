@@ -72,7 +72,7 @@ interface Display {
     fun printFrame(image: BufferedImage)
 }
 
-class PlayerVideo(filename: String?, private val display: Display) {
+class PlayerVideo(val filename: String?, private val display: Display) {
     private val demuxer: Demuxer = Demuxer.make().apply {
         open(
             filename!!,
@@ -188,7 +188,7 @@ class PlayerVideo(filename: String?, private val display: Display) {
 
         waitForPictureTimeStamp(picture)
 
-        display.printFrame()
+        display.printFrame(image)
 
         return image
     }
