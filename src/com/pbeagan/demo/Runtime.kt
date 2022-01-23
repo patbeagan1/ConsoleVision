@@ -39,7 +39,6 @@ class Runtime(
     private fun getTransform(image: BufferedImage): ScaleTransform =
         transform ?: ScaleTransform(image, width, height).also { transform = it }
 
-
     fun run() {
 //        PlayerVideo(filename, this).run()
         printFrame(ImageIO.read(File(filename)))
