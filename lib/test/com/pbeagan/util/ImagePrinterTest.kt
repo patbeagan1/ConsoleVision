@@ -14,7 +14,7 @@ import javax.imageio.ImageIO
 internal class ImagePrinterTest {
     lateinit var imagePrinter: ImagePrinter
 
-    private fun readAsset(s: String): BufferedImage = ImageIO.read(File("./assets/$s"))
+    private fun readAsset(s: String): BufferedImage = ImageIO.read(File("../assets/$s"))
 
     @Before
     fun setup() {

@@ -1,5 +1,6 @@
-package com.pbeagan.demo
+package dev.patbeagan.consolevision
 
+import com.pbeagan.demo.ConsoleVisionRuntime
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.CommandLineParser
 import org.apache.commons.cli.HelpFormatter
@@ -87,7 +88,7 @@ fun main(args: Array<String>) {
                 formatter.printHelp(Runtime::class.java.canonicalName + " <filename>", options)
             }
             else -> {
-                Runtime(
+                ConsoleVisionRuntime(
                     filename = cmd.getOptionValue("f"),
                     palette = cmd.getOptionValue("p"),
                     reductionRate = cmd.getOptionValue("r")?.toInt() ?: 0,
@@ -96,7 +97,7 @@ fun main(args: Array<String>) {
                     shouldNormalize = cmd.hasOption("n"),
                     width = cmd.getOptionValue("w")?.toInt(),
                     height = cmd.getOptionValue("h")?.toInt()
-                ).run()
+                ).start()
             }
         }
     } catch (e: ParseException) {

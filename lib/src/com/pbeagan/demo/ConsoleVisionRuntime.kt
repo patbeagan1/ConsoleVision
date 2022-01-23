@@ -8,7 +8,7 @@ import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
 
-class Runtime(
+class ConsoleVisionRuntime(
     private val filename: String?,
     palette: String?,
     reductionRate: Int,
@@ -16,10 +16,9 @@ class Runtime(
     isCompatPalette: Boolean,
     val width: Int?,
     val height: Int?,
-    shouldNormalize: Boolean
+    shouldNormalize: Boolean,
 ) : Display {
     private val paletteImage = palette?.let { ImageIO.read(File(palette)) }
-
     private val paletteColors: Set<Int>? = paletteImage?.let {
         it.createColorPalette(paletteReductionRate)
     }
@@ -39,7 +38,7 @@ class Runtime(
     private fun getTransform(image: BufferedImage): ScaleTransform =
         transform ?: ScaleTransform(image, width, height).also { transform = it }
 
-    fun run() {
+    fun start() {
         printFrame(ImageIO.read(File(filename)))
     }
 
