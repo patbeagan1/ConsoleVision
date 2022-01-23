@@ -1,1 +1,1 @@
-./gradlew assemble run --args="$@"
+./gradlew :app:assemble :app:run --args="$@"
