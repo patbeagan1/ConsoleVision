@@ -25,10 +25,54 @@ class Runtime(
     reductionRate: Int,
     paletteReductionRate: Int,
     isCompatPalette: Boolean,
-    width: Int?,
-    height: Int?,
+    val width: Int?,
+    val height: Int?,
     shouldNormalize: Boolean
-) {
+) : Display {
+    private val paletteImage = palette?.let { ImageIO.read(File(palette)) }
+
+    private val paletteColors: Set<Int>? = paletteImage?.let {
+        it.createColorPalette(paletteReductionRate)
+    }
+    private val imagePrinter = ImagePrinter(
+        reductionRate,
+        isCompatPalette,
+        shouldNormalize
+    )
+
+    class ScaleTransform(image: BufferedImage, width: Int?, height: Int?) {
+        val scaleTransform by lazy {
+            image.getScaleToBoundBy(width, height)
+        }
+    }
+
+    private var transform: ScaleTransform? = null
+    private fun getTransform(image: BufferedImage): ScaleTransform =
+        transform ?: ScaleTransform(image, width, height).also { transform = it }
+
+
+    fun run() {
+        PlayerVideo(filename, this).run()
+    }
+
+    override fun printFrame(image: BufferedImage) {
+        val scaleTransform = getTransform(image).scaleTransform
+        print(CURSOR_TO_START)
+        imagePrinter.printImage(
+            image.scale(
+                scaleTransform.first,
+                scaleTransform.second
+            ),
+            paletteColors
+        )
+    }
+}
+
+interface Display {
+    fun printFrame(image: BufferedImage)
+}
+
+class PlayerVideo(filename: String?, private val display: Display) {
     private val demuxer: Demuxer = Demuxer.make().apply {
         open(
             filename!!,
@@ -40,20 +84,6 @@ class Runtime(
         )
     }
 
-    private val paletteImage = palette?.let { ImageIO.read(File(palette)) }
-    private val paletteColors: Set<Int>? = paletteImage?.let {
-        it.createColorPalette(paletteReductionRate)
-    }
-
-    private val imagePrinter = ImagePrinter(
-        reductionRate,
-        isCompatPalette,
-        shouldNormalize
-    )
-
-    private val scaleTransform by lazy {
-        image.getScaleToBoundBy(width, height)
-    }
 
     var videoStreamId = -1
     var streamStartTime: Long = Global.NO_PTS
@@ -158,14 +188,7 @@ class Runtime(
 
         waitForPictureTimeStamp(picture)
 
-        print(CURSOR_TO_START)
-        imagePrinter.printImage(
-            image.scale(
-                scaleTransform.first,
-                scaleTransform.second
-            ),
-            paletteColors
-        )
+        display.printFrame()
 
         return image
     }
