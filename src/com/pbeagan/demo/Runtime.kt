@@ -53,6 +53,7 @@ class Runtime(
 
     fun run() {
         PlayerVideo(filename, this).run()
+        printFrame(ImageIO.read(File(filename)))
     }
 
     override fun printFrame(image: BufferedImage) {
