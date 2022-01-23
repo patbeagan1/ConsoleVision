@@ -1,4 +1,4 @@
-package com.pbeagan.demo.util
+package dev.patbeagan.consolevision.util
 
 import java.awt.geom.AffineTransform
 import java.awt.image.AffineTransformOp

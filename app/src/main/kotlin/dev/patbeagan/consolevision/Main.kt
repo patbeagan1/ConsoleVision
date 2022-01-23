@@ -1,6 +1,6 @@
 package dev.patbeagan.consolevision
 
-import com.pbeagan.demo.ConsoleVisionRuntime
+import dev.patbeagan.consolevision.ConsoleVisionRuntime
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.CommandLineParser
 import org.apache.commons.cli.HelpFormatter

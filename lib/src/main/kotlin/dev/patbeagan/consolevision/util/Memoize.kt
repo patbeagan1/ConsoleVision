@@ -1,4 +1,4 @@
-package com.pbeagan.demo.util
+package dev.patbeagan.consolevision.util
 
 class Memoize1<in T, out R>(val f: (T) -> R) : (T) -> R {
     private val values = mutableMapOf<T, R>()

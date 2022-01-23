@@ -1,9 +1,9 @@
-package com.pbeagan.demo
+package dev.patbeagan.consolevision
 
-import com.pbeagan.demo.util.colorAlpha
-import com.pbeagan.demo.util.colorBlue
-import com.pbeagan.demo.util.colorGreen
-import com.pbeagan.demo.util.colorRed
+import dev.patbeagan.consolevision.util.colorAlpha
+import dev.patbeagan.consolevision.util.colorBlue
+import dev.patbeagan.consolevision.util.colorGreen
+import dev.patbeagan.consolevision.util.colorRed
 import kotlin.random.Random
 
 object TerminalColorStyle {

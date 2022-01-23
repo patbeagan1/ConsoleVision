@@ -1,17 +1,15 @@
-package com.pbeagan.util
+package dev.patbeagan.consolevision.util
 
-import com.pbeagan.demo.Color256
-import com.pbeagan.demo.TerminalColorStyle
-import com.pbeagan.demo.TerminalColorStyle.Colors.Blue
-import com.pbeagan.demo.TerminalColorStyle.Colors.Custom
-import com.pbeagan.demo.TerminalColorStyle.Colors.CustomPreset
-import com.pbeagan.demo.TerminalColorStyle.Colors.Green
-import com.pbeagan.demo.TerminalColorStyle.Colors.Red
-import com.pbeagan.demo.TerminalColorStyle.ESC
-import com.pbeagan.demo.TerminalColorStyle.SGR
-import com.pbeagan.demo.TerminalColorStyle.style
-import com.pbeagan.demo.util.colorDistance
-import com.pbeagan.demo.util.safeLet
+import dev.patbeagan.consolevision.Color256
+import dev.patbeagan.consolevision.TerminalColorStyle
+import dev.patbeagan.consolevision.TerminalColorStyle.Colors.Blue
+import dev.patbeagan.consolevision.TerminalColorStyle.Colors.Custom
+import dev.patbeagan.consolevision.TerminalColorStyle.Colors.CustomPreset
+import dev.patbeagan.consolevision.TerminalColorStyle.Colors.Green
+import dev.patbeagan.consolevision.TerminalColorStyle.Colors.Red
+import dev.patbeagan.consolevision.TerminalColorStyle.ESC
+import dev.patbeagan.consolevision.TerminalColorStyle.SGR
+import dev.patbeagan.consolevision.TerminalColorStyle.style
 import org.junit.Test
 
 internal class TerminalColorStyleTest {

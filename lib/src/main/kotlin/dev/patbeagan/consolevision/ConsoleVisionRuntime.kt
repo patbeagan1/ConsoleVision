@@ -1,9 +1,9 @@
-package com.pbeagan.demo
+package dev.patbeagan.consolevision
 
-import com.pbeagan.demo.TerminalColorStyle.CURSOR_TO_START
-import com.pbeagan.demo.util.createColorPalette
-import com.pbeagan.demo.util.getScaleToBoundBy
-import com.pbeagan.demo.util.scale
+import dev.patbeagan.consolevision.TerminalColorStyle.CURSOR_TO_START
+import dev.patbeagan.consolevision.util.createColorPalette
+import dev.patbeagan.consolevision.util.getScaleToBoundBy
+import dev.patbeagan.consolevision.util.scale
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO

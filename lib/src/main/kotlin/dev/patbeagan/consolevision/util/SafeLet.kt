@@ -1,4 +1,4 @@
-package com.pbeagan.demo.util
+package dev.patbeagan.consolevision.util
 
 inline fun <T1 : Any, T2 : Any, R : Any> safeLet(
     p1: T1?,

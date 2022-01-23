@@ -1,17 +1,17 @@
-package com.pbeagan.demo
+package dev.patbeagan.consolevision
 
-import com.pbeagan.demo.ImagePrinter.CompressionStyle.DOTS
-import com.pbeagan.demo.ImagePrinter.CompressionStyle.UP_DOWN
-import com.pbeagan.demo.TerminalColorStyle.Colors.Black
-import com.pbeagan.demo.TerminalColorStyle.Colors.Custom
-import com.pbeagan.demo.TerminalColorStyle.Colors.CustomPreset
-import com.pbeagan.demo.TerminalColorStyle.colorIntStripAlpha
-import com.pbeagan.demo.TerminalColorStyle.style
-import com.pbeagan.demo.util.applyColorNormalization
-import com.pbeagan.demo.util.colorDistance
-import com.pbeagan.demo.util.memoize
-import com.pbeagan.demo.util.reduceColorSpace
-import com.pbeagan.demo.util.withDoubledLine
+import dev.patbeagan.consolevision.ImagePrinter.CompressionStyle.DOTS
+import dev.patbeagan.consolevision.ImagePrinter.CompressionStyle.UP_DOWN
+import dev.patbeagan.consolevision.TerminalColorStyle.Colors.Black
+import dev.patbeagan.consolevision.TerminalColorStyle.Colors.Custom
+import dev.patbeagan.consolevision.TerminalColorStyle.Colors.CustomPreset
+import dev.patbeagan.consolevision.TerminalColorStyle.colorIntStripAlpha
+import dev.patbeagan.consolevision.TerminalColorStyle.style
+import dev.patbeagan.consolevision.util.applyColorNormalization
+import dev.patbeagan.consolevision.util.colorDistance
+import dev.patbeagan.consolevision.util.memoize
+import dev.patbeagan.consolevision.util.reduceColorSpace
+import dev.patbeagan.consolevision.util.withDoubledLine
 import java.awt.image.BufferedImage
 
 class ImagePrinter(

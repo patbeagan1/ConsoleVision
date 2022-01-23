@@ -1,9 +1,6 @@
-package com.pbeagan.util
+package dev.patbeagan.consolevision.util
 
-import com.pbeagan.demo.ImagePrinter
-import com.pbeagan.demo.util.createColorPalette
-import com.pbeagan.demo.util.getScaleToBoundBy
-import com.pbeagan.demo.util.scale
+import dev.patbeagan.consolevision.ImagePrinter
 import org.junit.Before
 import org.junit.Test
 import java.awt.image.BufferedImage

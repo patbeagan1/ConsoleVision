@@ -1,6 +1,6 @@
-package com.pbeagan.demo
+package dev.patbeagan.consolevision
 
-import com.pbeagan.demo.util.distance
+import dev.patbeagan.consolevision.util.distance
 import kotlin.math.abs
 
 enum class Color256(val color: Int, val number: Int) {
