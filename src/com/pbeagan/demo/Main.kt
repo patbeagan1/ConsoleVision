@@ -82,10 +82,6 @@ fun main(args: Array<String>) {
                 HelpFormatter().printHelp("CMD", options)
                 exitProcess(0)
             }
-            cmd.hasOption("v") -> {
-                val version: String = io.humble.video_native.Version.getVersionInfo()
-                println("Humble Version: $version")
-            }
             args.isEmpty() -> {
                 val formatter = HelpFormatter()
                 formatter.printHelp(Runtime::class.java.canonicalName + " <filename>", options)
