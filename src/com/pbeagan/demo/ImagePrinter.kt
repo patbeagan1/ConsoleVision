@@ -23,11 +23,11 @@ class ImagePrinter(
     val set = Color256.values().toSet()
     val applyPalette = { rgb: Int, palette: Set<Int>? ->
         val color = rgb.colorIntStripAlpha()
-        palette?.minBy { color.colorDistance(it) } ?: color
+        palette?.minByOrNull { color.colorDistance(it) } ?: color
     }.memoize()
 
     val reducedSetApplicator = { color: Int ->
-        set.minBy { color.colorDistance(it.color) }
+        set.minByOrNull { color.colorDistance(it.color) }
     }.memoize()
 
     private val toColorPreset = { i: Color256? ->

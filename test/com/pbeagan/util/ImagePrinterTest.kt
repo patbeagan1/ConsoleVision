@@ -83,6 +83,7 @@ internal class ImagePrinterTest {
         val read = readAsset(LENNA)
         listOf(
             "borkfest-1x.png",
+            "denim-1x.png",
             "island-life-1x.png",
             "neon-lights-floatingtable-1x.png",
             "oil-6-1x.png",

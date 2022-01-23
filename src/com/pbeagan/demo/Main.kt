@@ -88,10 +88,10 @@ fun main(args: Array<String>) {
             }
             args.isEmpty() -> {
                 val formatter = HelpFormatter()
-                formatter.printHelp(Decoder::class.java.canonicalName + " <filename>", options)
+                formatter.printHelp(Runtime::class.java.canonicalName + " <filename>", options)
             }
             else -> {
-                Decoder(
+                Runtime(
                     filename = cmd.getOptionValue("f"),
                     palette = cmd.getOptionValue("p"),
                     reductionRate = cmd.getOptionValue("r")?.toInt() ?: 0,
@@ -100,7 +100,7 @@ fun main(args: Array<String>) {
                     shouldNormalize = cmd.hasOption("n"),
                     width = cmd.getOptionValue("w")?.toInt(),
                     height = cmd.getOptionValue("h")?.toInt()
-                ).playVideo()
+                ).run()
             }
         }
     } catch (e: ParseException) {

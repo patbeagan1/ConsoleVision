@@ -347,7 +347,7 @@ enum class Color256(val color: Int, val number: Int) {
                     color256.color and 255
                 )
                 //            abs(color - color256.color)
-            }.minBy { it.key }
+            }.minByOrNull { it.key }
             return toSortedMap?.value?.number ?: 0
         }
     }

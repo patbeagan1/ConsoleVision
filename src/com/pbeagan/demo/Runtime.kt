@@ -19,7 +19,7 @@ import java.io.File
 import java.io.IOException
 import javax.imageio.ImageIO
 
-class Decoder(
+class Runtime(
     private val filename: String?,
     palette: String?,
     reductionRate: Int,
@@ -71,7 +71,7 @@ class Decoder(
     private val streamTimebase: Rational by lazy { videoDecoder.timeBase }
 
     @Throws(InterruptedException::class, IOException::class)
-    fun playVideo() {
+    fun run() {
         initializeDecoder()
         videoDecoder.open(null, null)
         val picture: MediaPicture = MediaPicture.make(
