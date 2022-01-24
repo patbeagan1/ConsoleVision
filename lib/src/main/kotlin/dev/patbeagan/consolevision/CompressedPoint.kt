@@ -2,14 +2,15 @@ package dev.patbeagan.consolevision
 
 import kotlin.math.pow
 
-inline class CompressedPoint(val base: Long) {
-    val x get() = (base shr 32).toInt()
-    val y get() = base.toInt() // (base and (2.0.pow(32) - 1).toLong()).toInt()
+@JvmInline
+value class CompressedPoint(private val base: Long) {
+    private val x get() = (base shr 32).toInt()
+    private val y get() = base.toInt() // (base and (2.0.pow(32) - 1).toLong()).toInt()
 
     override fun toString(): String =
         "CompressedPoint of ${this.x} to ${this.y}\n" +
-            "                   ${Integer.toBinaryString(x)}\n" +
-            "                   ${Integer.toBinaryString(y)}"
+                "                   ${Integer.toBinaryString(x)}\n" +
+                "                   ${Integer.toBinaryString(y)}"
 
     companion object {
         fun from(x: Int, y: Int) = CompressedPoint(

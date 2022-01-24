@@ -4,16 +4,17 @@ plugins {
     id "org.jlleitschuh.gradle.ktlint" version "10.2.1"
 }
 
-group 'dev.patbeagan'
-version '0.0.1-SNAPSHOT'
-
 repositories {
     mavenLocal()
     mavenCentral()
 }
+
+group 'dev.patbeagan'
+version '0.0.1-SNAPSHOT'
 
 compileKotlin {
     kotlinOptions {
         freeCompilerArgs = ["-Xinline-classes"]
     }
 }
+

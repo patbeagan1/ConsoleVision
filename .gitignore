@@ -1,9 +1,10 @@
 .gradle
+gradle
 .idea
 out
 build
-server/build
-*/build*
+gradle/wrapper/gradle-wrapper.jar
+*/build
 *.iml
 *.ipr
 *.iws

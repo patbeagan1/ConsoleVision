@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+    id 'org.jetbrains.kotlin.jvm'
+    id("application")
+    id("maven-publish")
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.mod4j.org.apache.commons:cli:1.0.0'
+    implementation project(':lib')
+}
+
+application {
+    mainClassName = "dev.patbeagan.consolevision.MainKt"
+}
