@@ -5,12 +5,10 @@ import dev.patbeagan.consolevision.util.createColorPalette
 import dev.patbeagan.consolevision.util.getScaleToBoundBy
 import dev.patbeagan.consolevision.util.scale
 import java.awt.image.BufferedImage
-import java.io.File
-import javax.imageio.ImageIO
 
 class ConsoleVisionRuntime(
-    private val filename: String?,
-    palette: String?,
+    private val file: BufferedImage?,
+    paletteImage: BufferedImage?,
     reductionRate: Int,
     paletteReductionRate: Int,
     isCompatPalette: Boolean,
@@ -18,10 +16,7 @@ class ConsoleVisionRuntime(
     val height: Int?,
     shouldNormalize: Boolean,
 ) : Display {
-    private val paletteImage = palette?.let { ImageIO.read(File(palette)) }
-    private val paletteColors: Set<Int>? = paletteImage?.let {
-        it.createColorPalette(paletteReductionRate)
-    }
+    private val paletteColors: Set<Int>? = paletteImage?.createColorPalette(paletteReductionRate)
     private val imagePrinter = ImagePrinter(
         reductionRate,
         isCompatPalette,
@@ -38,15 +33,13 @@ class ConsoleVisionRuntime(
     private fun getTransform(image: BufferedImage): ScaleTransform =
         transform ?: ScaleTransform(image, width, height).also { transform = it }
 
-    fun start() {
-        printFrame(ImageIO.read(File(filename)))
-    }
-
-    override fun printFrame(image: BufferedImage) {
-        val scaleTransform = getTransform(image).scaleTransform
+    override fun printFrame(): String {
+        val scaleTransform =
+            file?.let { getTransform(it).scaleTransform } ?: return ""
+        // todo make this an option
         print(CURSOR_TO_START)
-        imagePrinter.printImage(
-            image.scale(
+        return imagePrinter.printImage(
+            file.scale(
                 scaleTransform.first,
                 scaleTransform.second
             ),
@@ -56,5 +49,5 @@ class ConsoleVisionRuntime(
 }
 
 interface Display {
-    fun printFrame(image: BufferedImage)
+    fun printFrame(): String
 }

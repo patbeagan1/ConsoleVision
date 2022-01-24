@@ -17,23 +17,19 @@ import java.awt.image.BufferedImage
 class ImagePrinter(
     private val reductionRate: Int,
     private val isCompatPalette: Boolean,
-    private val shouldNormalizeColors: Boolean
+    private val shouldNormalizeColors: Boolean,
 ) {
-
     val set = Color256.values().toSet()
     val applyPalette = { rgb: Int, palette: Set<Int>? ->
         val color = rgb.colorIntStripAlpha()
         palette?.minByOrNull { color.colorDistance(it) } ?: color
     }.memoize()
-
     val reducedSetApplicator = { color: Int ->
         set.minByOrNull { color.colorDistance(it.color) }
     }.memoize()
-
     private val toColorPreset = { i: Color256? ->
         CustomPreset(i?.number ?: 0)
     }.memoize()
-
     private val toColor = { i: Int? ->
         if (i == null) Black
         else Custom(
@@ -43,16 +39,28 @@ class ImagePrinter(
         )
     }.memoize()
 
-    fun printImage(read: BufferedImage, paletteColors: Set<Int>? = null, compressionStyle: CompressionStyle = UP_DOWN) {
+    fun printImage(
+        read: BufferedImage,
+        paletteColors: Set<Int>? = null,
+        compressionStyle: CompressionStyle = UP_DOWN,
+    ): String {
+        return obtainFrame(read, paletteColors, compressionStyle)
+    }
+
+    fun obtainFrame(
+        read: BufferedImage,
+        paletteColors: Set<Int>?,
+        compressionStyle: CompressionStyle,
+    ): String {
         if (shouldNormalizeColors) {
             read.applyColorNormalization()
         }
-        read.withDoubledLine({ println() }) { y, x ->
+        val out = StringBuilder()
+        read.withDoubledLine({ out.append("\n") }) { y, x ->
             val y0 = y.getOrNull(0) ?: 0
             val y1 = y.getOrNull(1) ?: 0
             val colorBackground = applyPalette(read.getRGB(x, y0).reduceColorSpace(reductionRate), paletteColors)
             val colorForeground = applyPalette(read.getRGB(x, y1).reduceColorSpace(reductionRate), paletteColors)
-
             val symbol = when (compressionStyle) {
                 UP_DOWN -> "▄"
                 DOTS -> "▓"
@@ -61,14 +69,15 @@ class ImagePrinter(
                 symbol.style(
                     colorBackground = reducedSetApplicator(colorBackground).let(toColorPreset),
                     colorForeground = reducedSetApplicator(colorForeground).let(toColorPreset)
-                ).also { print(it) }
+                ).also { out.append(it) }
             } else {
                 symbol.style(
                     colorBackground = colorBackground.let(toColor),
                     colorForeground = colorForeground.let(toColor)
-                ).also { print(it) }
+                ).also { out.append(it) }
             }
         }
+        return out.toString()
     }
 
     enum class CompressionStyle {
