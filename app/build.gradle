@@ -15,5 +15,5 @@ dependencies {
 }
 
 application {
-    mainClassName = "dev.patbeagan.consolevision.MainKt"
+    getMainClass().set("dev.patbeagan.consolevision.MainKt")
 }
