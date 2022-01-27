@@ -1,8 +1,7 @@
 package dev.patbeagan.consolevision
 
-import io.ktor.application.call
-import io.ktor.response.respondText
-import io.ktor.routing.get
+import dev.patbeagan.consolevision.Router.getHome
+import dev.patbeagan.consolevision.Router.postUpload
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
@@ -12,10 +11,8 @@ import org.apache.commons.cli.HelpFormatter
 import org.apache.commons.cli.Options
 import org.apache.commons.cli.ParseException
 import org.apache.commons.cli.PosixParser
-import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
-import java.net.URL
 import javax.imageio.ImageIO
 import kotlin.system.exitProcess
 
@@ -126,21 +123,9 @@ fun main(args: Array<String>) {
 private fun startServer() {
     embeddedServer(Netty, port = 8080) {
         routing {
-            get("/") {
-                val url = URL("http://www.avajava.com/images/avajavalogo.jpg")
-                val img: BufferedImage = ImageIO.read(url)
-                val out = ConsoleVisionRuntime(
-                    file = img,
-                    paletteImage = null,
-                    reductionRate = 0,
-                    paletteReductionRate = 0,
-                    isCompatPalette = false,
-                    shouldNormalize = false,
-                    width = 80,
-                    height = 80
-                ).printFrame().also { println(it) }
-                call.respondText("Hello, world!\n$out")
-            }
+            getHome()
+            postUpload()
         }
     }.start(wait = true)
 }
+

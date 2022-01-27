@@ -1,10 +1,9 @@
 package dev.patbeagan.consolevision
 
-import dev.patbeagan.consolevision.ImagePrinter.CompressionStyle.DOTS
-import dev.patbeagan.consolevision.ImagePrinter.CompressionStyle.UP_DOWN
-import dev.patbeagan.consolevision.TerminalColorStyle.Colors.Black
+import dev.patbeagan.consolevision.CompressionStyle.UP_DOWN
 import dev.patbeagan.consolevision.TerminalColorStyle.Colors.Custom
 import dev.patbeagan.consolevision.TerminalColorStyle.Colors.CustomPreset
+import dev.patbeagan.consolevision.TerminalColorStyle.Colors.Default
 import dev.patbeagan.consolevision.TerminalColorStyle.colorIntStripAlpha
 import dev.patbeagan.consolevision.TerminalColorStyle.style
 import dev.patbeagan.consolevision.util.applyColorNormalization
@@ -24,14 +23,12 @@ class ImagePrinter(
         val color = rgb.colorIntStripAlpha()
         palette?.minByOrNull { color.colorDistance(it) } ?: color
     }.memoize()
-    val reducedSetApplicator = { color: Int ->
-        set.minByOrNull { color.colorDistance(it.color) }
-    }.memoize()
-    private val toColorPreset = { i: Color256? ->
-        CustomPreset(i?.number ?: 0)
-    }.memoize()
+    val reducedSetApplicator =
+        { color: Int? -> set.minByOrNull { color?.colorDistance(it.color) ?: -1.0 } }.memoize()
+    private val toColorPreset =
+        { i: Color256? -> CustomPreset(i?.number ?: 0) }.memoize()
     private val toColor = { i: Int? ->
-        if (i == null) Black
+        if (i == null) Default
         else Custom(
             i shr 16 and 0xff,
             i shr 8 and 0xff,
@@ -43,11 +40,9 @@ class ImagePrinter(
         read: BufferedImage,
         paletteColors: Set<Int>? = null,
         compressionStyle: CompressionStyle = UP_DOWN,
-    ): String {
-        return obtainFrame(read, paletteColors, compressionStyle)
-    }
+    ): String = obtainFrame(read, paletteColors, compressionStyle)
 
-    fun obtainFrame(
+    private fun obtainFrame(
         read: BufferedImage,
         paletteColors: Set<Int>?,
         compressionStyle: CompressionStyle,
@@ -56,31 +51,46 @@ class ImagePrinter(
             read.applyColorNormalization()
         }
         val out = StringBuilder()
-        read.withDoubledLine({ out.append("\n") }) { y, x ->
-            val y0 = y.getOrNull(0) ?: 0
-            val y1 = y.getOrNull(1) ?: 0
-            val colorBackground = applyPalette(read.getRGB(x, y0).reduceColorSpace(reductionRate), paletteColors)
-            val colorForeground = applyPalette(read.getRGB(x, y1).reduceColorSpace(reductionRate), paletteColors)
-            val symbol = when (compressionStyle) {
-                UP_DOWN -> "▄"
-                DOTS -> "▓"
-            }
-            if (isCompatPalette) {
-                symbol.style(
-                    colorBackground = reducedSetApplicator(colorBackground).let(toColorPreset),
-                    colorForeground = reducedSetApplicator(colorForeground).let(toColorPreset)
-                ).also { out.append(it) }
-            } else {
-                symbol.style(
-                    colorBackground = colorBackground.let(toColor),
-                    colorForeground = colorForeground.let(toColor)
-                ).also { out.append(it) }
-            }
+        read.withDoubledLine({ out.append("\n") }) { ys, x ->
+            val (colorForeground, colorBackground) =
+                getForegroundBackgroundColors(ys, x, read, paletteColors)
+
+            compressionStyle.symbol.style(
+                colorBackground = applyCompatPalette(colorBackground),
+                colorForeground = applyCompatPalette(colorForeground)
+            ).also { out.append(it) }
         }
         return out.toString()
     }
 
-    enum class CompressionStyle {
-        UP_DOWN, DOTS
+    private fun getForegroundBackgroundColors(
+        ys: Pair<Int?, Int?>,
+        x: Int,
+        read: BufferedImage,
+        paletteColors: Set<Int>?,
+    ): Pair<Int?, Int?> {
+        val (first, second) = ys
+        val foreground = second ?: first
+        val background = if (foreground != first) first else null
+        val colorForeground = foreground?.let { pair(x, it, read, paletteColors) }
+        val colorBackground = background?.let { pair(x, it, read, paletteColors) }
+        return Pair(
+            colorForeground,
+            colorBackground,
+        )
     }
+
+    private fun applyCompatPalette(colorRes: Int?) =
+        if (isCompatPalette) {
+            reducedSetApplicator(colorRes).let(toColorPreset)
+        } else {
+            colorRes.let(toColor)
+        }
+
+    private fun pair(
+        x: Int,
+        y: Int,
+        image: BufferedImage,
+        paletteColors: Set<Int>?,
+    ): Int = applyPalette(image.getRGB(x, y).reduceColorSpace(reductionRate), paletteColors)
 }

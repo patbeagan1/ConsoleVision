@@ -1,5 +1,6 @@
 package dev.patbeagan.consolevision.util
 
+import dev.patbeagan.consolevision.CompressionStyle
 import dev.patbeagan.consolevision.ImagePrinter
 import org.junit.Before
 import org.junit.Test
@@ -54,7 +55,7 @@ internal class ImagePrinterTest {
     fun `sample image compressed dots`() {
         imagePrinter.printImage(
             readAsset(IMAGE_SMALL),
-            compressionStyle = ImagePrinter.CompressionStyle.DOTS
+            compressionStyle = CompressionStyle.DOTS
         )
     }
 

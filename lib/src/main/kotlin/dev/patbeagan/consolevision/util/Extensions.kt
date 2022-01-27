@@ -31,7 +31,7 @@ fun BufferedImage.getScaleToBoundBy(w: Int?, h: Int?): Pair<Double, AffineTransf
 }
 
 fun BufferedImage.createColorPalette(
-    paletteReductionRate: Int
+    paletteReductionRate: Int,
 ): Set<Int> {
     val colorSet = mutableSetOf<Int>()
     (minY until height).forEach { y ->
@@ -49,7 +49,7 @@ fun distance(
     z1: Int,
     x2: Int,
     y2: Int,
-    z2: Int
+    z2: Int,
 ): Double {
     val d1 = (x2 - x1).toDouble().pow(2)
     val d2 = (y2 - y1).toDouble().pow(2)
@@ -78,17 +78,28 @@ fun combineColor(a: Int, r: Int, g: Int, b: Int) = (a shl 24)
 
 inline fun BufferedImage.withDoubledLine(
     onLineEnd: () -> Unit = {},
-    action: (List<Int>, Int) -> Unit
+    action: (Pair<Int?, Int?>, Int) -> Unit,
 ) {
-    (minY until height).chunked(2).forEach { y ->
-        (minX until width).forEach { x -> action(y, x) }
+    val chunked = if ((height - minY) % 2 == 0) {
+        (minY until height).chunked(2)
+    } else {
+        // if there are an odd number of lines, we want to start with an odd chunk.
+        // this will make it start on a foreground, instead of a background.
+        // Otherwise, the last line would be 2 pixels tall.
+        listOf(listOf(minY)) + (minY + 1 until height).chunked(2)
+    }
+    chunked.forEach { y ->
+        (minX until width).forEach { x ->
+            action(y.getOrNull(0) to y.getOrNull(1), x)
+        }
         onLineEnd()
     }
+    println(height - minY)
 }
 
 inline fun BufferedImage.withLine(
     onLineEnd: () -> Unit = {},
-    action: (Int, Int) -> Unit
+    action: (Int, Int) -> Unit,
 ) {
     (minY until height).forEach { y ->
         (minX until width).forEach { x -> action(y, x) }
@@ -100,7 +111,6 @@ fun BufferedImage.applyColorNormalization() {
     var minR = Integer.MAX_VALUE
     var minG = Integer.MAX_VALUE
     var minB = Integer.MAX_VALUE
-
     var maxR = Integer.MIN_VALUE
     var maxG = Integer.MIN_VALUE
     var maxB = Integer.MIN_VALUE
