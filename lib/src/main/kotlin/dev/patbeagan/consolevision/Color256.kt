@@ -1,10 +1,9 @@
 package dev.patbeagan.consolevision
 
-import dev.patbeagan.consolevision.util.distance
+import dev.patbeagan.consolevision.util.ColorIntHelper.distance
 import kotlin.math.abs
 
 enum class Color256(val color: Int, val number: Int) {
-
     Color0(0x000000C, 0),
     Color1(0x800000C, 1),
     Color2(0x008000C, 2),

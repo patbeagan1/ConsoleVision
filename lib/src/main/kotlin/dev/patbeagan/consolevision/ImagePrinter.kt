@@ -6,10 +6,10 @@ import dev.patbeagan.consolevision.TerminalColorStyle.Colors.CustomPreset
 import dev.patbeagan.consolevision.TerminalColorStyle.Colors.Default
 import dev.patbeagan.consolevision.TerminalColorStyle.colorIntStripAlpha
 import dev.patbeagan.consolevision.TerminalColorStyle.style
+import dev.patbeagan.consolevision.util.ColorIntHelper.colorDistance
+import dev.patbeagan.consolevision.util.ColorIntHelper.reduceColorSpace
 import dev.patbeagan.consolevision.util.applyColorNormalization
-import dev.patbeagan.consolevision.util.colorDistance
 import dev.patbeagan.consolevision.util.memoize
-import dev.patbeagan.consolevision.util.reduceColorSpace
 import dev.patbeagan.consolevision.util.withDoubledLine
 import java.awt.image.BufferedImage
 
@@ -21,10 +21,13 @@ class ImagePrinter(
     val set = Color256.values().toSet()
     val applyPalette = { rgb: Int, palette: Set<Int>? ->
         val color = rgb.colorIntStripAlpha()
-        palette?.minByOrNull { color.colorDistance(it) } ?: color
+        palette?.minByOrNull { colorDistance(color, it) } ?: color
     }.memoize()
-    val reducedSetApplicator =
-        { color: Int? -> set.minByOrNull { color?.colorDistance(it.color) ?: -1.0 } }.memoize()
+    val reducedSetApplicator = { color: Int? ->
+        set.minByOrNull { each ->
+            color?.let { colorDistance(it, each.color) } ?: -1.0
+        }
+    }.memoize()
     private val toColorPreset =
         { i: Color256? -> CustomPreset(i?.number ?: 0) }.memoize()
     private val toColor = { i: Int? ->
@@ -36,48 +39,30 @@ class ImagePrinter(
         )
     }.memoize()
 
-    fun printImage(
+    fun getFrame(
         read: BufferedImage,
         paletteColors: Set<Int>? = null,
         compressionStyle: CompressionStyle = UP_DOWN,
-    ): String = obtainFrame(read, paletteColors, compressionStyle)
-
-    private fun obtainFrame(
-        read: BufferedImage,
-        paletteColors: Set<Int>?,
-        compressionStyle: CompressionStyle,
     ): String {
         if (shouldNormalizeColors) {
             read.applyColorNormalization()
         }
         val out = StringBuilder()
         read.withDoubledLine({ out.append("\n") }) { ys, x ->
-            val (colorForeground, colorBackground) =
-                getForegroundBackgroundColors(ys, x, read, paletteColors)
+            val (first, second) = ys
+            val foreground = second ?: first
+            val background = if (foreground != first) first else null
 
             compressionStyle.symbol.style(
-                colorBackground = applyCompatPalette(colorBackground),
-                colorForeground = applyCompatPalette(colorForeground)
+                colorForeground = applyCompatPalette(foreground?.let {
+                    getColorFromImageLocation(x, it, read, paletteColors)
+                }),
+                colorBackground = applyCompatPalette(background?.let {
+                    getColorFromImageLocation(x, it, read, paletteColors)
+                }),
             ).also { out.append(it) }
         }
         return out.toString()
-    }
-
-    private fun getForegroundBackgroundColors(
-        ys: Pair<Int?, Int?>,
-        x: Int,
-        read: BufferedImage,
-        paletteColors: Set<Int>?,
-    ): Pair<Int?, Int?> {
-        val (first, second) = ys
-        val foreground = second ?: first
-        val background = if (foreground != first) first else null
-        val colorForeground = foreground?.let { pair(x, it, read, paletteColors) }
-        val colorBackground = background?.let { pair(x, it, read, paletteColors) }
-        return Pair(
-            colorForeground,
-            colorBackground,
-        )
     }
 
     private fun applyCompatPalette(colorRes: Int?) =
@@ -87,10 +72,16 @@ class ImagePrinter(
             colorRes.let(toColor)
         }
 
-    private fun pair(
+    private fun getColorFromImageLocation(
         x: Int,
         y: Int,
         image: BufferedImage,
         paletteColors: Set<Int>?,
-    ): Int = applyPalette(image.getRGB(x, y).reduceColorSpace(reductionRate), paletteColors)
+    ): Int = applyPalette(
+        reduceColorSpace(
+            image.getRGB(x, y),
+            reductionRate
+        ),
+        paletteColors
+    )
 }

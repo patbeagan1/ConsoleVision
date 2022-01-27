@@ -20,50 +20,77 @@ internal class ImagePrinterTest {
     }
 
     @Test
+    fun compatPalette() {
+        println(ImagePrinter(0, true, shouldNormalizeColors = false).getFrame(getScaledImage(readAsset(LENNA))))
+    }
+
+    @Test
     fun `sample image fullsize`() {
         val directory = File("./")
         println(directory.absolutePath)
-        imagePrinter.printImage(readAsset(IMAGE_SMALL))
+        imagePrinter.getFrame(readAsset(IMAGE_SMALL)).also { println(it) }
     }
 
     @Test
     fun `sample image fullsize normalized`() {
         ImagePrinter(0, false, shouldNormalizeColors = true)
-            .printImage(readAsset(IMAGE_SMALL))
+            .getFrame(readAsset(IMAGE_SMALL)).also { println(it) }
     }
 
     @Test
-    fun `sample image reduced normalized`() {
+    fun `sample image scaled normalized`() {
         val read = readAsset(LENNA)
-
         val read1 = getScaledImage(read)
         val read2 = getScaledImage(read)
 
         println("Normalized: TRUE")
-        ImagePrinter(0, false, shouldNormalizeColors = true).printImage(read1)
+        ImagePrinter(0, false, shouldNormalizeColors = true).getFrame(read1).also { println(it) }
         println("Normalized: FALSE")
-        ImagePrinter(0, false, shouldNormalizeColors = false).printImage(read2)
+        ImagePrinter(0, false, shouldNormalizeColors = false).getFrame(read2).also { println(it) }
+    }
+
+    @Test
+    fun `sample image reduced - gradient`() {
+        val read = readAsset(GRADIENT)
+        val read1 = getScaledImage(read)
+        val read2 = getScaledImage(read)
+
+        println("Reduced: TRUE")
+        ImagePrinter(8, false, shouldNormalizeColors = false).getFrame(read1).also { println(it) }
+        println("Reduced: FALSE")
+        ImagePrinter(0, false, shouldNormalizeColors = false).getFrame(read2).also { println(it) }
+    }
+
+    @Test
+    fun `sample image reduced - lenna`() {
+        val read = readAsset(LENNA)
+        val read1 = getScaledImage(read)
+        val read2 = getScaledImage(read)
+
+        println("Reduced: TRUE")
+        ImagePrinter(40, false, shouldNormalizeColors = false).getFrame(read1).also { println(it) }
+        println("Reduced: FALSE")
+        ImagePrinter(0, false, shouldNormalizeColors = false).getFrame(read2).also { println(it) }
     }
 
     private fun getScaledImage(read: BufferedImage): BufferedImage {
         val (scale, transformOp) = read.getScaleToBoundBy(40, 40)
-        val read1 = read.scale(scale, transformOp)
-        return read1
+        return read.scale(scale, transformOp)
     }
 
     @Test
     fun `sample image compressed dots`() {
-        imagePrinter.printImage(
+        imagePrinter.getFrame(
             readAsset(IMAGE_SMALL),
             compressionStyle = CompressionStyle.DOTS
-        )
+        ).also { println(it) }
     }
 
     @Test
     fun `sample image compressed`() {
-        imagePrinter.printImage(
+        imagePrinter.getFrame(
             readAsset(IMAGE_SMALL)
-        )
+        ).also { println(it) }
     }
 
     @Test
@@ -71,9 +98,9 @@ internal class ImagePrinterTest {
         val read = readAsset(IMAGE_LARGE)
 
         val (scale, transformOp) = read.getScaleToBoundBy(90, 90)
-        imagePrinter.printImage(
+        imagePrinter.getFrame(
             read.scale(scale, transformOp)
-        )
+        ).also { println(it) }
     }
 
     @Test
@@ -98,13 +125,13 @@ internal class ImagePrinterTest {
                 println(e)
                 null
             }
-        }.forEach {
+        }.forEach { pair ->
             val (scale, transformOp) = read.getScaleToBoundBy(70, 70)
-            println(it.first)
-            imagePrinter.printImage(
+            println(pair.first)
+            imagePrinter.getFrame(
                 read.scale(scale, transformOp),
-                it.second?.createColorPalette(0)
-            )
+                pair.second?.createColorPalette(0)
+            ).also { println(it) }
         }
     }
 
@@ -112,5 +139,6 @@ internal class ImagePrinterTest {
         const val IMAGE_LARGE = "Landscape.jpg"
         const val IMAGE_SMALL = "LandscapeSmall.jpeg"
         const val LENNA = "Lenna.png"
+        const val GRADIENT = "purple-green-gradient.png"
     }
 }

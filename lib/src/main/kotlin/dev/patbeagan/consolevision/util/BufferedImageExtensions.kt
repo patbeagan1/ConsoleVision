@@ -1,10 +1,10 @@
 package dev.patbeagan.consolevision.util
 
+import dev.patbeagan.consolevision.util.ColorIntHelper.combineColor
+import dev.patbeagan.consolevision.util.ColorIntHelper.reduceColorSpace
 import java.awt.geom.AffineTransform
 import java.awt.image.AffineTransformOp
 import java.awt.image.BufferedImage
-import kotlin.math.pow
-import kotlin.math.sqrt
 
 fun BufferedImage.scale(scale: Double, affineTransformOp: AffineTransformOp): BufferedImage {
     val w = width
@@ -36,45 +36,12 @@ fun BufferedImage.createColorPalette(
     val colorSet = mutableSetOf<Int>()
     (minY until height).forEach { y ->
         (minX until width).forEach { x ->
-            val element = getRGB(x, y).reduceColorSpace(paletteReductionRate)
+            val element = reduceColorSpace(getRGB(x, y), paletteReductionRate)
             colorSet.add(element)
         }
     }
     return colorSet
 }
-
-fun distance(
-    x1: Int,
-    y1: Int,
-    z1: Int,
-    x2: Int,
-    y2: Int,
-    z2: Int,
-): Double {
-    val d1 = (x2 - x1).toDouble().pow(2)
-    val d2 = (y2 - y1).toDouble().pow(2)
-    val d3 = (z2 - z1).toDouble().pow(2)
-    return sqrt(d1 * d2 * d3)
-}
-
-fun Int.colorDistance(other: Int) = distance(
-    this shr 16 and 255,
-    this shr 8 and 255,
-    this and 255,
-    other shr 16 and 255,
-    other shr 8 and 255,
-    other and 255
-)
-
-val Int.colorAlpha: Int get() = this shr 24 and 255
-val Int.colorRed get() = this shr 16 and 255
-val Int.colorGreen get() = this shr 8 and 255
-val Int.colorBlue get() = this and 255
-
-fun combineColor(a: Int, r: Int, g: Int, b: Int) = (a shl 24)
-    .or(r shl 16)
-    .or(g shl 8)
-    .or(b)
 
 inline fun BufferedImage.withDoubledLine(
     onLineEnd: () -> Unit = {},
@@ -95,16 +62,6 @@ inline fun BufferedImage.withDoubledLine(
         onLineEnd()
     }
     println(height - minY)
-}
-
-inline fun BufferedImage.withLine(
-    onLineEnd: () -> Unit = {},
-    action: (Int, Int) -> Unit,
-) {
-    (minY until height).forEach { y ->
-        (minX until width).forEach { x -> action(y, x) }
-        onLineEnd()
-    }
 }
 
 fun BufferedImage.applyColorNormalization() {
@@ -146,17 +103,12 @@ fun BufferedImage.applyColorNormalization() {
     }
 }
 
-fun Int.reduceColorSpace(factor: Int): Int {
-    /**
-     * Used to increase the likelihood of a collision with the memo
-     * Improves performance drastically as soon as cache heats
-     */
-    if (factor < 1) return this // don't want to divide by 0
-    val r = this shr 16 and 0xff
-    val g = this shr 8 and 0xff
-    val b = this and 0xff
-    val r2 = (r / factor) * factor
-    val g2 = (g / factor) * factor
-    val b2 = (b / factor) * factor
-    return (r2 shl 16) + (g2 shl 8) + b2
+private inline fun BufferedImage.withLine(
+    onLineEnd: () -> Unit = {},
+    action: (Int, Int) -> Unit,
+) {
+    (minY until height).forEach { y ->
+        (minX until width).forEach { x -> action(y, x) }
+        onLineEnd()
+    }
 }

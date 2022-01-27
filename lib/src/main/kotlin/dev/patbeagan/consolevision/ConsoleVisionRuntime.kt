@@ -35,7 +35,7 @@ class ConsoleVisionRuntime(
             scaleTransform.first,
             scaleTransform.second
         )
-        return imagePrinter.printImage(
+        return imagePrinter.getFrame(
             scaledImage,
             paletteColors
         )
