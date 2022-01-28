@@ -18,14 +18,13 @@ class ImagePrinter(
     private val isCompatPalette: Boolean,
     private val shouldNormalizeColors: Boolean,
 ) {
-    val set = Color256.values().toSet()
     val applyPalette = { rgb: Int, palette: Set<Int>? ->
         val color = rgb.colorIntStripAlpha()
         palette?.minByOrNull { colorDistance(color, it) } ?: color
     }.memoize()
     val reducedSetApplicator = { color: Int? ->
-        set.minByOrNull { each ->
-            color?.let { colorDistance(it, each.color) } ?: -1.0
+        Color256.values().toSet().minByOrNull { each ->
+            color?.let { colorDistance(it, each.color) } ?: Double.MAX_VALUE
         }
     }.memoize()
     private val toColorPreset =

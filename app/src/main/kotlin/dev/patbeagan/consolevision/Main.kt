@@ -121,7 +121,7 @@ fun main(args: Array<String>) {
 }
 
 private fun startServer() {
-    embeddedServer(Netty, port = 8080) {
+    embeddedServer(Netty, port = 3000) {
         routing {
             getHome()
             postUpload()

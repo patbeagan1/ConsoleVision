@@ -14,7 +14,6 @@ import dev.patbeagan.consolevision.util.ColorIntHelper.colorDistance
 import org.junit.Test
 
 internal class TerminalColorStyleTest {
-
     @Test
     fun demoSGRValues() {
         SGR::class.sealedSubclasses.forEach {
@@ -32,11 +31,11 @@ internal class TerminalColorStyleTest {
         println("Todd wanted a ${"blue".style(Blue)} car")
         println(
             "Todd ${"wanted".style(sgr = SGR.Italic)} a ${
-            "redOnGreen".style(
-                Red,
-                Green,
-                SGR.Bold
-            )
+                "redOnGreen".style(
+                    Red,
+                    Green,
+                    SGR.Bold
+                )
             } car"
         )
     }
@@ -81,13 +80,19 @@ internal class TerminalColorStyleTest {
     @Test
     fun testColorDistance() {
         val set = Color256.values().toSet() // .sortedBy { it.color }//.colorDistance(0) }
-        val set2 = Color256.values().toSet().sortedBy { colorDistance(it.color, 0) }
+        val set2 = Color256.values().toSet().shuffled().sortedBy { colorDistance(it.color, 0) }
         set.forEachIndexed { index, it ->
             "▄".also { println(it) }
             print(
                 " ".style(
                     colorBackground = CustomPreset(it.number),
                     colorForeground = CustomPreset(set2[index].number)
+                )
+            )
+            print(
+                " ".style(
+                    colorForeground = CustomPreset(it.number),
+                    colorBackground = CustomPreset(set2[index].number)
                 )
             )
             if (index % 8 == 7) println()

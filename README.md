@@ -9,3 +9,9 @@ f () {
 	curl -X POST -F 'image=@'"$1" localhost:8080/upload
 }
 ```
+
+```bash
+ff () {
+	curl -X POST -F 'image=@'"$1" 3.221.34.94/upload
+}
+```
