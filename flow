@@ -1,0 +1,193 @@
+#!/bin/sh
+
+function die () {
+    echo "$1"
+    exit 1
+}
+
+first="$1"
+second="$2"
+
+set -euf pipefail
+
+DEVELOP="develop"
+CANDIDATE="candidate"
+MAIN="main"
+
+function help () {
+cat << HELPTEXT
+
+Usage: flow (feature_start|feature_finish
+            |release_start|release_finish
+            |hotfix_start|hotfix_finish) [branchname]
+
+This script attempts to follow the cactus model / threeflow
+https://www.nomachetejuggling.com/2017/04/09/a-different-branching-strategy/
+
+(init):
+    Creates the original 3 branches: develop, candidate and main
+
+(fs|feature_start) [branchname]:
+    This will create the specified feature branch off of develop
+
+(ff|feature_finish) [branchname]:
+    This will merge the specified feature branch back into develop
+
+(rs|release_start):
+    This will start a new release by merging the develop branch into candidate.
+    It will tag the place where it diverges from develop.
+
+(rf|release_finish):
+    This will tag the release, and merge the candidate branch into BOTH develop and main.
+    The merge to develop will be a --no-ff, and the merge to main will be a fastforward.
+
+(hs|hotfix_start) [branchname]:
+    This will start a hotfix branch off of the main branch.
+    It will tag the place where it diverges from main.
+    Since hotfix branches are temporary, they do not have a static name.
+
+(hf|hotfix_finish) [branchname]:
+    This will tag the hotfix, and merge it into main, candidate, and develop.
+
+(view)
+    Shows the current state of git, within the terminal.
+
+-------------------------------------------------------------------------------
+
+HELPTEXT
+}
+
+##########
+## Util
+##########
+
+function merge ()  {
+    git checkout "$1"
+    git merge --no-ff "$2"
+}
+
+function fastForwardMerge ()  {
+    git checkout "$1"
+    git merge "$2"
+}
+
+function initBranches () {
+    git checkout -b $DEVELOP
+    git checkout -b $CANDIDATE
+    git checkout -b $MAIN
+}
+
+##########
+## Feature
+##########
+
+function featureCut () {
+    git checkout $DEVELOP
+    git checkout -b "$1"
+}
+
+function featureClose () {
+    if output=$(git status --porcelain) && [ -z "$output" ]; then
+        git checkout $DEVELOP
+        git merge --squash "$1"
+        git commit -m "Merging $1"
+    else
+        die "No action taken. There are uncommitted changes in the working directory."
+    fi
+}
+
+##########
+## Release
+##########
+
+function releaseCut () {
+    merge $CANDIDATE $DEVELOP
+    git tag release_start_"$(date +%Y_%m_%d_%H_%M_%S)"
+}
+
+function releaseClose () {
+    fastForwardMerge $MAIN $CANDIDATE
+    git tag release_"$(date +%Y_%m_%d_%H_%M_%S)"
+    merge $DEVELOP $CANDIDATE
+}
+
+##########
+## Hotfix
+##########
+
+function hotfixCut () {
+    git checkout $MAIN
+    git checkout -b "$1"
+    git tag hotfix_start_"$(date +%Y_%m_%d_%H_%M_%S)"
+}
+
+function hotfixClose () {
+    merge $MAIN "$1"
+    git tag hotfix"$(date +%Y_%m_%d_%H_%M_%S)"
+    merge $CANDIDATE $MAIN
+    merge $DEVELOP $CANDIDATE
+}
+
+function main() {
+    if [ -z "$1" ]; then
+        help
+        exit 1
+    fi
+    case "$1" in
+        "help")
+            help
+        ;;
+        "init")
+            initBranches
+        ;;
+        "feature_start"|"fs")
+            if [ -z "$2" ]; then
+                help
+                die "Requires a branch name."
+            fi
+            featureCut "$2"
+        ;;
+        "feature_finish"|"ff")
+            if [ -z "$2" ]; then
+                help
+                die "Requires a branch name."
+            fi
+            featureClose "$2"
+        ;;
+        "release_start"|"rs")
+            releaseCut
+        ;;
+        "release_finish"|"rf")
+            releaseClose
+        ;;
+        "hotfix_start"|"hs")
+            if [ -z "$2" ]; then
+                help
+                die "Requires a branch name."
+            fi
+            hotfixCut "$2"
+        ;;
+        "hotfix_finish"|"hf")
+            if [ -z "$2" ]; then
+                help
+                die "Requires a branch name."
+            fi
+            hotfixClose
+        ;;
+        "view")
+            git log \
+            --graph \
+            --abbrev-commit \
+            --decorate \
+            --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' \
+            --all
+        ;;
+        *)
+            die "\"$1\" not recognized"
+        ;;
+    esac
+}
+
+main "$first" "$second"
+
+
