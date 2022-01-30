@@ -25,18 +25,23 @@ object Router {
         get("/") {
             val url =
                 URL("https://www.freepsdbazaar.com/wp-content/uploads/2020/06/sky-replace/sky-sunset/sunset-050-freepsdbazaar.jpg")
-            val img: BufferedImage = ImageIO.read(url)
-            val out = ConsoleVisionRuntime(
-                file = img,
-                paletteImage = null,
-                reductionRate = 0,
-                paletteReductionRate = 0,
-                isCompatPalette = false,
-                shouldNormalize = false,
-                width = 80,
-                height = 80
-            ).printFrame().also { println(it) }
-            call.respondText(out)
+            val file: BufferedImage = ImageIO.read(url)
+            val scaledImage = ImageScaler(width = 80, height = 80).scaledImage(file)
+            if (scaledImage != null) {
+                val printFrame = ConsoleVisionRuntime(
+                    paletteImage = null,
+                    reductionRate = 0,
+                    paletteReductionRate = 0,
+                    isCompatPalette = false,
+                    shouldNormalize = false,
+                ).printFrame(scaledImage)
+
+                printFrame
+                    .also { println(it) }
+                    .let { call.respondText(it) }
+            } else {
+                call.respondText("Could not process the image.")
+            }
         }
     }
 
@@ -57,19 +62,26 @@ object Router {
                             "image/svg+xml",
                             "image/webp",
                             -> {
-                                ConsoleVisionRuntime(
-                                    file = readPng(part.streamProvider().readBytes()),
-                                    paletteImage = null,
-                                    reductionRate = 0,
-                                    paletteReductionRate = 0,
-                                    isCompatPalette = false,
-                                    shouldNormalize = false,
-                                    width = 80,
-                                    height = 80
-                                )
-                                    .printFrame()
-                                    .also { println(it) }
-                                    .let { call.respondText(it) }
+                                val file = readPng(part.streamProvider().readBytes())
+                                val scaledImage = file?.let {
+                                    ImageScaler(width = 80, height = 80).scaledImage(it)
+                                }
+
+                                if (scaledImage != null) {
+                                    val printFrame = ConsoleVisionRuntime(
+                                        paletteImage = null,
+                                        reductionRate = 0,
+                                        paletteReductionRate = 0,
+                                        isCompatPalette = false,
+                                        shouldNormalize = false,
+                                    ).printFrame(scaledImage)
+
+                                    printFrame
+                                        .also { println(it) }
+                                        .let { call.respondText(it) }
+                                } else {
+                                    call.respondText("Could not process the image.")
+                                }
                             }
                         }
                     }

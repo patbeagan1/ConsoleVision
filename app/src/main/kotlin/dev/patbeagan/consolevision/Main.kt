@@ -103,16 +103,23 @@ fun main(args: Array<String>) {
                 startServer()
             }
             else -> {
+                val width = cmd.getOptionValue("w")?.toInt()
+                val height = cmd.getOptionValue("h")?.toInt()
+                val file = cmd.getOptionValue("f")
+                    ?.let { ImageIO.read(File(it)) }
+                    ?.let {
+                        ImageScaler(width, height).scaledImage(it)
+                    } ?: run {
+                    println("Could not process the file!")
+                    return
+                }
                 ConsoleVisionRuntime(
-                    file = cmd.getOptionValue("f")?.let { ImageIO.read(File(it)) },
                     paletteImage = cmd.getOptionValue("p")?.let { ImageIO.read(File(it)) },
                     reductionRate = cmd.getOptionValue("r")?.toInt() ?: 0,
                     paletteReductionRate = cmd.getOptionValue("P")?.toInt() ?: 0,
                     isCompatPalette = cmd.hasOption("c"),
                     shouldNormalize = cmd.hasOption("n"),
-                    width = cmd.getOptionValue("w")?.toInt(),
-                    height = cmd.getOptionValue("h")?.toInt()
-                ).printFrame().also { println(it) }
+                ).printFrame(file).also { println(it) }
             }
         }
     } catch (e: ParseException) {
