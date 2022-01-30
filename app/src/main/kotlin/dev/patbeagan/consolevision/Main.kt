@@ -2,6 +2,7 @@ package dev.patbeagan.consolevision
 
 import dev.patbeagan.consolevision.Router.getHome
 import dev.patbeagan.consolevision.Router.postUpload
+import dev.patbeagan.consolevision.util.safeLet
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
@@ -103,16 +104,24 @@ fun main(args: Array<String>) {
                 startServer()
             }
             else -> {
+                val width = cmd.getOptionValue("w")?.toInt()
+                val height = cmd.getOptionValue("h")?.toInt()
+                val file = cmd.getOptionValue("f")?.let { ImageIO.read(File(it)) }
+                val scaledFile = safeLet(width, height, file) { w, h, f ->
+                    val scaler = ImageScaler(width = w, height = h)
+                    scaler.scaledImage(f)
+                } ?: run {
+                    println("Could not process the file!")
+                    return
+                }
+
                 ConsoleVisionRuntime(
-                    file = cmd.getOptionValue("f")?.let { ImageIO.read(File(it)) },
                     paletteImage = cmd.getOptionValue("p")?.let { ImageIO.read(File(it)) },
                     reductionRate = cmd.getOptionValue("r")?.toInt() ?: 0,
                     paletteReductionRate = cmd.getOptionValue("P")?.toInt() ?: 0,
                     isCompatPalette = cmd.hasOption("c"),
                     shouldNormalize = cmd.hasOption("n"),
-                    width = cmd.getOptionValue("w")?.toInt(),
-                    height = cmd.getOptionValue("h")?.toInt()
-                ).printFrame().also { println(it) }
+                ).printFrame(scaledFile).also { println(it) }
             }
         }
     } catch (e: ParseException) {
