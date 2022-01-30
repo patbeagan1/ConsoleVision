@@ -90,7 +90,6 @@ function featureClose () {
     if output=$(git status --porcelain) && [ -z "$output" ]; then
         git checkout $DEVELOP
         git merge --squash "$1"
-        git commit -m "Merging $1"
     else
         die "No action taken. There are uncommitted changes in the working directory."
     fi
