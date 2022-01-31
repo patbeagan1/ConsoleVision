@@ -1,6 +1,7 @@
 package dev.patbeagan.consolevision
 
 import dev.patbeagan.consolevision.Router.getHome
+import dev.patbeagan.consolevision.Router.getImage
 import dev.patbeagan.consolevision.Router.postUpload
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
@@ -132,6 +133,7 @@ private fun startServer() {
         routing {
             getHome()
             postUpload()
+            getImage()
         }
     }.start(wait = true)
 }
