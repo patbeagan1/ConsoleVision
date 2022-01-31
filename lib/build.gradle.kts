@@ -22,7 +22,7 @@ dependencies {
 
 
 group = "dev.patbeagan"
-version = "0.1.0"
+version = "0.1.1"
 tasks {
     named<ShadowJar>("shadowJar") {
         minimize()

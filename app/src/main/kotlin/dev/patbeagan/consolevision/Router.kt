@@ -99,7 +99,7 @@ object Router {
 
                                     printFrame
                                         .also { println(it) }
-                                        .let { call.respondText(it) }
+                                        .let { call.respondText("$it\n${DigestUtils.md5Hex(scaledImage.getByteData())}") }
                                 } else {
                                     call.respondText("Could not process the image.")
                                 }
