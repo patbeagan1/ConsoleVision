@@ -5,6 +5,7 @@ import dev.patbeagan.consolevision.util.ColorIntHelper.reduceColorSpace
 import java.awt.geom.AffineTransform
 import java.awt.image.AffineTransformOp
 import java.awt.image.BufferedImage
+import java.awt.image.DataBufferByte
 
 fun BufferedImage.scale(scale: Double, affineTransformOp: AffineTransformOp): BufferedImage {
     val w = width
@@ -14,6 +15,11 @@ fun BufferedImage.scale(scale: Double, affineTransformOp: AffineTransformOp): Bu
     val after = BufferedImage(w2, h2, type)
     affineTransformOp.filter(this, after)
     return after
+}
+
+fun BufferedImage.getByteData(): ByteArray {
+    val buffer = raster.dataBuffer as DataBufferByte
+    return buffer.data
 }
 
 fun BufferedImage.getScaleToBoundBy(w: Int?, h: Int?): Pair<Double, AffineTransformOp> {
