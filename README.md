@@ -16,6 +16,10 @@ ff () {
 }
 ```
 
+```bash
+curl 3.221.34.94/im/eefbb5b84ef2d8824f3fcaf64c54a63a
+```
+
 # What is this project about?
 
 With this tool, you'll be able to display images without leaving your terminal. This can be useful when you are just sshing into another machine and don't have GUI access. 
