@@ -1,8 +1,8 @@
 #!/bin/sh
 
-function die () {
-    echo "$1"
-    exit 1
+die() {
+  echo "$1"
+  exit 1
 }
 
 first="$1"
@@ -14,8 +14,8 @@ DEVELOP="develop"
 CANDIDATE="candidate"
 MAIN="main"
 
-function help () {
-cat << HELPTEXT
+help() {
+  cat <<HELPTEXT
 
 Usage: flow (feature_start|feature_finish
             |release_start|release_finish
@@ -61,133 +61,208 @@ HELPTEXT
 ## Util
 ##########
 
-function merge ()  {
-    git checkout "$1"
-    git merge --no-ff "$2"
+get_date() {
+  date "+%y%m%d_%H%M%S"
 }
 
-function fastForwardMerge ()  {
-    git checkout "$1"
-    git merge "$2"
+automerge() {
+  git checkout "$1"
+  git pull
+  git merge --no-ff --no-edit "$2"
+  git push origin "$1"
 }
 
-function initBranches () {
-    git checkout -b $DEVELOP
-    git checkout -b $CANDIDATE
-    git checkout -b $MAIN
+automerge_integration() {
+  integration_branch="$2_to_$1_$(get_date)"
+  git checkout "$1"
+  git pull
+  git co -b $integration_branch
+  git merge --no-edit "$2"
+  git push origin "$integration_branch"
+}
+
+merge() {
+  git checkout "$1"
+  git pull
+  git merge --no-ff "$2"
+  git push origin "$1"
+}
+
+fastForwardMerge() {
+  git checkout "$1"
+  git pull
+  git merge --ff "$2"
+  git push origin "$1"
+}
+
+tag() {
+  git tag "$1"
+  git push origin "$1"
+}
+
+squashMerge() {
+  if output=$(git status --porcelain) && [ -z "$output" ]; then
+    git checkout "$1"
+    git pull
+    git merge --squash "$2" && git commit
+    git push origin "$1"
+  else
+    die "No action taken. There are uncommitted changes in the working directory."
+  fi
+}
+
+initBranches() {
+  git checkout -b $DEVELOP
+  git checkout -b $CANDIDATE
+  git checkout -b $MAIN
 }
 
 ##########
 ## Feature
 ##########
 
-function featureCut () {
-    git checkout $DEVELOP
-    git checkout -b "$1"
+featureCut() {
+  git checkout $DEVELOP
+  git checkout -b "$1"
 }
 
-function featureClose () {
-    if output=$(git status --porcelain) && [ -z "$output" ]; then
-        git checkout $DEVELOP
-        git merge --squash "$1"
-        git commit
-    else
-        die "No action taken. There are uncommitted changes in the working directory."
-    fi
+featureClose() {
+  squashMerge $DEVELOP "$1"
+}
+
+##########
+## Patch
+##########
+
+patchCut() {
+  git checkout $CANDIDATE
+  git checkout -b "$1"
+}
+
+patchClose() {
+  squashMerge $CANDIDATE "$1"
 }
 
 ##########
 ## Release
 ##########
 
-function releaseCut () {
-    merge $CANDIDATE $DEVELOP
-    git tag release_start_"$(date +%Y_%m_%d_%H_%M_%S)"
+releaseCut() {
+  automerge $CANDIDATE $DEVELOP
+  tag release_start_"$(get_date)"
 }
 
-function releaseClose () {
-    fastForwardMerge $MAIN $CANDIDATE
-    git tag release_"$(date +%Y_%m_%d_%H_%M_%S)"
-    merge $DEVELOP $CANDIDATE
+releaseClose() {
+  changelog="$(git log --oneline candidate...main | cat)"
+
+  fastForwardMerge $MAIN $CANDIDATE
+  tag release_"$(get_date)"
+
+  echo
+  echo "================================"
+  echo " Changelog"
+  echo "================================"
+  echo
+  echo "$changelog"
+  echo
+  echo "================================"
+  echo
+
+  automerge_integration $DEVELOP $CANDIDATE
+
 }
 
 ##########
 ## Hotfix
 ##########
 
-function hotfixCut () {
-    git checkout $MAIN
-    git checkout -b "$1"
-    git tag hotfix_start_"$(date +%Y_%m_%d_%H_%M_%S)"
+hotfixCut() {
+  git checkout $MAIN
+  git checkout -b "$1"
+  tag hotfix_start_"$(get_date)"
 }
 
-function hotfixClose () {
-    merge $MAIN "$1"
-    git tag hotfix"$(date +%Y_%m_%d_%H_%M_%S)"
-    merge $CANDIDATE $MAIN
-    merge $DEVELOP $CANDIDATE
+hotfixClose() {
+  automerge $MAIN "$1"
+  tag hotfix_"$(get_date)"
+  read -s -n 1 -p "Merge to main complete. Press any key to attempt a merge to candidate, and develop."
+
+  automerge $CANDIDATE $MAIN
+  automerge $DEVELOP $MAIN
 }
 
-function main() {
-    if [ -z "$1" ]; then
-        help
-        exit 1
+main() {
+  if [ -z "$1" ]; then
+    help
+    exit 1
+  fi
+  case "$1" in
+  "help")
+    help
+    ;;
+  "init")
+    initBranches
+    ;;
+  "feature_start" | "fs")
+    if [ -z "$2" ]; then
+      help
+      die "Requires a branch name."
     fi
-    case "$1" in
-        "help")
-            help
-        ;;
-        "init")
-            initBranches
-        ;;
-        "feature_start"|"fs")
-            if [ -z "$2" ]; then
-                help
-                die "Requires a branch name."
-            fi
-            featureCut "$2"
-        ;;
-        "feature_finish"|"ff")
-            if [ -z "$2" ]; then
-                help
-                die "Requires a branch name."
-            fi
-            featureClose "$2"
-        ;;
-        "release_start"|"rs")
-            releaseCut
-        ;;
-        "release_finish"|"rf")
-            releaseClose
-        ;;
-        "hotfix_start"|"hs")
-            if [ -z "$2" ]; then
-                help
-                die "Requires a branch name."
-            fi
-            hotfixCut "$2"
-        ;;
-        "hotfix_finish"|"hf")
-            if [ -z "$2" ]; then
-                help
-                die "Requires a branch name."
-            fi
-            hotfixClose
-        ;;
-        "view")
-            git log \
-            --graph \
-            --abbrev-commit \
-            --decorate \
-            --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' \
-            --all
-        ;;
-        *)
-            die "\"$1\" not recognized"
-        ;;
-    esac
+    featureCut "$2"
+    ;;
+  "feature_finish" | "ff")
+    if [ -z "$2" ]; then
+      help
+      die "Requires a branch name."
+    fi
+    featureClose "$2"
+    ;;
+  "patch_start" | "ps")
+    if [ -z "$2" ]; then
+      help
+      die "Requires a branch name."
+    fi
+    patchCut "$2"
+    ;;
+  "patch_finish" | "pf")
+    if [ -z "$2" ]; then
+      help
+      die "Requires a branch name."
+    fi
+    patchClose "$2"
+    ;;
+  "release_start" | "rs")
+    releaseCut
+    ;;
+  "release_finish" | "rf")
+    releaseClose
+    ;;
+  "hotfix_start" | "hs")
+    if [ -z "$2" ]; then
+      help
+      die "Requires a branch name."
+    fi
+    hotfixCut "$2"
+    ;;
+  "hotfix_finish" | "hf")
+    if [ -z "$2" ]; then
+      help
+      die "Requires a branch name."
+    fi
+    hotfixClose "$2"
+    ;;
+  "view")
+    git log \
+      --graph \
+      --abbrev-commit \
+      --decorate \
+      --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' \
+      --all
+    ;;
+  *)
+    die "\"$1\" not recognized"
+    ;;
+  esac
 }
 
 main "$first" "$second"
-
-

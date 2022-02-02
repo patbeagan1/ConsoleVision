@@ -1,8 +1,12 @@
 package dev.patbeagan.consolevision
 
-import dev.patbeagan.consolevision.Router.getHome
-import dev.patbeagan.consolevision.Router.getImage
-import dev.patbeagan.consolevision.Router.postUpload
+import dev.patbeagan.consolevision.routes.GetHome
+import dev.patbeagan.consolevision.routes.GetImageRoute
+import dev.patbeagan.consolevision.routes.GetLastImage
+import dev.patbeagan.consolevision.routes.PostUpdateRoute
+import io.ktor.application.call
+import io.ktor.routing.get
+import io.ktor.routing.post
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
@@ -129,11 +133,16 @@ fun main(args: Array<String>) {
 }
 
 private fun startServer() {
+    val imageRoute = GetImageRoute()
+    val postUpdateRoute = PostUpdateRoute()
+    val getHome = GetHome()
+    val getLastImage = GetLastImage()
     embeddedServer(Netty, port = 3000) {
         routing {
-            getHome()
-            postUpload()
-            getImage()
+            get("/") { getHome.handle(call) }
+            post("/upload") { postUpdateRoute.handle(call) }
+            get("/im/{imageId}") { imageRoute.handle(call) }
+            get("/last") { getLastImage.handle(call) }
         }
     }.start(wait = true)
 }
