@@ -1,8 +1,8 @@
-package dev.patbeagan.consolevision.routes
+package dev.patbeagan.consolevision.server.routes
 
 import dev.patbeagan.consolevision.ConsoleVisionRuntime
-import dev.patbeagan.consolevision.RouteHandler
 import dev.patbeagan.consolevision.ImageScaler
+import dev.patbeagan.consolevision.server.RouteHandler
 import io.ktor.application.ApplicationCall
 import io.ktor.response.respondText
 import java.awt.image.BufferedImage
@@ -25,9 +25,7 @@ class GetHome : RouteHandler {
                 shouldNormalize = false,
             ).printFrame(scaledImage)
 
-            printFrame
-                .also { println(it) }
-                .let { call.respondText(it) }
+            printFrame.let { call.respondText(it) }
         } else {
             call.respondText("Could not process the image.")
         }
