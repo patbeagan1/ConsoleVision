@@ -1,9 +1,9 @@
-package dev.patbeagan.consolevision.routes
+package dev.patbeagan.consolevision.server.routes
 
 import dev.patbeagan.consolevision.ConsoleVisionRuntime
-import dev.patbeagan.consolevision.RouteHandler
+import dev.patbeagan.consolevision.util.Const
 import dev.patbeagan.consolevision.ImageScaler
-import dev.patbeagan.consolevision.Const
+import dev.patbeagan.consolevision.server.RouteHandler
 import dev.patbeagan.consolevision.util.getByteData
 import io.ktor.application.ApplicationCall
 import io.ktor.http.content.PartData
@@ -13,15 +13,20 @@ import io.ktor.request.receiveMultipart
 import io.ktor.response.respondText
 import io.ktor.utils.io.errors.IOException
 import org.apache.commons.codec.digest.DigestUtils
+import org.koin.core.component.inject
+import org.slf4j.Logger
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.File
+import java.io.FileWriter
 import javax.imageio.ImageIO
 import kotlin.io.path.Path
 import kotlin.io.path.createDirectory
 
 class PostUpdateRoute : RouteHandler {
-    fun ensureDirectory(s: String) = try {
+    private val logger by inject<Logger>()
+
+    private fun ensureDirectory(s: String) = try {
         Path(s).createDirectory()
     } catch (e: FileAlreadyExistsException) {
         // this is ok, just making sure it is there
@@ -32,7 +37,7 @@ class PostUpdateRoute : RouteHandler {
     private fun saveProcessedImage(scaledImage: BufferedImage) {
         ensureDirectory(Const.UPLOAD_DIRECTORY_NAME)
         val md5 = DigestUtils.md5Hex(scaledImage.getByteData())
-        println(md5)
+        logger.info(md5)
         val imageFolder = md5.take(2)
         ensureDirectory("${Const.UPLOAD_DIRECTORY_NAME}/$imageFolder")
         ImageIO.write(scaledImage, "png", File("${Const.UPLOAD_DIRECTORY_NAME}/$imageFolder/$md5.png"))
@@ -42,7 +47,10 @@ class PostUpdateRoute : RouteHandler {
     private fun attemptToWriteLast(scaledImage: BufferedImage) {
         // needed in case multiple users access the server at the same time
         try {
-            ImageIO.write(scaledImage, "png", File("${Const.UPLOAD_DIRECTORY_NAME}/last.png"))
+            ImageIO.write(scaledImage, "png", File(Const.LAST_IMAGE_NAME))
+            FileWriter(File(Const.LAST_IMAGE_HASH_FILE)).use {
+                it.write(DigestUtils.md5Hex(scaledImage.getByteData()))
+            }
         } catch (e: IOException) {
         } catch (e: java.io.IOException) {
         }
@@ -78,9 +86,7 @@ class PostUpdateRoute : RouteHandler {
                                     shouldNormalize = false,
                                 ).printFrame(scaledImage)
 
-                                printFrame
-                                    .also { println(it) }
-                                    .let { call.respondText("$it\n${DigestUtils.md5Hex(scaledImage.getByteData())}") }
+                                printFrame.let { call.respondText("$it\n${DigestUtils.md5Hex(scaledImage.getByteData())}") }
                             } else {
                                 call.respondText("Could not process the image.")
                             }

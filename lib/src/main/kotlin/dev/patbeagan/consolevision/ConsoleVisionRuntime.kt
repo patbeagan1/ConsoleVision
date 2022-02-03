@@ -1,6 +1,5 @@
 package dev.patbeagan.consolevision
 
-import dev.patbeagan.consolevision.TerminalColorStyle.CURSOR_TO_START
 import dev.patbeagan.consolevision.util.createColorPalette
 import java.awt.image.BufferedImage
 
@@ -19,8 +18,8 @@ class ConsoleVisionRuntime(
     )
 
     fun printFrame(file: BufferedImage): String {
-        // todo make this an option
-        print(CURSOR_TO_START)
+//        // todo make this an option
+//        print(CURSOR_TO_START)
         return imagePrinter.getFrame(
             file,
             paletteColors
