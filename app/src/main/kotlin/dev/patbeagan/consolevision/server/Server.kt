@@ -36,6 +36,7 @@ class Server : KoinComponent {
                 post("/upload") { router.postUpdateRoute.handle(call) }
                 get("/im/{imageId}") { router.imageRoute.handle(call) }
                 get("/last") { router.getLastImage.handle(call) }
+                get("/random") { router.getRandom.handle(call) }
             }
         }.start(wait = true)
     }
