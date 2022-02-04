@@ -67,7 +67,6 @@ inline fun BufferedImage.withDoubledLine(
         }
         onLineEnd()
     }
-    println(height - minY)
 }
 
 fun BufferedImage.applyColorNormalization() {
