@@ -1,9 +1,9 @@
 package dev.patbeagan.consolevision.server.routes
 
 import dev.patbeagan.consolevision.ConsoleVisionRuntime
-import dev.patbeagan.consolevision.util.Const
 import dev.patbeagan.consolevision.ImageScaler
 import dev.patbeagan.consolevision.server.RouteHandler
+import dev.patbeagan.consolevision.util.Const
 import dev.patbeagan.consolevision.util.getByteData
 import io.ktor.application.ApplicationCall
 import io.ktor.http.content.PartData
@@ -86,7 +86,7 @@ class PostUpdateRoute : RouteHandler {
                                     shouldNormalize = false,
                                 ).printFrame(scaledImage)
 
-                                printFrame.let { call.respondText("$it\n${DigestUtils.md5Hex(scaledImage.getByteData())}") }
+                                printFrame.let { call.respondText("$it\n${DigestUtils.md5Hex(scaledImage.getByteData())}\n") }
                             } else {
                                 call.respondText("Could not process the image.")
                             }
