@@ -62,21 +62,21 @@ HELPTEXT
 ##########
 
 get_date() {
-  date "+%y%m%d_%H%M%S"
+  date "+%y.%m.%d_%H.%M.%S"
 }
 
-automerge() {
+autoMerge() {
   git checkout "$1"
   git pull
   git merge --no-ff --no-edit "$2"
   git push origin "$1"
 }
 
-automerge_integration() {
-  integration_branch="$2_to_$1_$(get_date)"
+autoMergeIntegration() {
+  integration_branch="$2_to_$1_v$3"
   git checkout "$1"
   git pull
-  git co -b $integration_branch
+  git co -b "$integration_branch"
   git merge --no-edit "$2"
   git push origin "$integration_branch"
 }
@@ -148,15 +148,15 @@ patchClose() {
 ##########
 
 releaseCut() {
-  automerge $CANDIDATE $DEVELOP
-  tag release_start_"$(get_date)"
+  autoMerge $CANDIDATE $DEVELOP
 }
 
 releaseClose() {
+  local_version="$1"
   changelog="$(git log --oneline candidate...main | cat)"
 
   fastForwardMerge $MAIN $CANDIDATE
-  tag release_"$(get_date)"
+  tag v"$local_version"
 
   echo
   echo "================================"
@@ -168,7 +168,7 @@ releaseClose() {
   echo "================================"
   echo
 
-  automerge_integration $DEVELOP $CANDIDATE
+  autoMergeIntegration $DEVELOP $CANDIDATE "$local_version"
 
 }
 
@@ -183,12 +183,12 @@ hotfixCut() {
 }
 
 hotfixClose() {
-  automerge $MAIN "$1"
+  autoMerge $MAIN "$1"
   tag hotfix_"$(get_date)"
-  read -s -n 1 -p "Merge to main complete. Press any key to attempt a merge to candidate, and develop."
+  read -r -s -n 1 -p "Merge to main complete. Press any key to attempt a merge to candidate, and develop."
 
-  automerge $CANDIDATE $MAIN
-  automerge $DEVELOP $MAIN
+  autoMerge $CANDIDATE $MAIN
+  autoMerge $DEVELOP $MAIN
 }
 
 main() {
@@ -235,7 +235,11 @@ main() {
     releaseCut
     ;;
   "release_finish" | "rf")
-    releaseClose
+    if [ -z "$2" ]; then
+      help
+      die "Requires a semantic version."
+    fi
+    releaseClose "$2"
     ;;
   "hotfix_start" | "hs")
     if [ -z "$2" ]; then

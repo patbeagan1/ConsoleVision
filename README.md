@@ -4,6 +4,15 @@ A kotlin demo for displaying images in the terminal.
 You can read more about this project at my site:
 https://patbeagan.dev/projects/consolevideo
 
+# What is this project about?
+
+With this tool, you'll be able to display images without leaving your terminal. This can be useful when you are just sshing into another machine and don't have GUI access. 
+
+To make this more convenient, there is an option to run the tool as a server instead, so the only thing that you need installed is `curl`
+
+<img width="707" alt="Screen Shot 2022-02-03 at 10 50 28 PM" src="https://user-images.githubusercontent.com/10187351/152473836-502b5415-df40-4657-9d01-e93cf130515f.png">
+
+
 ```bash
 f () {
 	curl -X POST -F 'image=@'"$1" localhost:8080/upload
@@ -19,12 +28,6 @@ ff () {
 ```bash
 curl 3.221.34.94/im/eefbb5b84ef2d8824f3fcaf64c54a63a
 ```
-
-# What is this project about?
-
-With this tool, you'll be able to display images without leaving your terminal. This can be useful when you are just sshing into another machine and don't have GUI access. 
-
-To make this more convenient, there is an option to run the tool as a server instead, so the only thing that you need installed is `curl`
 
 # What's included?
 
