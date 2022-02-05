@@ -1,4 +1,4 @@
-# ConsoleVideo
+# ConsoleVision
 https://patbeagan.dev/projects/consolevideo
 
 # What is this project about?
