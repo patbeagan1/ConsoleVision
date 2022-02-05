@@ -1,4 +1,3 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     id("java-library")
@@ -19,14 +18,3 @@ dependencies {
     testImplementation("junit:junit:4.13.1")
     testImplementation("org.jetbrains.kotlin:kotlin-reflect:1.3.72")
 }
-
-
-group = "dev.patbeagan"
-version = "0.4.0"
-tasks {
-    named<ShadowJar>("shadowJar") {
-        minimize()
-    }
-}
-
-

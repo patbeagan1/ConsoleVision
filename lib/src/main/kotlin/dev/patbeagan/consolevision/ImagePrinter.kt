@@ -53,12 +53,16 @@ class ImagePrinter(
             val background = if (foreground != first) first else null
 
             compressionStyle.symbol.style(
-                colorForeground = applyCompatPalette(foreground?.let {
-                    getColorFromImageLocation(x, it, read, paletteColors)
-                }),
-                colorBackground = applyCompatPalette(background?.let {
-                    getColorFromImageLocation(x, it, read, paletteColors)
-                }),
+                colorForeground = applyCompatPalette(
+                    foreground?.let {
+                        getColorFromImageLocation(x, it, read, paletteColors)
+                    }
+                ),
+                colorBackground = applyCompatPalette(
+                    background?.let {
+                        getColorFromImageLocation(x, it, read, paletteColors)
+                    }
+                ),
             ).also { out.append(it) }
         }
         return out.toString()

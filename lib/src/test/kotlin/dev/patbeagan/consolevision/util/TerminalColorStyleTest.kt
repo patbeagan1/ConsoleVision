@@ -31,11 +31,11 @@ internal class TerminalColorStyleTest {
         println("Todd wanted a ${"blue".style(Blue)} car")
         println(
             "Todd ${"wanted".style(sgr = SGR.Italic)} a ${
-                "redOnGreen".style(
-                    Red,
-                    Green,
-                    SGR.Bold
-                )
+            "redOnGreen".style(
+                Red,
+                Green,
+                SGR.Bold
+            )
             } car"
         )
     }

@@ -1,5 +1,3 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-
 plugins {
     id("application")
     id("com.github.johnrengelman.shadow")
@@ -23,13 +21,4 @@ dependencies {
 
 application {
     mainClass.set("dev.patbeagan.consolevision.MainKt")
-}
-
-group = "dev.patbeagan"
-version = "0.4.0"
-
-tasks {
-    named<ShadowJar>("shadowJar") {
-        minimize()
-    }
 }
