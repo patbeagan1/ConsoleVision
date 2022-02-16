@@ -1,20 +1,30 @@
 package dev.patbeagan.consolevision
 
+import dev.patbeagan.consolevision.types.ColorPalette
 import dev.patbeagan.consolevision.util.createColorPalette
 import java.awt.image.BufferedImage
 
 class ConsoleVisionRuntime(
     paletteImage: BufferedImage?,
-    reductionRate: Int,
-    paletteReductionRate: Int,
-    isCompatPalette: Boolean,
-    shouldNormalize: Boolean,
+    config: Config
 ) {
-    private val paletteColors: Set<Int>? = paletteImage?.createColorPalette(paletteReductionRate)
+
+    data class Config(
+        val reductionRate: Int,
+        val paletteReductionRate: Int,
+        val isCompatPalette: Boolean,
+        val shouldNormalize: Boolean,
+        val shouldMutateColors: Boolean = false
+    )
+
+    private val paletteColors: ColorPalette? =
+        paletteImage?.createColorPalette(config.paletteReductionRate)
+
     private val imagePrinter = ImagePrinter(
-        reductionRate,
-        isCompatPalette,
-        shouldNormalize
+        config.reductionRate,
+        ColorMapToAnsi(config.isCompatPalette),
+        config.shouldNormalize,
+        config.shouldMutateColors
     )
 
     fun printFrame(file: BufferedImage): String {

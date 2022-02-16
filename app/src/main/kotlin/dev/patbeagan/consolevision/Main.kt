@@ -44,10 +44,12 @@ fun main(args: Array<String>) {
                 }
                 ConsoleVisionRuntime(
                     paletteImage = cmd.getOptionValue("p")?.let { ImageIO.read(File(it)) },
-                    reductionRate = cmd.getOptionValue("r")?.toInt() ?: 0,
-                    paletteReductionRate = cmd.getOptionValue("P")?.toInt() ?: 0,
-                    isCompatPalette = cmd.hasOption("c"),
-                    shouldNormalize = cmd.hasOption("n"),
+                    ConsoleVisionRuntime.Config(
+                        reductionRate = cmd.getOptionValue("r")?.toInt() ?: 0,
+                        paletteReductionRate = cmd.getOptionValue("P")?.toInt() ?: 0,
+                        isCompatPalette = cmd.hasOption("c"),
+                        shouldNormalize = cmd.hasOption("n"),
+                    )
                 ).printFrame(file).also { println(it) }
             }
         }

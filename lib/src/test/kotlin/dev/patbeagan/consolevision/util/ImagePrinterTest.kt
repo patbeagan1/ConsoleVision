@@ -1,7 +1,11 @@
 package dev.patbeagan.consolevision.util
 
-import dev.patbeagan.consolevision.CompressionStyle
+import dev.patbeagan.consolevision.ColorMapToAnsi
 import dev.patbeagan.consolevision.ImagePrinter
+import dev.patbeagan.consolevision.ImageScaler
+import dev.patbeagan.consolevision.getScaleToBoundBy
+import dev.patbeagan.consolevision.scale
+import dev.patbeagan.consolevision.types.CompressionStyle
 import org.junit.Before
 import org.junit.Test
 import java.awt.image.BufferedImage
@@ -16,12 +20,16 @@ internal class ImagePrinterTest {
 
     @Before
     fun setup() {
-        imagePrinter = ImagePrinter(0, false, shouldNormalizeColors = false)
+        imagePrinter = ImagePrinter(0, ColorMapToAnsi(false), shouldNormalizeColors = false)
     }
 
     @Test
     fun compatPalette() {
-        println(ImagePrinter(0, true, shouldNormalizeColors = false).getFrame(getScaledImage(readAsset(LENNA))))
+        println(
+            ImagePrinter(0, ColorMapToAnsi(true), shouldNormalizeColors = false).getFrame(
+                getScaledImage(readAsset(LENNA))
+            )
+        )
     }
 
     @Test
@@ -33,7 +41,7 @@ internal class ImagePrinterTest {
 
     @Test
     fun `sample image fullsize normalized`() {
-        ImagePrinter(0, false, shouldNormalizeColors = true)
+        ImagePrinter(0, ColorMapToAnsi(false), shouldNormalizeColors = true)
             .getFrame(readAsset(IMAGE_SMALL)).also { println(it) }
     }
 
@@ -44,9 +52,11 @@ internal class ImagePrinterTest {
         val read2 = getScaledImage(read)
 
         println("Normalized: TRUE")
-        ImagePrinter(0, false, shouldNormalizeColors = true).getFrame(read1).also { println(it) }
+        ImagePrinter(0, ColorMapToAnsi(false), shouldNormalizeColors = true).getFrame(read1)
+            .also { println(it) }
         println("Normalized: FALSE")
-        ImagePrinter(0, false, shouldNormalizeColors = false).getFrame(read2).also { println(it) }
+        ImagePrinter(0, ColorMapToAnsi(false), shouldNormalizeColors = false).getFrame(read2)
+            .also { println(it) }
     }
 
     @Test
@@ -56,9 +66,11 @@ internal class ImagePrinterTest {
         val read2 = getScaledImage(read)
 
         println("Reduced: TRUE")
-        ImagePrinter(8, false, shouldNormalizeColors = false).getFrame(read1).also { println(it) }
+        ImagePrinter(8, ColorMapToAnsi(false), shouldNormalizeColors = false).getFrame(read1)
+            .also { println(it) }
         println("Reduced: FALSE")
-        ImagePrinter(0, false, shouldNormalizeColors = false).getFrame(read2).also { println(it) }
+        ImagePrinter(0, ColorMapToAnsi(false), shouldNormalizeColors = false).getFrame(read2)
+            .also { println(it) }
     }
 
     @Test
@@ -68,9 +80,11 @@ internal class ImagePrinterTest {
         val read2 = getScaledImage(read)
 
         println("Reduced: TRUE")
-        ImagePrinter(40, false, shouldNormalizeColors = false).getFrame(read1).also { println(it) }
+        ImagePrinter(40, ColorMapToAnsi(false), shouldNormalizeColors = false).getFrame(read1)
+            .also { println(it) }
         println("Reduced: FALSE")
-        ImagePrinter(0, false, shouldNormalizeColors = false).getFrame(read2).also { println(it) }
+        ImagePrinter(0, ColorMapToAnsi(false), shouldNormalizeColors = false).getFrame(read2)
+            .also { println(it) }
     }
 
     private fun getScaledImage(read: BufferedImage): BufferedImage {
@@ -82,7 +96,7 @@ internal class ImagePrinterTest {
     fun `sample image compressed dots`() {
         imagePrinter.getFrame(
             readAsset(IMAGE_SMALL),
-            compressionStyle = CompressionStyle.DOTS
+            compressionStyle = CompressionStyle.DOTS_HIGH
         ).also { println(it) }
     }
 
@@ -91,6 +105,22 @@ internal class ImagePrinterTest {
         imagePrinter.getFrame(
             readAsset(IMAGE_SMALL)
         ).also { println(it) }
+    }
+
+    @Test
+    fun `color mutation filter`() {
+        val image = ImageScaler(80, 80).scaledImage(readAsset(LENNA))
+        image ?: run {
+            print("Image not found")
+            return
+        }
+        ImagePrinter(
+            0,
+            ColorMapToAnsi(true),
+            shouldNormalizeColors = true,
+            shouldMutateColors = true
+        ).getFrame(image)
+            .also { println(it) }
     }
 
     @Test
@@ -125,12 +155,12 @@ internal class ImagePrinterTest {
                 println(e)
                 null
             }
-        }.forEach { pair ->
+        }.forEach { (first, second) ->
             val (scale, transformOp) = read.getScaleToBoundBy(70, 70)
-            println(pair.first)
+            println(first)
             imagePrinter.getFrame(
                 read.scale(scale, transformOp),
-                pair.second?.createColorPalette(0)
+                second?.createColorPalette(0)
             ).also { println(it) }
         }
     }

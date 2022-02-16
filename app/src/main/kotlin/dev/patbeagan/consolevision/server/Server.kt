@@ -1,28 +1,23 @@
 package dev.patbeagan.consolevision.server
 
-import io.ktor.application.call
-import io.ktor.application.install
-import io.ktor.application.log
-import io.ktor.features.CallLogging
-import io.ktor.routing.get
-import io.ktor.routing.post
-import io.ktor.routing.routing
-import io.ktor.server.engine.embeddedServer
-import io.ktor.server.netty.Netty
+import io.ktor.application.*
+import io.ktor.features.*
+import io.ktor.routing.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.context.startKoin
-import org.koin.dsl.module
 import org.slf4j.event.Level
+
 
 class Server : KoinComponent {
     fun startServer() {
         embeddedServer(Netty, port = 3000) {
             startKoin {
                 modules(
-                    module {
-                        single { log }
-                    },
+                    Injection.dispatcherModule(),
+                    Injection.loggingModule(log),
                     Router.moduleRoutes
                 )
             }

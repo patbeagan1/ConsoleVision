@@ -5,13 +5,11 @@ import dev.patbeagan.consolevision.ImageScaler
 import dev.patbeagan.consolevision.server.RouteHandler
 import dev.patbeagan.consolevision.util.Const
 import dev.patbeagan.consolevision.util.getByteData
-import io.ktor.application.ApplicationCall
-import io.ktor.http.content.PartData
-import io.ktor.http.content.forEachPart
-import io.ktor.http.content.streamProvider
-import io.ktor.request.receiveMultipart
-import io.ktor.response.respondText
-import io.ktor.utils.io.errors.IOException
+import io.ktor.application.*
+import io.ktor.http.content.*
+import io.ktor.request.*
+import io.ktor.response.*
+import io.ktor.utils.io.errors.*
 import org.apache.commons.codec.digest.DigestUtils
 import org.koin.core.component.inject
 import org.slf4j.Logger
@@ -40,7 +38,11 @@ class PostUpdateRoute : RouteHandler {
         logger.info(md5)
         val imageFolder = md5.take(2)
         ensureDirectory("${Const.UPLOAD_DIRECTORY_NAME}/$imageFolder")
-        ImageIO.write(scaledImage, "png", File("${Const.UPLOAD_DIRECTORY_NAME}/$imageFolder/$md5.png"))
+        ImageIO.write(
+            scaledImage,
+            "png",
+            File("${Const.UPLOAD_DIRECTORY_NAME}/$imageFolder/$md5.png")
+        )
         attemptToWriteLast(scaledImage)
     }
 
@@ -72,7 +74,11 @@ class PostUpdateRoute : RouteHandler {
                         "image/svg+xml",
                         "image/webp",
                         -> {
-                            val file = ImageIO.read(ByteArrayInputStream(part.streamProvider().readBytes()))
+                            val file = ImageIO.read(
+                                ByteArrayInputStream(
+                                    part.streamProvider().readBytes()
+                                )
+                            )
                             val scaledImage = file?.let {
                                 ImageScaler(width = 80, height = 80).scaledImage(it)
                             }?.also { saveProcessedImage(it) }
@@ -80,13 +86,18 @@ class PostUpdateRoute : RouteHandler {
                             if (scaledImage != null) {
                                 val printFrame = ConsoleVisionRuntime(
                                     paletteImage = null,
-                                    reductionRate = 0,
-                                    paletteReductionRate = 0,
-                                    isCompatPalette = false,
-                                    shouldNormalize = false,
+                                    ConsoleVisionRuntime.Config(
+                                        reductionRate = 0,
+                                        paletteReductionRate = 0,
+                                        isCompatPalette = false,
+                                        shouldNormalize = false,
+                                    )
                                 ).printFrame(scaledImage)
 
-                                printFrame.let { call.respondText("$it\n${DigestUtils.md5Hex(scaledImage.getByteData())}\n") }
+                                printFrame.let {
+                                    val md5Hex = DigestUtils.md5Hex(scaledImage.getByteData())
+                                    call.respondText("$it\n$md5Hex\n")
+                                }
                             } else {
                                 call.respondText("Could not process the image.")
                             }

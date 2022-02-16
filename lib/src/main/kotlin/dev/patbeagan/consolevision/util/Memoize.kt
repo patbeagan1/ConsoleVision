@@ -1,6 +1,6 @@
 package dev.patbeagan.consolevision.util
 
-class Memoize1<in T, out R>(val f: (T) -> R) : (T) -> R {
+class Memoize1<in T, out R>(private val f: (T) -> R) : (T) -> R {
     private val values = mutableMapOf<T, R>()
 
     override fun invoke(x: T): R {
@@ -8,15 +8,15 @@ class Memoize1<in T, out R>(val f: (T) -> R) : (T) -> R {
             val first = values.entries.first()
             values.remove(first.key)
         }
-        return values.getOrPut(x, { f(x) })
+        return values.getOrPut(x) { f(x) }
     }
 
     companion object {
-        const val SIZE_LIMIT = 500
+        private const val SIZE_LIMIT = 500
     }
 }
 
-class Memoize2<in S, in T, out R>(val f: (S, T) -> R) : (S, T) -> R {
+class Memoize2<in S, in T, out R>(private val f: (S, T) -> R) : (S, T) -> R {
     private val values = mutableMapOf<Pair<S, T>, R>()
     private val cache = Array<Pair<S, T>?>(SIZE_LIMIT) { null }
     private var counter = 0
@@ -28,11 +28,11 @@ class Memoize2<in S, in T, out R>(val f: (S, T) -> R) : (S, T) -> R {
         val pair = p1 to p2
         cache[counter++] = pair
         counter %= cache.size
-        return values.getOrPut(pair, { f(p1, p2) })
+        return values.getOrPut(pair) { f(p1, p2) }
     }
 
     companion object {
-        const val SIZE_LIMIT = 500
+        private const val SIZE_LIMIT: Int = 500
     }
 }
 

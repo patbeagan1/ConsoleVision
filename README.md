@@ -27,7 +27,7 @@ The app supports a variety of command line flags which will allow for:
 
 <img width="611" alt="Screen Shot 2022-02-05 at 8 43 56 AM" src="https://user-images.githubusercontent.com/10187351/152646523-cf415c81-47cf-45e5-9a27-600ac00789d4.png">
 
-|||||
+|Normalized Colors| Default| Custom palette|Reduced colorspace|
 |-|-|-|-|
 |<img width="705" alt="Screen Shot 2022-02-05 at 8 51 15 AM" src="https://user-images.githubusercontent.com/10187351/152647110-105c8015-f7a7-4a98-aaff-6947722651b6.png">|<img width="700" alt="Screen Shot 2022-02-05 at 8 50 53 AM" src="https://user-images.githubusercontent.com/10187351/152647111-787eeef5-dd59-4ef8-8e0d-47678f44f953.png">|<img width="719" alt="Screen Shot 2022-02-05 at 9 03 37 AM" src="https://user-images.githubusercontent.com/10187351/152647252-c9035db3-a684-4818-8455-f917dade6700.png">|<img width="717" alt="Screen Shot 2022-02-05 at 9 02 59 AM" src="https://user-images.githubusercontent.com/10187351/152647253-1c6b5be0-bb7f-4b58-a98e-ba10c253106a.png">|
 

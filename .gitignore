@@ -3,7 +3,6 @@ gradle
 .idea
 out
 build
-gradle/wrapper/gradle-wrapper.jar
 */build
 *.iml
 *.ipr

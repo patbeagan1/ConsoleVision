@@ -1,11 +1,11 @@
 package dev.patbeagan.consolevision.server.routes
 
 import dev.patbeagan.consolevision.ConsoleVisionRuntime
+import dev.patbeagan.consolevision.server.RouteHandler
 import dev.patbeagan.consolevision.util.Const.LAST_IMAGE_HASH_FILE
 import dev.patbeagan.consolevision.util.Const.LAST_IMAGE_NAME
-import dev.patbeagan.consolevision.server.RouteHandler
-import io.ktor.application.ApplicationCall
-import io.ktor.response.respondText
+import io.ktor.application.*
+import io.ktor.response.*
 import org.koin.core.component.inject
 import org.slf4j.Logger
 import java.io.File
@@ -26,12 +26,16 @@ class GetLastImage : RouteHandler {
             .use { it.readText() }
         logger.info("lastUploadHash: $lastUploadHash")
 
-        call.respondText(ConsoleVisionRuntime(
-            paletteImage = null,
-            reductionRate = 0,
-            paletteReductionRate = 0,
-            isCompatPalette = false,
-            shouldNormalize = false,
-        ).printFrame(read))
+        call.respondText(
+            ConsoleVisionRuntime(
+                paletteImage = null,
+                ConsoleVisionRuntime.Config(
+                    reductionRate = 0,
+                    paletteReductionRate = 0,
+                    isCompatPalette = false,
+                    shouldNormalize = false,
+                )
+            ).printFrame(read)
+        )
     }
 }
