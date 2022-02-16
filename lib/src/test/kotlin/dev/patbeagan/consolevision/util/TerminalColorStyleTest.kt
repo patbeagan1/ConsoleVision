@@ -28,14 +28,13 @@ internal class TerminalColorStyleTest {
     @Test
     fun demoInlineUsage() {
         println("Todd wanted a ${"blue".style(Blue)} car")
+        val styledText = "redOnGreen".style(
+            Red,
+            Green,
+            SGR.Bold
+        )
         println(
-            "Todd ${"wanted".style(sgr = SGR.Italic)} a ${
-            "redOnGreen".style(
-                Red,
-                Green,
-                SGR.Bold
-            )
-            } car"
+            "Todd ${"wanted".style(sgr = SGR.Italic)} a $styledText car"
         )
     }
 
@@ -56,15 +55,14 @@ internal class TerminalColorStyleTest {
             }
         }
         println()
-        println(
-            "1test${SGR.Underline.enableString()}2test${
-            "3test".style(
-                sgr = arrayOf(
-                    SGR.Bold,
-                    SGR.Framed
-                )
+        val styledText = "3test".style(
+            sgr = arrayOf(
+                SGR.Bold,
+                SGR.Framed
             )
-            }4test"
+        )
+        println(
+            "1test${SGR.Underline.enableString()}2test${styledText}4test"
         )
     }
 
