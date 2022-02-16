@@ -116,8 +116,8 @@ internal class ImagePrinterTest {
         }
         ImagePrinter(
             0,
-            ColorMapToAnsi(false),
-            shouldNormalizeColors = false,
+            ColorMapToAnsi(true),
+            shouldNormalizeColors = true,
             shouldMutateColors = true
         ).getFrame(image)
             .also { println(it) }

@@ -78,11 +78,11 @@ class ImagePrinter(
     )
 
     private fun applyFilters(read: BufferedImage) {
-        if (shouldNormalizeColors) {
-            read.applyFilter(ColorNormalization())
-        }
         if (shouldMutateColors) {
             read.applyFilter(ColorMutation(50))
+        }
+        if (shouldNormalizeColors) {
+            read.applyFilter(ColorNormalization())
         }
     }
 
