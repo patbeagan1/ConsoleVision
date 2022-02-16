@@ -4,7 +4,6 @@ import dev.patbeagan.consolevision.types.ColorPalette
 import dev.patbeagan.consolevision.util.createColorPalette
 import java.awt.image.BufferedImage
 
-
 class ConsoleVisionRuntime(
     paletteImage: BufferedImage?,
     config: Config

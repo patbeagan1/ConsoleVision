@@ -1,7 +1,7 @@
 package dev.patbeagan.consolevision.util
 
-import dev.patbeagan.consolevision.types.ColorPalette
 import dev.patbeagan.consolevision.types.ColorInt
+import dev.patbeagan.consolevision.types.ColorPalette
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
 
@@ -23,4 +23,3 @@ fun BufferedImage.createColorPalette(
     }
     return ColorPalette(colorSet)
 }
-
