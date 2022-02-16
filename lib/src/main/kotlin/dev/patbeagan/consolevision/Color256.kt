@@ -3,7 +3,21 @@ package dev.patbeagan.consolevision
 import dev.patbeagan.consolevision.util.ColorIntHelper.distance
 import kotlin.math.abs
 
-enum class Color256(val color: Int, val number: Int) {
+/**
+ * A resource that stands for a color
+ * This enum contains the 256 colors that are defined by ANSI,
+ * along with their hexcode values.
+ */
+enum class Color256(
+    /**
+     * The hexcode for the color that this [Color256] represents
+     */
+    val color: Int,
+    /**
+     * The id of this color within the ANSI 256 color set
+     */
+    val number: Int
+) {
     Color0(0x000000C, 0),
     Color1(0x800000C, 1),
     Color2(0x008000C, 2),
@@ -303,7 +317,10 @@ enum class Color256(val color: Int, val number: Int) {
     Color255(0xeeeeee, 255);
 
     companion object {
-        val greyscale = listOf(
+        /**
+         * A list of all the greyscale colors in the 256 color set.
+         */
+        val greyscale: List<Color256> = listOf(
             Color232,
             Color233,
             Color234,
@@ -330,23 +347,36 @@ enum class Color256(val color: Int, val number: Int) {
             Color255
         )
 
+        /**
+         * Takes any color, and finds the closest matching color from the 256 color set.
+         *
+         * @return the closest matching [Color256]
+         */
         fun reduceColor(color: Int) = values().associateBy {
             abs(color - it.color)
         }.toSortedMap()[0]
             ?.number ?: 0
 
+        /**
+         * Takes any color, and finds the closest matching color from
+         *
+         * 16 evenly dispersed colors in the 256 color set.
+         *
+         * @return one of 16 possible [Color256]
+         */
         fun reduceColor16(color: Int): Int {
-            val toSortedMap: Map.Entry<Double, Color256>? = values().take(16).associateBy { color256 ->
-                distance(
-                    color shr 16 and 255,
-                    color shr 8 and 255,
-                    color and 255,
-                    color256.color shr 16 and 255,
-                    color256.color shr 8 and 255,
-                    color256.color and 255
-                )
-                //            abs(color - color256.color)
-            }.minByOrNull { it.key }
+            val toSortedMap: Map.Entry<Double, Color256>? =
+                values().take(16).associateBy { color256 ->
+                    distance(
+                        color shr 16 and 255,
+                        color shr 8 and 255,
+                        color and 255,
+                        color256.color shr 16 and 255,
+                        color256.color shr 8 and 255,
+                        color256.color and 255
+                    )
+                    //            abs(color - color256.color)
+                }.minByOrNull { it.key }
             return toSortedMap?.value?.number ?: 0
         }
     }

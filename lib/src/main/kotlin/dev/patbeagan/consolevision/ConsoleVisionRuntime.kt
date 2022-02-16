@@ -1,5 +1,6 @@
 package dev.patbeagan.consolevision
 
+import dev.patbeagan.consolevision.util.ColorInt
 import dev.patbeagan.consolevision.util.createColorPalette
 import java.awt.image.BufferedImage
 
@@ -10,7 +11,7 @@ class ConsoleVisionRuntime(
     isCompatPalette: Boolean,
     shouldNormalize: Boolean,
 ) {
-    private val paletteColors: Set<Int>? = paletteImage?.createColorPalette(paletteReductionRate)
+    private val paletteColors: Set<ColorInt>? = paletteImage?.createColorPalette(paletteReductionRate)
     private val imagePrinter = ImagePrinter(
         reductionRate,
         isCompatPalette,

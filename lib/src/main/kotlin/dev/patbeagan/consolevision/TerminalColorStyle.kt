@@ -1,9 +1,5 @@
 package dev.patbeagan.consolevision
 
-import dev.patbeagan.consolevision.util.colorAlpha
-import dev.patbeagan.consolevision.util.colorBlue
-import dev.patbeagan.consolevision.util.colorGreen
-import dev.patbeagan.consolevision.util.colorRed
 import kotlin.random.Random
 
 object TerminalColorStyle {
@@ -88,25 +84,14 @@ object TerminalColorStyle {
         fun disableString() = "$CSI${this.disable}m"
     }
 
-    fun Int.colorIntToARGB(): ARGB = ARGB(
-        colorAlpha,
-        colorRed,
-        colorGreen,
-        colorBlue
-    )
+    data class ARGB(val a: Int, val r: Int, val g: Int, val b: Int) {
+        fun argbToColorInt(withAlpha: Boolean = true): Int =
+            (a shl 24).takeIf { withAlpha } ?: 0
+                .or(r shl 16)
+                .or(g shl 8)
+                .or(b)
 
-    /**
-     * Masks just the last 3 color spaces - assumes ARGB
-     */
-    fun Int.colorIntStripAlpha(): Int = this and 0xFFFFFF
-
-    fun ARGB.argbToColorInt(withAlpha: Boolean = true): Int =
-        (a shl 24).takeIf { withAlpha } ?: 0
-            .or(r shl 16)
-            .or(g shl 8)
-            .or(b)
-
-    data class ARGB(val a: Int, val r: Int, val g: Int, val b: Int)
+    }
 
     fun String.style(
         colorForeground: Colors = Colors.Default,

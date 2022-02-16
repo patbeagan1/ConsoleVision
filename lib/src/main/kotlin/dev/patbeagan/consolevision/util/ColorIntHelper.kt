@@ -1,7 +1,59 @@
 package dev.patbeagan.consolevision.util
 
+import dev.patbeagan.consolevision.TerminalColorStyle
 import kotlin.math.pow
 import kotlin.math.sqrt
+
+/**
+ * A class which ensures that an Int will be treated as a color.
+ *
+ * This increases type safety when dealing with colors,
+ * without any tradeoff for performance.
+ */
+@JvmInline
+value class ColorInt(
+    /**
+     * The backing field that represents the color as an int.
+     */
+    val color: Int
+) {
+
+    val colorAlpha: Int get() = this.color shr 24 and 255
+    val colorRed get() = this.color shr 16 and 255
+    val colorGreen get() = this.color shr 8 and 255
+    val colorBlue get() = this.color and 255
+
+    fun colorIntToARGB(): TerminalColorStyle.ARGB = TerminalColorStyle.ARGB(
+        colorAlpha,
+        colorRed,
+        colorGreen,
+        colorBlue
+    )
+
+    /**
+     * Masks just the last 3 color spaces - assumes ARGB
+     */
+    fun colorIntStripAlpha(): ColorInt = ColorInt(this.color and 0xFFFFFF)
+
+    /**
+     * Treats this color as a three dimensional point and returns its distance from another color.
+     *
+     * @return the distance from another color, as a double
+     */
+    fun colorDistanceFrom(other: ColorInt): Double = ColorIntHelper.distance(
+        this.color shr 16 and 255,
+        this.color shr 8 and 255,
+        this.color and 255,
+        other.color shr 16 and 255,
+        other.color shr 8 and 255,
+        other.color and 255
+    )
+}
+
+/**
+ * @return this int as a color
+ */
+fun Int.asColor() = ColorInt(this)
 
 object ColorIntHelper {
     fun distance(
@@ -18,14 +70,6 @@ object ColorIntHelper {
         return sqrt(d1 * d2 * d3)
     }
 
-    fun colorDistance(self: Int, other: Int) = distance(
-        self shr 16 and 255,
-        self shr 8 and 255,
-        self and 255,
-        other shr 16 and 255,
-        other shr 8 and 255,
-        other and 255
-    )
 
     fun combineColor(a: Int, r: Int, g: Int, b: Int) = (a shl 24)
         .or(r shl 16)
@@ -36,6 +80,7 @@ object ColorIntHelper {
 
     /**
      * Used to increase the likelihood of a collision with the memo
+     *
      * Improves performance drastically as soon as cache heats
      */
     fun reduceColorSpace(subject: Int, factor: Int): Int {

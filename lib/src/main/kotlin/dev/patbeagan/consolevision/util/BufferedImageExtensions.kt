@@ -38,11 +38,11 @@ fun BufferedImage.getScaleToBoundBy(w: Int?, h: Int?): Pair<Double, AffineTransf
 
 fun BufferedImage.createColorPalette(
     paletteReductionRate: Int,
-): Set<Int> {
-    val colorSet = mutableSetOf<Int>()
+): Set<ColorInt> {
+    val colorSet = mutableSetOf<ColorInt>()
     (minY until height).forEach { y ->
         (minX until width).forEach { x ->
-            val element = reduceColorSpace(getRGB(x, y), paletteReductionRate)
+            val element = reduceColorSpace(getRGB(x, y), paletteReductionRate).asColor()
             colorSet.add(element)
         }
     }
@@ -78,7 +78,7 @@ fun BufferedImage.applyColorNormalization() {
     var maxB = Integer.MIN_VALUE
 
     this.withLine { y, x ->
-        val rgb = this.getRGB(x, y)
+        val rgb = this.getRGB(x, y).asColor()
 
         minR = if (rgb.colorRed < minR) rgb.colorRed else minR
         maxR = if (rgb.colorRed > maxR) rgb.colorRed else maxR
@@ -91,14 +91,15 @@ fun BufferedImage.applyColorNormalization() {
     }
     this.withLine { y, x ->
         val newColor = getRGB(x, y).let {
-            val toDouble = (it.colorRed - minR).toDouble()
+            val color = it.asColor()
+            val toDouble = (color.colorRed - minR).toDouble()
             val i = maxR - minR
             val colorRed = toDouble / i
-            val colorGreen = (it.colorGreen - minG).toDouble() / (maxG - minG)
-            val colorBlue = (it.colorBlue - minB).toDouble() / (maxB - minB)
+            val colorGreen = (color.colorGreen - minG).toDouble() / (maxG - minG)
+            val colorBlue = (color.colorBlue - minB).toDouble() / (maxB - minB)
 
             combineColor(
-                it.colorAlpha,
+                color.colorAlpha,
                 (colorRed * 255).toInt(),
                 (colorGreen * 255).toInt(),
                 (colorBlue * 255).toInt()

@@ -10,7 +10,7 @@ import dev.patbeagan.consolevision.TerminalColorStyle.Colors.Red
 import dev.patbeagan.consolevision.TerminalColorStyle.ESC
 import dev.patbeagan.consolevision.TerminalColorStyle.SGR
 import dev.patbeagan.consolevision.TerminalColorStyle.style
-import dev.patbeagan.consolevision.util.ColorIntHelper.colorDistance
+import dev.patbeagan.consolevision.util.ColorIntHelper.colorDistanceFrom
 import org.junit.Test
 
 internal class TerminalColorStyleTest {
@@ -80,7 +80,7 @@ internal class TerminalColorStyleTest {
     @Test
     fun testColorDistance() {
         val set = Color256.values().toSet() // .sortedBy { it.color }//.colorDistance(0) }
-        val set2 = Color256.values().toSet().shuffled().sortedBy { colorDistance(it.color, 0) }
+        val set2 = Color256.values().toSet().shuffled().sortedBy { it.color.colorDistanceFrom(0) }
         set.forEachIndexed { index, it ->
             "▄".also { println(it) }
             print(

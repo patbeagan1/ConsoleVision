@@ -1,16 +1,10 @@
 package dev.patbeagan.consolevision
 
 import dev.patbeagan.consolevision.CompressionStyle.UP_DOWN
-import dev.patbeagan.consolevision.TerminalColorStyle.Colors.Custom
-import dev.patbeagan.consolevision.TerminalColorStyle.Colors.CustomPreset
-import dev.patbeagan.consolevision.TerminalColorStyle.Colors.Default
-import dev.patbeagan.consolevision.TerminalColorStyle.colorIntStripAlpha
+import dev.patbeagan.consolevision.TerminalColorStyle.Colors.*
 import dev.patbeagan.consolevision.TerminalColorStyle.style
-import dev.patbeagan.consolevision.util.ColorIntHelper.colorDistance
+import dev.patbeagan.consolevision.util.*
 import dev.patbeagan.consolevision.util.ColorIntHelper.reduceColorSpace
-import dev.patbeagan.consolevision.util.applyColorNormalization
-import dev.patbeagan.consolevision.util.memoize
-import dev.patbeagan.consolevision.util.withDoubledLine
 import java.awt.image.BufferedImage
 
 class ImagePrinter(
@@ -18,29 +12,30 @@ class ImagePrinter(
     private val isCompatPalette: Boolean,
     private val shouldNormalizeColors: Boolean,
 ) {
-    val applyPalette = { rgb: Int, palette: Set<Int>? ->
-        val color = rgb.colorIntStripAlpha()
-        palette?.minByOrNull { colorDistance(color, it) } ?: color
-    }.memoize()
-    val reducedSetApplicator = { color: Int? ->
+    val applyPalette: (ColorInt, Set<ColorInt>?) -> ColorInt =
+        { rgb: ColorInt, palette: Set<ColorInt>? ->
+            val color: ColorInt = rgb.colorIntStripAlpha()
+            palette?.minByOrNull { color.colorDistanceFrom(it) } ?: color
+        }.memoize()
+    val reducedSetApplicator = { color: ColorInt? ->
         Color256.values().toSet().minByOrNull { each ->
-            color?.let { colorDistance(it, each.color) } ?: Double.MAX_VALUE
+            color?.colorDistanceFrom(each.color.asColor()) ?: Double.MAX_VALUE
         }
     }.memoize()
     private val toColorPreset =
         { i: Color256? -> CustomPreset(i?.number ?: 0) }.memoize()
-    private val toColor = { i: Int? ->
+    private val toColor = { i: ColorInt? ->
         if (i == null) Default
         else Custom(
-            i shr 16 and 0xff,
-            i shr 8 and 0xff,
-            i and 0xff
+            i.color shr 16 and 0xff,
+            i.color shr 8 and 0xff,
+            i.color and 0xff
         )
     }.memoize()
 
     fun getFrame(
         read: BufferedImage,
-        paletteColors: Set<Int>? = null,
+        paletteColors: Set<ColorInt>? = null,
         compressionStyle: CompressionStyle = UP_DOWN,
     ): String {
         if (shouldNormalizeColors) {
@@ -68,7 +63,7 @@ class ImagePrinter(
         return out.toString()
     }
 
-    private fun applyCompatPalette(colorRes: Int?) =
+    private fun applyCompatPalette(colorRes: ColorInt?) =
         if (isCompatPalette) {
             reducedSetApplicator(colorRes).let(toColorPreset)
         } else {
@@ -79,12 +74,12 @@ class ImagePrinter(
         x: Int,
         y: Int,
         image: BufferedImage,
-        paletteColors: Set<Int>?,
-    ): Int = applyPalette(
+        paletteColors: Set<ColorInt>?,
+    ): ColorInt = applyPalette(
         reduceColorSpace(
             image.getRGB(x, y),
             reductionRate
-        ),
+        ).asColor(),
         paletteColors
     )
 }
