@@ -1,8 +1,11 @@
 package dev.patbeagan.consolevision.util
 
 import dev.patbeagan.consolevision.ColorMapToAnsi
-import dev.patbeagan.consolevision.CompressionStyle
 import dev.patbeagan.consolevision.ImagePrinter
+import dev.patbeagan.consolevision.ImageScaler
+import dev.patbeagan.consolevision.getScaleToBoundBy
+import dev.patbeagan.consolevision.scale
+import dev.patbeagan.consolevision.types.CompressionStyle
 import org.junit.Before
 import org.junit.Test
 import java.awt.image.BufferedImage
@@ -102,6 +105,22 @@ internal class ImagePrinterTest {
         imagePrinter.getFrame(
             readAsset(IMAGE_SMALL)
         ).also { println(it) }
+    }
+
+    @Test
+    fun `color mutation filter`() {
+        val image = ImageScaler(80, 80).scaledImage(readAsset(LENNA))
+        image ?: run {
+            print("Image not found")
+            return
+        }
+        ImagePrinter(
+            0,
+            ColorMapToAnsi(false),
+            shouldNormalizeColors = false,
+            shouldMutateColors = true
+        ).getFrame(image)
+            .also { println(it) }
     }
 
     @Test

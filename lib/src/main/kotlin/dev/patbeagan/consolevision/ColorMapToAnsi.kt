@@ -21,10 +21,10 @@ class ColorMapToAnsi(
      */
     fun convertToAnsi(colorInt: ColorInt?): AnsiColor = applyPaletteInternal(colorInt)
 
-    private fun toColorPreset(i: Color256?): AnsiColor.CustomPreset =
+    private fun toPresetColor(i: Color256?): AnsiColor.CustomPreset =
         AnsiColor.CustomPreset(i?.number ?: 0)
 
-    private fun toColor(i: ColorInt?): AnsiColor =
+    private fun toFullColor(i: ColorInt?): AnsiColor =
         if (i == null) AnsiColor.Default else AnsiColor.Custom(i)
 
     private fun reducedSetApplicator(color: ColorInt?): Color256? =
@@ -36,9 +36,9 @@ class ColorMapToAnsi(
 
     private val applyPaletteInternal = { colorInt: ColorInt? ->
         if (isCompatPalette) {
-            toColorPreset(reducedSetApplicator(colorInt))
+            toPresetColor(reducedSetApplicator(colorInt))
         } else {
-            toColor(colorInt)
+            toFullColor(colorInt)
         }
     }.memoize()
 }

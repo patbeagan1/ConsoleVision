@@ -1,4 +1,4 @@
-package dev.patbeagan.consolevision
+package dev.patbeagan.consolevision.types
 
 /**
  * Allows us to choose which characters will be overlaid on

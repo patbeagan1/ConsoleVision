@@ -3,6 +3,9 @@ package dev.patbeagan.consolevision.util
 import kotlin.math.pow
 import kotlin.math.sqrt
 
+/**
+ * A 3D distance formula
+ */
 fun distance(
     x1: Int,
     y1: Int,

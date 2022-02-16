@@ -29,10 +29,12 @@ class GetLastImage : RouteHandler {
         call.respondText(
             ConsoleVisionRuntime(
                 paletteImage = null,
-                reductionRate = 0,
-                paletteReductionRate = 0,
-                isCompatPalette = false,
-                shouldNormalize = false,
+                ConsoleVisionRuntime.Config(
+                    reductionRate = 0,
+                    paletteReductionRate = 0,
+                    isCompatPalette = false,
+                    shouldNormalize = false,
+                )
             ).printFrame(read)
         )
     }

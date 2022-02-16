@@ -6,11 +6,10 @@ import kotlin.random.Random
 
 /**
  * A filter that adds some color noise to an image by
- * mutating the color at a given pixel a certain amount.
+ * mutating the color of each pixel a certain amount.
  */
 class ColorMutation(private val variance: Int) : ImageFilter {
     override fun invoke(bufferedImage: BufferedImage) {
-
         bufferedImage.withLine { y, x ->
             ColorInt(bufferedImage.getRGB(x, y))
                 .mutate(variance)

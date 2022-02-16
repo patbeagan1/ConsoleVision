@@ -3,8 +3,8 @@ package dev.patbeagan.consolevision.server.routes
 import dev.patbeagan.consolevision.ConsoleVisionRuntime
 import dev.patbeagan.consolevision.server.RouteHandler
 import dev.patbeagan.consolevision.util.Const
-import io.ktor.application.ApplicationCall
-import io.ktor.response.respondText
+import io.ktor.application.*
+import io.ktor.response.*
 import org.koin.core.component.inject
 import org.slf4j.Logger
 import java.io.File
@@ -25,10 +25,12 @@ class GetRandom : RouteHandler {
         val image = ImageIO.read(randomImage)
         val text = ConsoleVisionRuntime(
             paletteImage = null,
-            reductionRate = 0,
-            paletteReductionRate = 0,
-            isCompatPalette = false,
-            shouldNormalize = false,
+            ConsoleVisionRuntime.Config(
+                reductionRate = 0,
+                paletteReductionRate = 0,
+                isCompatPalette = false,
+                shouldNormalize = false,
+            )
         ).printFrame(image)
         val nameWithoutExtension = randomImage.nameWithoutExtension
         logger.info(nameWithoutExtension)
