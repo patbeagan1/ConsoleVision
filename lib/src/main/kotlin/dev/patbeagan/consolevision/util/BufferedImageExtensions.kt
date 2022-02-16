@@ -1,7 +1,6 @@
 package dev.patbeagan.consolevision.util
 
-import dev.patbeagan.consolevision.util.ColorIntHelper.combineColor
-import dev.patbeagan.consolevision.util.ColorIntHelper.reduceColorSpace
+import dev.patbeagan.consolevision.types.ColorInt
 import java.awt.geom.AffineTransform
 import java.awt.image.AffineTransformOp
 import java.awt.image.BufferedImage
@@ -42,7 +41,8 @@ fun BufferedImage.createColorPalette(
     val colorSet = mutableSetOf<ColorInt>()
     (minY until height).forEach { y ->
         (minX until width).forEach { x ->
-            val element = reduceColorSpace(getRGB(x, y), paletteReductionRate).asColor()
+            val subject = ColorInt.from(getRGB(x, y))
+            val element = ColorInt.from(subject.reduceColorSpaceBy(paletteReductionRate))
             colorSet.add(element)
         }
     }
@@ -69,52 +69,4 @@ inline fun BufferedImage.withDoubledLine(
     }
 }
 
-fun BufferedImage.applyColorNormalization() {
-    var minR = Integer.MAX_VALUE
-    var minG = Integer.MAX_VALUE
-    var minB = Integer.MAX_VALUE
-    var maxR = Integer.MIN_VALUE
-    var maxG = Integer.MIN_VALUE
-    var maxB = Integer.MIN_VALUE
 
-    this.withLine { y, x ->
-        val rgb = this.getRGB(x, y).asColor()
-
-        minR = if (rgb.colorRed < minR) rgb.colorRed else minR
-        maxR = if (rgb.colorRed > maxR) rgb.colorRed else maxR
-
-        minG = if (rgb.colorGreen < minG) rgb.colorGreen else minG
-        maxG = if (rgb.colorGreen > maxG) rgb.colorGreen else maxG
-
-        minB = if (rgb.colorBlue < minB) rgb.colorBlue else minB
-        maxB = if (rgb.colorBlue > maxB) rgb.colorBlue else maxB
-    }
-    this.withLine { y, x ->
-        val newColor = getRGB(x, y).let {
-            val color = it.asColor()
-            val toDouble = (color.colorRed - minR).toDouble()
-            val i = maxR - minR
-            val colorRed = toDouble / i
-            val colorGreen = (color.colorGreen - minG).toDouble() / (maxG - minG)
-            val colorBlue = (color.colorBlue - minB).toDouble() / (maxB - minB)
-
-            combineColor(
-                color.colorAlpha,
-                (colorRed * 255).toInt(),
-                (colorGreen * 255).toInt(),
-                (colorBlue * 255).toInt()
-            )
-        }
-        setRGB(x, y, newColor)
-    }
-}
-
-private inline fun BufferedImage.withLine(
-    onLineEnd: () -> Unit = {},
-    action: (Int, Int) -> Unit,
-) {
-    (minY until height).forEach { y ->
-        (minX until width).forEach { x -> action(y, x) }
-        onLineEnd()
-    }
-}

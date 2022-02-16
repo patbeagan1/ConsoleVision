@@ -1,5 +1,6 @@
 package dev.patbeagan.consolevision
 
+import dev.patbeagan.consolevision.types.CompressedPoint
 import org.junit.Assert
 import org.junit.Test
 

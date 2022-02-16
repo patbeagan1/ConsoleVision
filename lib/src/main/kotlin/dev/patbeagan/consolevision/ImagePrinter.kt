@@ -1,10 +1,12 @@
 package dev.patbeagan.consolevision
 
 import dev.patbeagan.consolevision.CompressionStyle.UP_DOWN
-import dev.patbeagan.consolevision.TerminalColorStyle.Colors.*
-import dev.patbeagan.consolevision.TerminalColorStyle.style
+import dev.patbeagan.consolevision.ansi.AnsiColor.*
+import dev.patbeagan.consolevision.ansi.AnsiConstants.style
+import dev.patbeagan.consolevision.ansi.Color256
+import dev.patbeagan.consolevision.imagefilter.ColorNormalization
+import dev.patbeagan.consolevision.types.ColorInt
 import dev.patbeagan.consolevision.util.*
-import dev.patbeagan.consolevision.util.ColorIntHelper.reduceColorSpace
 import java.awt.image.BufferedImage
 
 class ImagePrinter(
@@ -14,12 +16,12 @@ class ImagePrinter(
 ) {
     val applyPalette: (ColorInt, Set<ColorInt>?) -> ColorInt =
         { rgb: ColorInt, palette: Set<ColorInt>? ->
-            val color: ColorInt = rgb.colorIntStripAlpha()
+            val color: ColorInt = rgb.removeAlpha()
             palette?.minByOrNull { color.colorDistanceFrom(it) } ?: color
         }.memoize()
     val reducedSetApplicator = { color: ColorInt? ->
         Color256.values().toSet().minByOrNull { each ->
-            color?.colorDistanceFrom(each.color.asColor()) ?: Double.MAX_VALUE
+            color?.colorDistanceFrom(ColorInt.from(each.color)) ?: Double.MAX_VALUE
         }
     }.memoize()
     private val toColorPreset =
@@ -39,7 +41,7 @@ class ImagePrinter(
         compressionStyle: CompressionStyle = UP_DOWN,
     ): String {
         if (shouldNormalizeColors) {
-            read.applyColorNormalization()
+            read.applyFilter(ColorNormalization())
         }
         val out = StringBuilder()
         read.withDoubledLine({ out.append("\n") }) { ys, x ->
@@ -76,10 +78,11 @@ class ImagePrinter(
         image: BufferedImage,
         paletteColors: Set<ColorInt>?,
     ): ColorInt = applyPalette(
-        reduceColorSpace(
-            image.getRGB(x, y),
-            reductionRate
-        ).asColor(),
+        ColorInt.from(
+            ColorInt.from(image.getRGB(x, y)).reduceColorSpaceBy(
+                reductionRate
+            )
+        ),
         paletteColors
     )
 }

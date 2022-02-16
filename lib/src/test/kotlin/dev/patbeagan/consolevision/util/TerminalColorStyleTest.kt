@@ -1,21 +1,22 @@
 package dev.patbeagan.consolevision.util
 
-import dev.patbeagan.consolevision.Color256
-import dev.patbeagan.consolevision.TerminalColorStyle
-import dev.patbeagan.consolevision.TerminalColorStyle.Colors.Blue
-import dev.patbeagan.consolevision.TerminalColorStyle.Colors.Custom
-import dev.patbeagan.consolevision.TerminalColorStyle.Colors.CustomPreset
-import dev.patbeagan.consolevision.TerminalColorStyle.Colors.Green
-import dev.patbeagan.consolevision.TerminalColorStyle.Colors.Red
-import dev.patbeagan.consolevision.TerminalColorStyle.ESC
-import dev.patbeagan.consolevision.TerminalColorStyle.SGR
-import dev.patbeagan.consolevision.TerminalColorStyle.style
+import dev.patbeagan.consolevision.ansi.AnsiColor
+import dev.patbeagan.consolevision.ansi.Color256
+import dev.patbeagan.consolevision.ansi.AnsiColor.Blue
+import dev.patbeagan.consolevision.ansi.AnsiColor.Custom
+import dev.patbeagan.consolevision.ansi.AnsiColor.CustomPreset
+import dev.patbeagan.consolevision.ansi.AnsiColor.Green
+import dev.patbeagan.consolevision.ansi.AnsiColor.Red
+import dev.patbeagan.consolevision.ansi.AnsiConstants.ESC
+import dev.patbeagan.consolevision.ansi.AnsiSGR
+import dev.patbeagan.consolevision.ansi.AnsiConstants.style
+import dev.patbeagan.consolevision.types.ColorInt
 import org.junit.Test
 
 internal class TerminalColorStyleTest {
     @Test
     fun demoSGRValues() {
-        SGR::class.sealedSubclasses.forEach {
+        AnsiSGR::class.sealedSubclasses.forEach {
             println(it.simpleName?.style(sgr = it.objectInstance!!))
         }
     }
@@ -31,16 +32,16 @@ internal class TerminalColorStyleTest {
         val styledText = "redOnGreen".style(
             Red,
             Green,
-            SGR.Bold
+            AnsiSGR.Bold
         )
         println(
-            "Todd ${"wanted".style(sgr = SGR.Italic)} a $styledText car"
+            "Todd ${"wanted".style(sgr = AnsiSGR.Italic)} a $styledText car"
         )
     }
 
     @Test
     fun demoNamedColors() {
-        TerminalColorStyle.Colors::class.sealedSubclasses.forEach {
+        AnsiColor::class.sealedSubclasses.forEach {
             safeLet(it.simpleName, it.objectInstance) { name, color ->
                 println(name.style(color) + "test")
             }
@@ -49,7 +50,7 @@ internal class TerminalColorStyleTest {
 
     @Test
     fun demoInlineSGR() {
-        SGR::class.sealedSubclasses.forEach {
+        AnsiSGR::class.sealedSubclasses.forEach {
             safeLet(it.simpleName, it.objectInstance) { name, sgr ->
                 println("test${name.style(sgr = sgr)}test")
             }
@@ -57,12 +58,12 @@ internal class TerminalColorStyleTest {
         println()
         val styledText = "3test".style(
             sgr = arrayOf(
-                SGR.Bold,
-                SGR.Framed
+                AnsiSGR.Bold,
+                AnsiSGR.Framed
             )
         )
         println(
-            "1test${SGR.Underline.enableString()}2test${styledText}4test"
+            "1test${AnsiSGR.Underline.enableString()}2test${styledText}4test"
         )
     }
 
@@ -95,7 +96,7 @@ internal class TerminalColorStyleTest {
     fun testColorDistance() {
         val set = Color256.values().toSet() // .sortedBy { it.color }//.colorDistance(0) }
         val set2 = Color256.values().toSet().shuffled()
-            .sortedBy { it.color.asColor().colorDistanceFrom(0.asColor()) }
+            .sortedBy { ColorInt.from(it.color).colorDistanceFrom(ColorInt.from(0)) }
         set.forEachIndexed { index, it ->
             "▄".also { println(it) }
             print(

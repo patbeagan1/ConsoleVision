@@ -1,4 +1,4 @@
-package dev.patbeagan.consolevision
+package dev.patbeagan.consolevision.types
 
 import kotlin.math.pow
 

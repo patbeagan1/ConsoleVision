@@ -1,6 +1,6 @@
 package dev.patbeagan.consolevision
 
-import dev.patbeagan.consolevision.util.ColorInt
+import dev.patbeagan.consolevision.types.ColorInt
 import dev.patbeagan.consolevision.util.createColorPalette
 import java.awt.image.BufferedImage
 
