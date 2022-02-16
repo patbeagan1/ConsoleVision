@@ -21,7 +21,7 @@ sealed class AnsiColor(val foreground: String, val background: String) {
     object Yellow : AnsiColor("33", "43")
     object YellowBright : AnsiColor("93", "103")
     class CustomPreset(value: Int = 0) : AnsiColor("38;5;$value", "48;5;$value")
-    class Custom(private val colorInt: ColorInt) : AnsiColor(
+    class Custom(colorInt: ColorInt) : AnsiColor(
         "38;2;${colorInt.colorRed};${colorInt.colorGreen};${colorInt.colorBlue}",
         "48;2;${colorInt.colorRed};${colorInt.colorGreen};${colorInt.colorBlue}"
     )
