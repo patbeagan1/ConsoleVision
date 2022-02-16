@@ -1,6 +1,5 @@
 package dev.patbeagan.consolevision.util
 
-import dev.patbeagan.consolevision.TerminalColorStyle
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -22,13 +21,6 @@ value class ColorInt(
     val colorRed get() = this.color shr 16 and 255
     val colorGreen get() = this.color shr 8 and 255
     val colorBlue get() = this.color and 255
-
-    fun colorIntToARGB(): TerminalColorStyle.ARGB = TerminalColorStyle.ARGB(
-        colorAlpha,
-        colorRed,
-        colorGreen,
-        colorBlue
-    )
 
     /**
      * Masks just the last 3 color spaces - assumes ARGB

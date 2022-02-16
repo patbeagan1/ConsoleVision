@@ -52,8 +52,6 @@ object TerminalColorStyle {
             private val b: Int = 0
         ) : Colors("38;2;$r;$g;$b", "48;2;$r;$g;$b") {
 
-            constructor(argb: ARGB) : this(argb.r, argb.g, argb.b)
-
             fun mutate(variation: Int): Colors {
                 fun Int.newColorVal() = this + (Random.nextInt() % variation).coerceIn(0..255)
                 return Custom(r.newColorVal(), g.newColorVal(), b.newColorVal())
@@ -82,14 +80,6 @@ object TerminalColorStyle {
 
         fun enableString() = "$CSI${this.enable}m"
         fun disableString() = "$CSI${this.disable}m"
-    }
-
-    data class ARGB(val a: Int, val r: Int, val g: Int, val b: Int) {
-        fun argbToColorInt(withAlpha: Boolean = true): Int =
-            (a shl 24).takeIf { withAlpha } ?: 0
-                .or(r shl 16)
-                .or(g shl 8)
-                .or(b)
     }
 
     fun String.style(
