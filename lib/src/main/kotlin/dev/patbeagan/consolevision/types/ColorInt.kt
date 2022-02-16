@@ -48,6 +48,8 @@ value class ColorInt(
      *
      * @return the distance from another color, as a double
      */
+    // todo try to find a more accurate measurement for this.
+    //  colorspace is non-euclidean
     fun colorDistanceFrom(other: ColorInt): Double = distance(
         this.color shr 16 and 255,
         this.color shr 8 and 255,
