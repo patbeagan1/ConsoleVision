@@ -82,7 +82,7 @@ internal class ImagePrinterTest {
     fun `sample image compressed dots`() {
         imagePrinter.getFrame(
             readAsset(IMAGE_SMALL),
-            compressionStyle = CompressionStyle.DOTS
+            compressionStyle = CompressionStyle.DOTS_HIGH
         ).also { println(it) }
     }
 

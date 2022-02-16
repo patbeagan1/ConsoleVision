@@ -2,9 +2,10 @@ package dev.patbeagan.consolevision
 
 import dev.patbeagan.consolevision.CompressionStyle.UP_DOWN
 import dev.patbeagan.consolevision.ansi.AnsiColor.*
-import dev.patbeagan.consolevision.ansi.AnsiConstants.style
 import dev.patbeagan.consolevision.ansi.Color256
+import dev.patbeagan.consolevision.ansi.StyleExtensions.style
 import dev.patbeagan.consolevision.imagefilter.ColorNormalization
+import dev.patbeagan.consolevision.imagefilter.applyFilter
 import dev.patbeagan.consolevision.types.ColorInt
 import dev.patbeagan.consolevision.util.*
 import java.awt.image.BufferedImage
