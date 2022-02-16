@@ -90,7 +90,6 @@ object TerminalColorStyle {
                 .or(r shl 16)
                 .or(g shl 8)
                 .or(b)
-
     }
 
     fun String.style(

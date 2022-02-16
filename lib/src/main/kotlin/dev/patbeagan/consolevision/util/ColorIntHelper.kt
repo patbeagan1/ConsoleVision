@@ -70,7 +70,6 @@ object ColorIntHelper {
         return sqrt(d1 * d2 * d3)
     }
 
-
     fun combineColor(a: Int, r: Int, g: Int, b: Int) = (a shl 24)
         .or(r shl 16)
         .or(g shl 8)

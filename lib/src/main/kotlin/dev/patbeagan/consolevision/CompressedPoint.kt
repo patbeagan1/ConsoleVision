@@ -20,8 +20,8 @@ value class CompressedPoint(private val base: Long) {
 
     override fun toString(): String =
         "CompressedPoint of ${this.x} to ${this.y}\n" +
-                "                   ${Integer.toBinaryString(x)}\n" +
-                "                   ${Integer.toBinaryString(y)}"
+            "                   ${Integer.toBinaryString(x)}\n" +
+            "                   ${Integer.toBinaryString(y)}"
 
     companion object {
         /**
@@ -35,4 +35,3 @@ value class CompressedPoint(private val base: Long) {
         )
     }
 }
-

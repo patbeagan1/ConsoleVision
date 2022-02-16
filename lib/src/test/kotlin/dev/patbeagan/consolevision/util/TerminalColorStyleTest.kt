@@ -10,7 +10,6 @@ import dev.patbeagan.consolevision.TerminalColorStyle.Colors.Red
 import dev.patbeagan.consolevision.TerminalColorStyle.ESC
 import dev.patbeagan.consolevision.TerminalColorStyle.SGR
 import dev.patbeagan.consolevision.TerminalColorStyle.style
-import dev.patbeagan.consolevision.util.ColorIntHelper.colorDistanceFrom
 import org.junit.Test
 
 internal class TerminalColorStyleTest {
@@ -57,7 +56,16 @@ internal class TerminalColorStyleTest {
             }
         }
         println()
-        println("1test${SGR.Underline.enableString()}2test${"3test".style(sgr = arrayOf(SGR.Bold, SGR.Framed))}4test")
+        println(
+            "1test${SGR.Underline.enableString()}2test${
+            "3test".style(
+                sgr = arrayOf(
+                    SGR.Bold,
+                    SGR.Framed
+                )
+            )
+            }4test"
+        )
     }
 
     @Test
@@ -73,14 +81,23 @@ internal class TerminalColorStyleTest {
     @Test
     fun testGreyscaleColors() {
         (0..255).forEach {
-            println("$ESC[38;2;$it;$it;${it}m test" + " ".style(colorBackground = Custom(it, it, it)))
+            println(
+                "$ESC[38;2;$it;$it;${it}m test" + " ".style(
+                    colorBackground = Custom(
+                        it,
+                        it,
+                        it
+                    )
+                )
+            )
         }
     }
 
     @Test
     fun testColorDistance() {
         val set = Color256.values().toSet() // .sortedBy { it.color }//.colorDistance(0) }
-        val set2 = Color256.values().toSet().shuffled().sortedBy { it.color.colorDistanceFrom(0) }
+        val set2 = Color256.values().toSet().shuffled()
+            .sortedBy { it.color.asColor().colorDistanceFrom(0.asColor()) }
         set.forEachIndexed { index, it ->
             "▄".also { println(it) }
             print(
