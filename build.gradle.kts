@@ -17,7 +17,7 @@ childProjects
     .forEach { entry ->
         entry.value.run {
             group = "dev.patbeagan"
-            version = "0.5.0"
+            version = "0.6.0"
             afterEvaluate {
                 tasks {
                     named<ShadowJar>("shadowJar") {
