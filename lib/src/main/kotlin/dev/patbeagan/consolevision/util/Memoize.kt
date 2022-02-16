@@ -1,6 +1,6 @@
 package dev.patbeagan.consolevision.util
 
-class Memoize1<in T, out R>(val f: (T) -> R) : (T) -> R {
+class Memoize1<in T, out R>(private val f: (T) -> R) : (T) -> R {
     private val values = mutableMapOf<T, R>()
 
     override fun invoke(x: T): R {
@@ -16,7 +16,7 @@ class Memoize1<in T, out R>(val f: (T) -> R) : (T) -> R {
     }
 }
 
-class Memoize2<in S, in T, out R>(val f: (S, T) -> R) : (S, T) -> R {
+class Memoize2<in S, in T, out R>(private val f: (S, T) -> R) : (S, T) -> R {
     private val values = mutableMapOf<Pair<S, T>, R>()
     private val cache = Array<Pair<S, T>?>(SIZE_LIMIT) { null }
     private var counter = 0

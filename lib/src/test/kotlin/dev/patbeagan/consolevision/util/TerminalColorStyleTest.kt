@@ -1,7 +1,6 @@
 package dev.patbeagan.consolevision.util
 
 import dev.patbeagan.consolevision.ansi.AnsiColor
-import dev.patbeagan.consolevision.ansi.Color256
 import dev.patbeagan.consolevision.ansi.AnsiColor.Blue
 import dev.patbeagan.consolevision.ansi.AnsiColor.Custom
 import dev.patbeagan.consolevision.ansi.AnsiColor.CustomPreset
@@ -9,6 +8,7 @@ import dev.patbeagan.consolevision.ansi.AnsiColor.Green
 import dev.patbeagan.consolevision.ansi.AnsiColor.Red
 import dev.patbeagan.consolevision.ansi.AnsiConstants.ESC
 import dev.patbeagan.consolevision.ansi.AnsiSGR
+import dev.patbeagan.consolevision.ansi.Color256
 import dev.patbeagan.consolevision.ansi.StyleExtensions.style
 import dev.patbeagan.consolevision.types.ColorInt
 import org.junit.Test
@@ -71,7 +71,7 @@ internal class TerminalColorStyleTest {
     fun testColorBlending() {
         (50..100).forEach { y ->
             (100 downTo 50).forEach { x ->
-                " ".style(colorBackground = Custom(x, y, x)).also { print(it) }
+                " ".style(colorBackground = Custom(ColorInt.from(255, x, y, x))).also { print(it) }
             }
             println()
         }
@@ -81,13 +81,8 @@ internal class TerminalColorStyleTest {
     fun testGreyscaleColors() {
         (0..255).forEach {
             println(
-                "$ESC[38;2;$it;$it;${it}m test" + " ".style(
-                    colorBackground = Custom(
-                        it,
-                        it,
-                        it
-                    )
-                )
+                "$ESC[38;2;$it;$it;${it}m test" +
+                    " ".style(colorBackground = Custom(ColorInt(it)))
             )
         }
     }
@@ -96,7 +91,7 @@ internal class TerminalColorStyleTest {
     fun testColorDistance() {
         val set = Color256.values().toSet() // .sortedBy { it.color }//.colorDistance(0) }
         val set2 = Color256.values().toSet().shuffled()
-            .sortedBy { ColorInt.from(it.color).colorDistanceFrom(ColorInt.from(0)) }
+            .sortedBy { ColorInt(it.color).colorDistanceFrom(ColorInt(0)) }
         set.forEachIndexed { index, it ->
             "▄".also { println(it) }
             print(

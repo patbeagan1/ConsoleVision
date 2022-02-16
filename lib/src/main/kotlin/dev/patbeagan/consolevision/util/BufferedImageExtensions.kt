@@ -41,8 +41,8 @@ fun BufferedImage.createColorPalette(
     val colorSet = mutableSetOf<ColorInt>()
     (minY until height).forEach { y ->
         (minX until width).forEach { x ->
-            val subject = ColorInt.from(getRGB(x, y))
-            val element = ColorInt.from(subject.reduceColorSpaceBy(paletteReductionRate))
+            val subject = ColorInt(getRGB(x, y))
+            val element = subject.reduceColorSpaceBy(paletteReductionRate)
             colorSet.add(element)
         }
     }
@@ -68,5 +68,3 @@ inline fun BufferedImage.withDoubledLine(
         onLineEnd()
     }
 }
-
-

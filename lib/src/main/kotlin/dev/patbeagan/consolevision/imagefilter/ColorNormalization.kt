@@ -1,7 +1,6 @@
 package dev.patbeagan.consolevision.imagefilter
 
 import dev.patbeagan.consolevision.types.ColorInt
-import dev.patbeagan.consolevision.util.ColorIntHelper
 import java.awt.image.BufferedImage
 
 /**
@@ -35,7 +34,7 @@ class ColorNormalization : ImageFilter {
         var maxB = Integer.MIN_VALUE
 
         bufferedImage.withLine { y, x ->
-            val rgb = ColorInt.from(bufferedImage.getRGB(x, y))
+            val rgb = ColorInt(bufferedImage.getRGB(x, y))
 
             minR = if (rgb.colorRed < minR) rgb.colorRed else minR
             maxR = if (rgb.colorRed > maxR) rgb.colorRed else maxR
@@ -49,31 +48,21 @@ class ColorNormalization : ImageFilter {
 
         bufferedImage.withLine { y, x ->
             val newColor = bufferedImage.getRGB(x, y).let {
-                val color = ColorInt.from(it)
+                val color = ColorInt(it)
                 val toDouble = (color.colorRed - minR).toDouble()
                 val i = maxR - minR
                 val colorRed = toDouble / i
                 val colorGreen = (color.colorGreen - minG).toDouble() / (maxG - minG)
                 val colorBlue = (color.colorBlue - minB).toDouble() / (maxB - minB)
 
-                ColorIntHelper.combineColor(
+                ColorInt.from(
                     color.colorAlpha,
                     (colorRed * 255).toInt(),
                     (colorGreen * 255).toInt(),
                     (colorBlue * 255).toInt()
                 )
             }
-            bufferedImage.setRGB(x, y, newColor)
-        }
-    }
-
-    private inline fun BufferedImage.withLine(
-        onLineEnd: () -> Unit = {},
-        action: (Int, Int) -> Unit,
-    ) {
-        (minY until height).forEach { y ->
-            (minX until width).forEach { x -> action(y, x) }
-            onLineEnd()
+            bufferedImage.setRGB(x, y, newColor.color)
         }
     }
 }

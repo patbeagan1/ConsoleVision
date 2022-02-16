@@ -11,10 +11,12 @@ class ConsoleVisionRuntime(
     isCompatPalette: Boolean,
     shouldNormalize: Boolean,
 ) {
-    private val paletteColors: Set<ColorInt>? = paletteImage?.createColorPalette(paletteReductionRate)
+    private val paletteColors: Set<ColorInt>? =
+        paletteImage?.createColorPalette(paletteReductionRate)
+
     private val imagePrinter = ImagePrinter(
         reductionRate,
-        isCompatPalette,
+        ColorMapToAnsi(isCompatPalette),
         shouldNormalize
     )
 

@@ -1,6 +1,6 @@
 package dev.patbeagan.consolevision.ansi
 
-import kotlin.random.Random
+import dev.patbeagan.consolevision.types.ColorInt
 
 sealed class AnsiColor(val foreground: String, val background: String) {
     object Default : AnsiColor("39", "49")
@@ -20,17 +20,9 @@ sealed class AnsiColor(val foreground: String, val background: String) {
     object RedBright : AnsiColor("91", "101")
     object Yellow : AnsiColor("33", "43")
     object YellowBright : AnsiColor("93", "103")
-    class Custom(
-        private val r: Int = 0,
-        private val g: Int = 0,
-        private val b: Int = 0
-    ) : AnsiColor("38;2;$r;$g;$b", "48;2;$r;$g;$b") {
-
-        fun mutate(variation: Int): AnsiColor {
-            fun Int.newColorVal() = this + (Random.nextInt() % variation).coerceIn(0..255)
-            return Custom(r.newColorVal(), g.newColorVal(), b.newColorVal())
-        }
-    }
-
     class CustomPreset(value: Int = 0) : AnsiColor("38;5;$value", "48;5;$value")
+    class Custom(private val colorInt: ColorInt) : AnsiColor(
+        "38;2;${colorInt.colorRed};${colorInt.colorGreen};${colorInt.colorBlue}",
+        "48;2;${colorInt.colorRed};${colorInt.colorGreen};${colorInt.colorBlue}"
+    )
 }
