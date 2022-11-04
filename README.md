@@ -1,5 +1,10 @@
 # ConsoleVision
 https://patbeagan.dev/projects/consolevideo
+![Screenshot_2022-04-27_23-45-04](https://user-images.githubusercontent.com/10187351/165678333-b3c45bbe-1a8b-49ae-91ab-48feb0337482.png)
+```bash
+# print this image ^ on the terminal via
+curl 3.221.34.94/im/68445a202b79b2943679064c03b3dee7
+```
 
 # What is this project about?
 
