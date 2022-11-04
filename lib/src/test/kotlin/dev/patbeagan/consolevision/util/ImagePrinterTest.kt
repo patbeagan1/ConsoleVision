@@ -34,6 +34,7 @@ internal class ImagePrinterTest {
 
     @Test
     fun `sample image fullsize`() {
+        println("sample image fullsize")
         val directory = File("./")
         println(directory.absolutePath)
         imagePrinter.getFrame(readAsset(IMAGE_SMALL)).also { println(it) }
@@ -41,12 +42,14 @@ internal class ImagePrinterTest {
 
     @Test
     fun `sample image fullsize normalized`() {
+        println("sample image fullsize normalized")
         ImagePrinter(0, ColorMapToAnsi(false), shouldNormalizeColors = true)
             .getFrame(readAsset(IMAGE_SMALL)).also { println(it) }
     }
 
     @Test
     fun `sample image scaled normalized`() {
+        println("sample image scaled normalized")
         val read = readAsset(LENNA)
         val read1 = getScaledImage(read)
         val read2 = getScaledImage(read)
@@ -61,6 +64,7 @@ internal class ImagePrinterTest {
 
     @Test
     fun `sample image reduced - gradient`() {
+        println("sample image reduced - gradient")
         val read = readAsset(GRADIENT)
         val read1 = getScaledImage(read)
         val read2 = getScaledImage(read)
@@ -75,6 +79,7 @@ internal class ImagePrinterTest {
 
     @Test
     fun `sample image reduced - lenna`() {
+        println("sample image reduced - lenna")
         val read = readAsset(LENNA)
         val read1 = getScaledImage(read)
         val read2 = getScaledImage(read)
@@ -94,6 +99,7 @@ internal class ImagePrinterTest {
 
     @Test
     fun `sample image compressed dots`() {
+        println("sample image compressed dots")
         imagePrinter.getFrame(
             readAsset(IMAGE_SMALL),
             compressionStyle = CompressionStyle.DOTS_HIGH
@@ -102,6 +108,7 @@ internal class ImagePrinterTest {
 
     @Test
     fun `sample image compressed`() {
+        println("sample image compressed")
         imagePrinter.getFrame(
             readAsset(IMAGE_SMALL)
         ).also { println(it) }
@@ -109,6 +116,7 @@ internal class ImagePrinterTest {
 
     @Test
     fun `color mutation filter`() {
+        println("color mutation filter")
         val image = ImageScaler(80, 80).scaledImage(readAsset(LENNA))
         image ?: run {
             print("Image not found")
@@ -125,6 +133,7 @@ internal class ImagePrinterTest {
 
     @Test
     fun `sizedown sampling comparison`() {
+        println("sizedown sampling comparison")
         val read = readAsset(IMAGE_LARGE)
 
         val (scale, transformOp) = read.getScaleToBoundBy(90, 90)
@@ -135,6 +144,7 @@ internal class ImagePrinterTest {
 
     @Test
     fun `palette swapping`() {
+        println("palette swapping")
         val read = readAsset(LENNA)
         listOf(
             "borkfest-1x.png",

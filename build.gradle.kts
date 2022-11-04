@@ -13,11 +13,11 @@ repositories {
 
 childProjects
     .onEach { println(it) }
-    .filter { it.key in listOf("app", "lib") }
+    .filter { it.key in listOf("app", "lib", "server") }
     .forEach { entry ->
         entry.value.run {
             group = "dev.patbeagan"
-            version = "0.6.0"
+            version = "0.7.0"
             afterEvaluate {
                 tasks {
                     named<ShadowJar>("shadowJar") {

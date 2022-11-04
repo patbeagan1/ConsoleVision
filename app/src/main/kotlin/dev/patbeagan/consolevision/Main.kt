@@ -1,6 +1,5 @@
 package dev.patbeagan.consolevision
 
-import dev.patbeagan.consolevision.server.Server
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.CommandLineParser
 import org.apache.commons.cli.HelpFormatter
@@ -24,13 +23,12 @@ fun main(args: Array<String>) {
                 HelpFormatter().printHelp("CMD", options)
                 exitProcess(0)
             }
+
             args.isEmpty() -> {
                 val formatter = HelpFormatter()
                 formatter.printHelp(Runtime::class.java.canonicalName + " <filename>", options)
             }
-            cmd.hasOption("s") -> {
-                Server().startServer()
-            }
+
             else -> {
                 val width = cmd.getOptionValue("w")?.toInt()
                 val height = cmd.getOptionValue("h")?.toInt()
@@ -76,12 +74,6 @@ private fun getOptions() = Options().apply {
         "compat",
         false,
         "requests to use the reduced ansi color set"
-    )
-    addOption(
-        "s",
-        "server",
-        false,
-        "starts a server that will handle multiple requests."
     )
     addOption(
         "n",
