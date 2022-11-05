@@ -11,12 +11,12 @@ value class CompressedPoint(private val base: Long) {
     /**
      * The first coordinate in the CompressedPoint
      */
-    val x get() = (base shr 32).toInt()
+    val x: Int get() = (base shr 32).toInt()
 
     /**
      * The second coordinate in the CompressedPoint
      */
-    val y get() = base.toInt() // (base and (2.0.pow(32) - 1).toLong()).toInt()
+    val y: Int get() = base.toInt() // (base and (2.0.pow(32) - 1).toLong()).toInt()
 
     override fun toString(): String =
         "CompressedPoint of ${this.x} to ${this.y}\n" +

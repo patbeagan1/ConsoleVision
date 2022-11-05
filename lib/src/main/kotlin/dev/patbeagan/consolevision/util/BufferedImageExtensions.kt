@@ -5,11 +5,6 @@ import dev.patbeagan.consolevision.types.ColorPalette
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
 
-fun BufferedImage.getByteData(): ByteArray {
-    val buffer = raster.dataBuffer as DataBufferByte
-    return buffer.data
-}
-
 fun BufferedImage.createColorPalette(
     paletteReductionRate: Int,
 ): ColorPalette {

@@ -4,7 +4,6 @@ import dev.patbeagan.consolevision.ansi.AnsiColor
 import dev.patbeagan.consolevision.ansi.StyleExtensions.style
 import dev.patbeagan.consolevision.imagefilter.ColorMutation
 import dev.patbeagan.consolevision.imagefilter.ColorNormalization
-import dev.patbeagan.consolevision.imagefilter.applyFilter
 import dev.patbeagan.consolevision.types.ColorInt
 import dev.patbeagan.consolevision.types.ColorPalette
 import dev.patbeagan.consolevision.types.CompressionStyle
@@ -20,17 +19,15 @@ class ImagePrinter(
     private val colorMapToAnsi: ColorMapToAnsi,
     private val shouldNormalizeColors: Boolean,
     private val shouldMutateColors: Boolean = false,
+    private val paletteColors: ColorPalette? = null,
+    private val compressionStyle: CompressionStyle = LOWER_HALF,
 ) {
     private val applyPalette: (ColorInt, ColorPalette?) -> ColorInt =
         { colorInt: ColorInt, palette: ColorPalette? ->
             palette?.matchColor(colorInt) ?: colorInt
         }.memoize()
 
-    fun getFrame(
-        read: BufferedImage,
-        paletteColors: ColorPalette? = null,
-        compressionStyle: CompressionStyle = LOWER_HALF,
-    ): String {
+    fun getFrame(read: BufferedImage): String {
         applyFilters(read)
         val out = buildOutput(read, compressionStyle, paletteColors)
         return out.toString()
