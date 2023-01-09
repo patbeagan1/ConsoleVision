@@ -20,13 +20,21 @@ internal class ImagePrinterTest {
 
     @Before
     fun setup() {
-        imagePrinter = ImagePrinter(0, ColorMapToAnsi(false), shouldNormalizeColors = false)
+        imagePrinter = ImagePrinter(
+            0,
+            ColorMapToAnsi(false),
+            shouldNormalizeColors = false,
+        )
     }
 
     @Test
     fun compatPalette() {
         println(
-            ImagePrinter(0, ColorMapToAnsi(true), shouldNormalizeColors = false).getFrame(
+            ImagePrinter(
+                0,
+                ColorMapToAnsi(true),
+                shouldNormalizeColors = false,
+            ).getFrame(
                 getScaledImage(readAsset(LENNA))
             )
         )
@@ -34,6 +42,7 @@ internal class ImagePrinterTest {
 
     @Test
     fun `sample image fullsize`() {
+        println("sample image fullsize")
         val directory = File("./")
         println(directory.absolutePath)
         imagePrinter.getFrame(readAsset(IMAGE_SMALL)).also { println(it) }
@@ -41,49 +50,81 @@ internal class ImagePrinterTest {
 
     @Test
     fun `sample image fullsize normalized`() {
-        ImagePrinter(0, ColorMapToAnsi(false), shouldNormalizeColors = true)
+        println("sample image fullsize normalized")
+        ImagePrinter(
+            0,
+            ColorMapToAnsi(false),
+            shouldNormalizeColors = true,
+        )
             .getFrame(readAsset(IMAGE_SMALL)).also { println(it) }
     }
 
     @Test
     fun `sample image scaled normalized`() {
+        println("sample image scaled normalized")
         val read = readAsset(LENNA)
         val read1 = getScaledImage(read)
         val read2 = getScaledImage(read)
 
         println("Normalized: TRUE")
-        ImagePrinter(0, ColorMapToAnsi(false), shouldNormalizeColors = true).getFrame(read1)
+        ImagePrinter(
+            0,
+            ColorMapToAnsi(false),
+            shouldNormalizeColors = true,
+        ).getFrame(read1)
             .also { println(it) }
         println("Normalized: FALSE")
-        ImagePrinter(0, ColorMapToAnsi(false), shouldNormalizeColors = false).getFrame(read2)
+        ImagePrinter(
+            0,
+            ColorMapToAnsi(false),
+            shouldNormalizeColors = false,
+        ).getFrame(read2)
             .also { println(it) }
     }
 
     @Test
     fun `sample image reduced - gradient`() {
+        println("sample image reduced - gradient")
         val read = readAsset(GRADIENT)
         val read1 = getScaledImage(read)
         val read2 = getScaledImage(read)
 
         println("Reduced: TRUE")
-        ImagePrinter(8, ColorMapToAnsi(false), shouldNormalizeColors = false).getFrame(read1)
+        ImagePrinter(
+            8,
+            ColorMapToAnsi(false),
+            shouldNormalizeColors = false,
+        ).getFrame(read1)
             .also { println(it) }
         println("Reduced: FALSE")
-        ImagePrinter(0, ColorMapToAnsi(false), shouldNormalizeColors = false).getFrame(read2)
+        ImagePrinter(
+            0,
+            ColorMapToAnsi(false),
+            shouldNormalizeColors = false,
+        ).getFrame(read2)
             .also { println(it) }
     }
 
     @Test
     fun `sample image reduced - lenna`() {
+        println("sample image reduced - lenna")
         val read = readAsset(LENNA)
         val read1 = getScaledImage(read)
         val read2 = getScaledImage(read)
 
         println("Reduced: TRUE")
-        ImagePrinter(40, ColorMapToAnsi(false), shouldNormalizeColors = false).getFrame(read1)
+        ImagePrinter(
+            40,
+            ColorMapToAnsi(false),
+            shouldNormalizeColors = false,
+        ).getFrame(read1)
             .also { println(it) }
         println("Reduced: FALSE")
-        ImagePrinter(0, ColorMapToAnsi(false), shouldNormalizeColors = false).getFrame(read2)
+        ImagePrinter(
+            0,
+            ColorMapToAnsi(false),
+            shouldNormalizeColors = false,
+        ).getFrame(read2)
             .also { println(it) }
     }
 
@@ -94,14 +135,20 @@ internal class ImagePrinterTest {
 
     @Test
     fun `sample image compressed dots`() {
-        imagePrinter.getFrame(
-            readAsset(IMAGE_SMALL),
+        println("sample image compressed dots")
+        ImagePrinter(
+            0,
+            ColorMapToAnsi(false),
+            shouldNormalizeColors = false,
             compressionStyle = CompressionStyle.DOTS_HIGH
+        ).getFrame(
+            readAsset(IMAGE_SMALL),
         ).also { println(it) }
     }
 
     @Test
     fun `sample image compressed`() {
+        println("sample image compressed")
         imagePrinter.getFrame(
             readAsset(IMAGE_SMALL)
         ).also { println(it) }
@@ -109,6 +156,7 @@ internal class ImagePrinterTest {
 
     @Test
     fun `color mutation filter`() {
+        println("color mutation filter")
         val image = ImageScaler(80, 80).scaledImage(readAsset(LENNA))
         image ?: run {
             print("Image not found")
@@ -118,13 +166,14 @@ internal class ImagePrinterTest {
             0,
             ColorMapToAnsi(true),
             shouldNormalizeColors = true,
-            shouldMutateColors = true
+            shouldMutateColors = true,
         ).getFrame(image)
             .also { println(it) }
     }
 
     @Test
     fun `sizedown sampling comparison`() {
+        println("sizedown sampling comparison")
         val read = readAsset(IMAGE_LARGE)
 
         val (scale, transformOp) = read.getScaleToBoundBy(90, 90)
@@ -135,6 +184,7 @@ internal class ImagePrinterTest {
 
     @Test
     fun `palette swapping`() {
+        println("palette swapping")
         val read = readAsset(LENNA)
         listOf(
             "borkfest-1x.png",
@@ -158,9 +208,14 @@ internal class ImagePrinterTest {
         }.forEach { (first, second) ->
             val (scale, transformOp) = read.getScaleToBoundBy(70, 70)
             println(first)
-            imagePrinter.getFrame(
-                read.scale(scale, transformOp),
-                second?.createColorPalette(0)
+            ImagePrinter(
+                0,
+                ColorMapToAnsi(false),
+                shouldNormalizeColors = false,
+                compressionStyle = CompressionStyle.LOWER_HALF,
+                paletteColors = second?.createColorPalette(0),
+            ).getFrame(
+                read.scale(scale, transformOp)
             ).also { println(it) }
         }
     }

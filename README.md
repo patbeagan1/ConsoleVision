@@ -1,7 +1,10 @@
 # ConsoleVision
 https://patbeagan.dev/projects/consolevideo
+![Screenshot_2022-04-27_23-45-04](https://user-images.githubusercontent.com/10187351/165678333-b3c45bbe-1a8b-49ae-91ab-48feb0337482.png)
 
 # What is this project about?
+
+`ConsoleVision` is a library that will take a bitmap and convert it to a ANSI
 
 With this tool, you'll be able to display images without leaving your terminal. This can be useful when you are just sshing into another machine and don't have GUI access. 
 
@@ -9,15 +12,16 @@ To make this more convenient, there is an option to run the tool as a server ins
 
 # What's included?
 
-There are 2 deliverables from this repo
-- **lib** - a library that will take a bitmap and convert it to a ANSI
-- **app** - a wrapper that makes the library available via CLI and as a server.
+<details>
+<summary>As a Library</summary>
 
-## As a library
 
 The library jar file includes an implementation of [ANSI](https://mudhalla.net/tintin/info/ansicolor/) for the JVM. It has some similar content to [Jansi](http://fusesource.github.io/jansi/) (which I was unaware of at the time), but it includes extensions that make it more useful for image processing.
 
-## As an app
+</details>
+
+<details>
+<summary>As an App</summary>
 
 The app supports a variety of command line flags which will allow for:
 - colorspace reduction
@@ -31,7 +35,12 @@ The app supports a variety of command line flags which will allow for:
 |-|-|-|-|
 |<img width="705" alt="Screen Shot 2022-02-05 at 8 51 15 AM" src="https://user-images.githubusercontent.com/10187351/152647110-105c8015-f7a7-4a98-aaff-6947722651b6.png">|<img width="700" alt="Screen Shot 2022-02-05 at 8 50 53 AM" src="https://user-images.githubusercontent.com/10187351/152647111-787eeef5-dd59-4ef8-8e0d-47678f44f953.png">|<img width="719" alt="Screen Shot 2022-02-05 at 9 03 37 AM" src="https://user-images.githubusercontent.com/10187351/152647252-c9035db3-a684-4818-8455-f917dade6700.png">|<img width="717" alt="Screen Shot 2022-02-05 at 9 02 59 AM" src="https://user-images.githubusercontent.com/10187351/152647253-1c6b5be0-bb7f-4b58-a98e-ba10c253106a.png">|
 
-It also has the ability to be run as a server, with the `-s` flag. This will allow you to use a limited feature set of the command line tool, in a more convenient way. 
+</details>
+
+<details>
+<summary>As a Server</summary>
+
+Running the tool as a server will allow you to use a limited feature set of the command line tool, in a more convenient way. 
 - To upload a photo, POST to the `/upload` endpoint. You'll receive an image hash. 
 - To retrieve a photo, GET to the `/im/{id}` endpoint, using an image hash.
 - To retrieve the last photo, GET to the `/last` endpoint
@@ -62,7 +71,10 @@ I have a server where this is deployed as well, if you just want to test it out.
 ```bash
 curl 3.221.34.94/im/eefbb5b84ef2d8824f3fcaf64c54a63a
 ```
+</details>
 
-### Other things to note? 
+---
+
+## Other things to note? 
 
 Initial functionality that allowed for playing videos has been taken out. The video player that was being used, [humble](https://github.com/artclarke/humble-video/blob/master/humble-video-demos/src/main/java/io/humble/video/demos/DecodeAndPlayVideo.java),  was not able to be packaged into a shadow jar.

@@ -4,7 +4,6 @@ import dev.patbeagan.consolevision.ConsoleVisionRuntime
 import dev.patbeagan.consolevision.ImageScaler
 import dev.patbeagan.consolevision.server.RouteHandler
 import dev.patbeagan.consolevision.util.Const
-import dev.patbeagan.consolevision.util.getByteData
 import io.ktor.application.*
 import io.ktor.http.content.*
 import io.ktor.request.*
@@ -14,6 +13,7 @@ import org.apache.commons.codec.digest.DigestUtils
 import org.koin.core.component.inject
 import org.slf4j.Logger
 import java.awt.image.BufferedImage
+import java.awt.image.DataBufferByte
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.FileWriter
@@ -104,9 +104,15 @@ class PostUpdateRoute : RouteHandler {
                         }
                     }
                 }
+
                 is PartData.FormItem -> TODO()
                 is PartData.BinaryItem -> TODO()
             }
         }
     }
+}
+
+fun BufferedImage.getByteData(): ByteArray {
+    val buffer = raster.dataBuffer as DataBufferByte
+    return buffer.data
 }

@@ -1,7 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.6.10"
+    id("org.jetbrains.kotlin.jvm") version "1.7.22"
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
 }
@@ -11,14 +11,17 @@ repositories {
     mavenCentral()
 }
 
+version = "0.8.0"
+group = "dev.patbeagan"
+
 childProjects
     .onEach { println(it) }
-    .filter { it.key in listOf("app", "lib") }
+    .filter { it.key in listOf("app", "lib", "server") }
     .forEach { entry ->
-        entry.value.run {
-            group = "dev.patbeagan"
-            version = "0.6.0"
-            afterEvaluate {
+        entry.value.let { project ->
+            project.group = group
+            project.version = version
+            project.afterEvaluate {
                 tasks {
                     named<ShadowJar>("shadowJar") {
                         minimize()

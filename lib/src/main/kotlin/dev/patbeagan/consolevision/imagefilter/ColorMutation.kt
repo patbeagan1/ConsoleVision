@@ -1,6 +1,7 @@
 package dev.patbeagan.consolevision.imagefilter
 
 import dev.patbeagan.consolevision.types.ColorInt
+import dev.patbeagan.consolevision.withLine
 import java.awt.image.BufferedImage
 import kotlin.random.Random
 
