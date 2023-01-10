@@ -2,13 +2,13 @@ package dev.patbeagan.consolevision.server.routes
 
 import dev.patbeagan.consolevision.ConsoleVisionRuntime
 import dev.patbeagan.consolevision.ImageScaler
-import dev.patbeagan.consolevision.ext.toList2D
 import dev.patbeagan.consolevision.server.RouteHandler
+import dev.patbeagan.consolevision.toList2D
 import dev.patbeagan.consolevision.util.Const
-import io.ktor.application.*
 import io.ktor.http.content.*
-import io.ktor.request.*
-import io.ktor.response.*
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
 import io.ktor.utils.io.errors.*
 import org.apache.commons.codec.digest.DigestUtils
 import org.koin.core.component.inject
@@ -108,6 +108,7 @@ class PostUpdateRoute : RouteHandler {
 
                 is PartData.FormItem -> TODO()
                 is PartData.BinaryItem -> TODO()
+                else -> {}
             }
         }
     }

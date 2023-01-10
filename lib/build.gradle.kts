@@ -1,6 +1,6 @@
 plugins {
-    id("java-library")
     kotlin("jvm")
+    id("java-library")
     id("com.github.johnrengelman.shadow")
     id("org.jlleitschuh.gradle.ktlint")
     `maven-publish`
@@ -12,11 +12,12 @@ repositories {
 }
 
 dependencies {
+    api(project(":consolevision"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     implementation("org.mod4j.org.apache.commons:cli:1.0.0")
     testImplementation("junit:junit:4.13.2")
-    testImplementation("org.jetbrains.kotlin:kotlin-reflect:1.3.72")
+    testImplementation("org.jetbrains.kotlin:kotlin-reflect:1.7.22")
 }
 
 publishing {

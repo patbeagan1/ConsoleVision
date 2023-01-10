@@ -1,6 +1,6 @@
 package dev.patbeagan.consolevision.util
 
-import io.ktor.application.ApplicationCall
+import io.ktor.server.application.*
 
 val ApplicationCall.userAgent get() = request.headers["User-Agent"]
 

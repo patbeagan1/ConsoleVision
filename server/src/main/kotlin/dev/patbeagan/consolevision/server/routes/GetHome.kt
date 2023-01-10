@@ -3,9 +3,9 @@ package dev.patbeagan.consolevision.server.routes
 import dev.patbeagan.consolevision.server.RouteHandler
 import dev.patbeagan.consolevision.util.respondContentBasedOnUserAgent
 import dev.patbeagan.consolevision.util.userAgent
-import io.ktor.application.ApplicationCall
-import io.ktor.html.respondHtml
-import io.ktor.response.respondText
+import io.ktor.server.application.*
+import io.ktor.server.html.*
+import io.ktor.server.response.*
 import kotlinx.html.FormEncType
 import kotlinx.html.FormMethod
 import kotlinx.html.InputType

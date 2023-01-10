@@ -1,6 +1,5 @@
 package dev.patbeagan.consolevision
 
-import dev.patbeagan.consolevision.ext.toList2D
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.CommandLineParser
 import org.apache.commons.cli.HelpFormatter

@@ -9,7 +9,7 @@ import dev.patbeagan.consolevision.ansi.AnsiColor.Red
 import dev.patbeagan.consolevision.ansi.AnsiConstants.ESC
 import dev.patbeagan.consolevision.ansi.AnsiSGR
 import dev.patbeagan.consolevision.ansi.Color256
-import dev.patbeagan.consolevision.ansi.style
+import dev.patbeagan.consolevision.style
 import dev.patbeagan.consolevision.types.ColorInt
 import org.junit.Test
 

@@ -3,7 +3,7 @@ package dev.patbeagan.consolevision.util
 import dev.patbeagan.consolevision.ColorMapToAnsi
 import dev.patbeagan.consolevision.ImagePrinter
 import dev.patbeagan.consolevision.ImageScaler
-import dev.patbeagan.consolevision.ext.toList2D
+import dev.patbeagan.consolevision.toList2D
 import dev.patbeagan.consolevision.getScaleToBoundBy
 import dev.patbeagan.consolevision.scale
 import dev.patbeagan.consolevision.types.ColorInt
