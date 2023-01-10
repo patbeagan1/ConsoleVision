@@ -2,6 +2,7 @@ package dev.patbeagan.consolevision.server.routes
 
 import dev.patbeagan.consolevision.ConsoleVisionRuntime
 import dev.patbeagan.consolevision.ImageScaler
+import dev.patbeagan.consolevision.ext.toList2D
 import dev.patbeagan.consolevision.server.RouteHandler
 import dev.patbeagan.consolevision.util.Const
 import io.ktor.application.*
@@ -12,6 +13,7 @@ import io.ktor.utils.io.errors.*
 import org.apache.commons.codec.digest.DigestUtils
 import org.koin.core.component.inject
 import org.slf4j.Logger
+import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
 import java.io.ByteArrayInputStream
 import java.io.File
@@ -31,7 +33,7 @@ class PostUpdateRoute : RouteHandler {
         // this is ok, just making sure it is there
     }
 
-    private fun saveProcessedImage(scaledImage: ImageList2D) {
+    private fun saveProcessedImage(scaledImage: BufferedImage) {
         ensureDirectory(Const.UPLOAD_DIRECTORY_NAME)
         val md5 = DigestUtils.md5Hex(scaledImage.getByteData())
         logger.info(md5)
@@ -45,7 +47,7 @@ class PostUpdateRoute : RouteHandler {
         attemptToWriteLast(scaledImage)
     }
 
-    private fun attemptToWriteLast(scaledImage: ImageList2D) {
+    private fun attemptToWriteLast(scaledImage: BufferedImage) {
         // needed in case multiple users access the server at the same time
         try {
             ImageIO.write(scaledImage, "png", File(Const.LAST_IMAGE_NAME))
@@ -91,7 +93,7 @@ class PostUpdateRoute : RouteHandler {
                                         isCompatPalette = false,
                                         shouldNormalize = false,
                                     )
-                                ).printFrame(scaledImage)
+                                ).printFrame(scaledImage.toList2D())
 
                                 printFrame.let {
                                     val md5Hex = DigestUtils.md5Hex(scaledImage.getByteData())
@@ -111,7 +113,7 @@ class PostUpdateRoute : RouteHandler {
     }
 }
 
-fun ImageList2D.getByteData(): ByteArray {
+fun BufferedImage.getByteData(): ByteArray {
     val buffer = raster.dataBuffer as DataBufferByte
     return buffer.data
 }

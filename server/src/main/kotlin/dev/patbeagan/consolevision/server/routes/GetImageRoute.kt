@@ -1,6 +1,7 @@
 package dev.patbeagan.consolevision.server.routes
 
 import dev.patbeagan.consolevision.ConsoleVisionRuntime
+import dev.patbeagan.consolevision.ext.toList2D
 import dev.patbeagan.consolevision.server.RouteHandler
 import dev.patbeagan.consolevision.util.Const
 import io.ktor.application.*
@@ -28,7 +29,7 @@ class GetImageRoute : RouteHandler {
                     isCompatPalette = false,
                     shouldNormalize = false,
                 )
-            ).printFrame(read)
+            ).printFrame(read.toList2D())
         )
     }
 }

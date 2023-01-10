@@ -1,6 +1,7 @@
 package dev.patbeagan.consolevision.server.routes
 
 import dev.patbeagan.consolevision.ConsoleVisionRuntime
+import dev.patbeagan.consolevision.ext.toList2D
 import dev.patbeagan.consolevision.server.RouteHandler
 import dev.patbeagan.consolevision.util.Const
 import io.ktor.application.*
@@ -31,7 +32,7 @@ class GetRandom : RouteHandler {
                 isCompatPalette = false,
                 shouldNormalize = false,
             )
-        ).printFrame(image)
+        ).printFrame(image.toList2D())
         val nameWithoutExtension = randomImage.nameWithoutExtension
         logger.info(nameWithoutExtension)
         call.respondText("$text$nameWithoutExtension\n")
