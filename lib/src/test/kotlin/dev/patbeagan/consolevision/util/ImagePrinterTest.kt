@@ -39,7 +39,7 @@ internal class ImagePrinterTest {
                 ColorMapToAnsi(true),
                 shouldNormalizeColors = false,
             ).getFrame(
-                getScaledImage(readAsset(LENNA))
+                getScaledImage(readAsset(Mona))
             )
         )
     }
@@ -49,7 +49,7 @@ internal class ImagePrinterTest {
         println("sample image fullsize")
         val directory = File("./")
         println(directory.absolutePath)
-        imagePrinter.getFrame(readAsset(IMAGE_SMALL).toList2D()).also { println(it) }
+        imagePrinter.getFrame(readAsset(ImageSmall).toList2D()).also { println(it) }
     }
 
     @Test
@@ -60,13 +60,13 @@ internal class ImagePrinterTest {
             ColorMapToAnsi(false),
             shouldNormalizeColors = true,
         )
-            .getFrame(readAsset(IMAGE_SMALL).toList2D()).also { println(it) }
+            .getFrame(readAsset(ImageSmall).toList2D()).also { println(it) }
     }
 
     @Test
     fun `sample image scaled normalized`() {
         println("sample image scaled normalized")
-        val read = readAsset(LENNA)
+        val read = readAsset(Mona)
         val read1 = getScaledImage(read)
         val read2 = getScaledImage(read)
 
@@ -89,7 +89,7 @@ internal class ImagePrinterTest {
     @Test
     fun `sample image reduced - gradient`() {
         println("sample image reduced - gradient")
-        val read = readAsset(GRADIENT)
+        val read = readAsset(Gradient)
         val read1 = getScaledImage(read)
         val read2 = getScaledImage(read)
 
@@ -112,7 +112,7 @@ internal class ImagePrinterTest {
     @Test
     fun `sample image reduced - lenna`() {
         println("sample image reduced - lenna")
-        val read = readAsset(LENNA)
+        val read = readAsset(Mona)
         val read1 = getScaledImage(read)
         val read2 = getScaledImage(read)
 
@@ -146,7 +146,7 @@ internal class ImagePrinterTest {
             shouldNormalizeColors = false,
             compressionStyle = CompressionStyle.DOTS_HIGH
         ).getFrame(
-            readAsset(IMAGE_SMALL).toList2D(),
+            readAsset(ImageSmall).toList2D(),
         ).also { println(it) }
     }
 
@@ -154,14 +154,14 @@ internal class ImagePrinterTest {
     fun `sample image compressed`() {
         println("sample image compressed")
         imagePrinter.getFrame(
-            readAsset(IMAGE_SMALL).toList2D()
+            readAsset(ImageSmall).toList2D()
         ).also { println(it) }
     }
 
     @Test
     fun `color mutation filter`() {
         println("color mutation filter")
-        val image = ImageScaler(80, 80).scaledImage(readAsset(LENNA))
+        val image = ImageScaler(80, 80).scaledImage(readAsset(Mona))
         image ?: run {
             print("Image not found")
             return
@@ -178,7 +178,7 @@ internal class ImagePrinterTest {
     @Test
     fun `sizedown sampling comparison`() {
         println("sizedown sampling comparison")
-        val read = readAsset(IMAGE_LARGE)
+        val read = readAsset(ImageLarge)
 
         val (scale, transformOp) = read.getScaleToBoundBy(90, 90)
         imagePrinter.getFrame(
@@ -189,7 +189,7 @@ internal class ImagePrinterTest {
     @Test
     fun `palette swapping`() {
         println("palette swapping")
-        val read = readAsset(LENNA)
+        val read = readAsset(Mona)
         listOf(
             "borkfest-1x.png",
             "denim-1x.png",
@@ -225,9 +225,9 @@ internal class ImagePrinterTest {
     }
 
     companion object {
-        const val IMAGE_LARGE = "Landscape.jpg"
-        const val IMAGE_SMALL = "LandscapeSmall.jpeg"
-        const val LENNA = "Lenna.png"
-        const val GRADIENT = "purple-green-gradient.png"
+        const val ImageLarge = "Landscape.jpg"
+        const val ImageSmall = "LandscapeSmall.jpeg"
+        const val Mona = "mona-lisa.jpeg"
+        const val Gradient = "purple-green-gradient.png"
     }
 }
