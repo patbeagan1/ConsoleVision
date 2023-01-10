@@ -2,19 +2,14 @@ package dev.patbeagan.consolevision.util
 
 import dev.patbeagan.consolevision.types.ColorInt
 import dev.patbeagan.consolevision.types.ColorPalette
-import java.awt.image.BufferedImage
-import java.awt.image.DataBufferByte
+import dev.patbeagan.consolevision.types.List2D
 
-fun BufferedImage.createColorPalette(
+fun List2D<ColorInt>.createColorPalette(
     paletteReductionRate: Int,
 ): ColorPalette {
     val colorSet = mutableSetOf<ColorInt>()
-    (minY until height).forEach { y ->
-        (minX until width).forEach { x ->
-            val subject = ColorInt(getRGB(x, y))
-            val element = subject.reduceColorSpaceBy(paletteReductionRate)
-            colorSet.add(element)
-        }
+    traverse({}) { _, _, each ->
+        colorSet.add(each.reduceColorSpaceBy(paletteReductionRate))
     }
     return ColorPalette(colorSet)
 }

@@ -140,6 +140,14 @@ value class List2D<T> private constructor(private val value: MutableList<Mutable
          */
         fun <T> from(value: List<List<T>>): List2D<T> =
             List2D(value.map { it.toMutableList() }.toMutableList())
+
+        /**
+         * Creates a [List2D] filled with a default value.
+         */
+        fun <T> of(width: Int, height: Int, default: T): List2D<T> =
+            from((0 until height).map {
+                (0 until width).map { default }
+            })
     }
 }
 

@@ -1,5 +1,6 @@
 package dev.patbeagan.consolevision
 
+import dev.patbeagan.consolevision.ext.toList2D
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.CommandLineParser
 import org.apache.commons.cli.HelpFormatter
@@ -41,14 +42,16 @@ fun main(args: Array<String>) {
                     return
                 }
                 ConsoleVisionRuntime(
-                    paletteImage = cmd.getOptionValue("p")?.let { ImageIO.read(File(it)) },
+                    paletteImage = cmd.getOptionValue("p")
+                        ?.let { ImageIO.read(File(it)) }
+                        ?.toList2D(),
                     ConsoleVisionRuntime.Config(
                         reductionRate = cmd.getOptionValue("r")?.toInt() ?: 0,
                         paletteReductionRate = cmd.getOptionValue("P")?.toInt() ?: 0,
                         isCompatPalette = cmd.hasOption("c"),
                         shouldNormalize = cmd.hasOption("n"),
                     )
-                ).printFrame(file).also { println(it) }
+                ).printFrame(file.toList2D()).also { println(it) }
             }
         }
     } catch (e: ParseException) {

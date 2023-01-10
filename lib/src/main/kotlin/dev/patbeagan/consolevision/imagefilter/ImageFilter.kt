@@ -1,7 +1,9 @@
 package dev.patbeagan.consolevision.imagefilter
 
-import java.awt.image.BufferedImage
+import dev.patbeagan.consolevision.types.ColorInt
+import dev.patbeagan.consolevision.types.List2D
+
 
 interface ImageFilter {
-    operator fun invoke(bufferedImage: BufferedImage)
+    operator fun invoke(ImageList2D: List2D<ColorInt>)
 }

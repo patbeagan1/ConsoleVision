@@ -1,11 +1,12 @@
 package dev.patbeagan.consolevision
 
+import dev.patbeagan.consolevision.types.ColorInt
 import dev.patbeagan.consolevision.types.ColorPalette
+import dev.patbeagan.consolevision.types.List2D
 import dev.patbeagan.consolevision.util.createColorPalette
-import java.awt.image.BufferedImage
 
 class ConsoleVisionRuntime(
-    paletteImage: BufferedImage?,
+    paletteImage: List2D<ColorInt>?,
     config: Config
 ) {
 
@@ -20,7 +21,7 @@ class ConsoleVisionRuntime(
         paletteColors,
     )
 
-    fun printFrame(file: BufferedImage): String {
+    fun printFrame(file: List2D<ColorInt>): String {
 //        // todo make this an option
 //        print(CURSOR_TO_START)
         return imagePrinter.getFrame(file)

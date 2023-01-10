@@ -1,10 +1,9 @@
-package dev.patbeagan.consolevision.consolevision.demo
+package dev.patbeagan.consolevision
 
 import dev.patbeagan.consolevision.ansi.AnsiColor
 import dev.patbeagan.consolevision.ansi.AnsiConstants.HIDE_CURSOR
 
 import dev.patbeagan.consolevision.ansi.AnsiConstants.RIS
-import dev.patbeagan.consolevision.style
 import dev.patbeagan.consolevision.types.ColorInt
 import dev.patbeagan.consolevision.types.CompressedPoint
 import dev.patbeagan.consolevision.types.CoordRect

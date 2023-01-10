@@ -3,9 +3,12 @@ package dev.patbeagan.consolevision.util
 import dev.patbeagan.consolevision.ColorMapToAnsi
 import dev.patbeagan.consolevision.ImagePrinter
 import dev.patbeagan.consolevision.ImageScaler
+import dev.patbeagan.consolevision.ext.toList2D
 import dev.patbeagan.consolevision.getScaleToBoundBy
 import dev.patbeagan.consolevision.scale
+import dev.patbeagan.consolevision.types.ColorInt
 import dev.patbeagan.consolevision.types.CompressionStyle
+import dev.patbeagan.consolevision.types.List2D
 import org.junit.Before
 import org.junit.Test
 import java.awt.image.BufferedImage
@@ -16,7 +19,8 @@ import javax.imageio.ImageIO
 internal class ImagePrinterTest {
     lateinit var imagePrinter: ImagePrinter
 
-    private fun readAsset(s: String): BufferedImage = ImageIO.read(File("../assets/$s"))
+    private fun readAsset(s: String): BufferedImage = ImageIO
+        .read(File("../assets/$s"))
 
     @Before
     fun setup() {
@@ -45,7 +49,7 @@ internal class ImagePrinterTest {
         println("sample image fullsize")
         val directory = File("./")
         println(directory.absolutePath)
-        imagePrinter.getFrame(readAsset(IMAGE_SMALL)).also { println(it) }
+        imagePrinter.getFrame(readAsset(IMAGE_SMALL).toList2D()).also { println(it) }
     }
 
     @Test
@@ -56,7 +60,7 @@ internal class ImagePrinterTest {
             ColorMapToAnsi(false),
             shouldNormalizeColors = true,
         )
-            .getFrame(readAsset(IMAGE_SMALL)).also { println(it) }
+            .getFrame(readAsset(IMAGE_SMALL).toList2D()).also { println(it) }
     }
 
     @Test
@@ -128,9 +132,9 @@ internal class ImagePrinterTest {
             .also { println(it) }
     }
 
-    private fun getScaledImage(read: BufferedImage): BufferedImage {
+    private fun getScaledImage(read: BufferedImage): List2D<ColorInt> {
         val (scale, transformOp) = read.getScaleToBoundBy(40, 40)
-        return read.scale(scale, transformOp)
+        return read.scale(scale, transformOp).toList2D()
     }
 
     @Test
@@ -142,7 +146,7 @@ internal class ImagePrinterTest {
             shouldNormalizeColors = false,
             compressionStyle = CompressionStyle.DOTS_HIGH
         ).getFrame(
-            readAsset(IMAGE_SMALL),
+            readAsset(IMAGE_SMALL).toList2D(),
         ).also { println(it) }
     }
 
@@ -150,7 +154,7 @@ internal class ImagePrinterTest {
     fun `sample image compressed`() {
         println("sample image compressed")
         imagePrinter.getFrame(
-            readAsset(IMAGE_SMALL)
+            readAsset(IMAGE_SMALL).toList2D()
         ).also { println(it) }
     }
 
@@ -167,7 +171,7 @@ internal class ImagePrinterTest {
             ColorMapToAnsi(true),
             shouldNormalizeColors = true,
             shouldMutateColors = true,
-        ).getFrame(image)
+        ).getFrame(image.toList2D())
             .also { println(it) }
     }
 
@@ -178,7 +182,7 @@ internal class ImagePrinterTest {
 
         val (scale, transformOp) = read.getScaleToBoundBy(90, 90)
         imagePrinter.getFrame(
-            read.scale(scale, transformOp)
+            read.scale(scale, transformOp).toList2D()
         ).also { println(it) }
     }
 
@@ -212,10 +216,10 @@ internal class ImagePrinterTest {
                 0,
                 ColorMapToAnsi(false),
                 shouldNormalizeColors = false,
-                compressionStyle = CompressionStyle.LOWER_HALF,
-                paletteColors = second?.createColorPalette(0),
+                compressionStyle = CompressionStyle.UPPER_HALF,
+                paletteColors = second?.toList2D()?.createColorPalette(0),
             ).getFrame(
-                read.scale(scale, transformOp)
+                read.scale(scale, transformOp).toList2D()
             ).also { println(it) }
         }
     }

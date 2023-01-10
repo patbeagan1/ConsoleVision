@@ -1,8 +1,7 @@
 package dev.patbeagan.consolevision.imagefilter
 
 import dev.patbeagan.consolevision.types.ColorInt
-import dev.patbeagan.consolevision.withLine
-import java.awt.image.BufferedImage
+import dev.patbeagan.consolevision.types.List2D
 
 /**
  * A filter that will go through the image and calculate the max and min values
@@ -26,7 +25,7 @@ import java.awt.image.BufferedImage
  * but they take up all of the available space.
  */
 class ColorNormalization : ImageFilter {
-    override fun invoke(bufferedImage: BufferedImage) {
+    override fun invoke(image: List2D<ColorInt>) {
         var minR = Integer.MAX_VALUE
         var minG = Integer.MAX_VALUE
         var minB = Integer.MAX_VALUE
@@ -34,36 +33,27 @@ class ColorNormalization : ImageFilter {
         var maxG = Integer.MIN_VALUE
         var maxB = Integer.MIN_VALUE
 
-        bufferedImage.withLine { y, x ->
-            val rgb = ColorInt(bufferedImage.getRGB(x, y))
+        image.traverseMutate { _, _, color ->
 
-            minR = if (rgb.colorRed < minR) rgb.colorRed else minR
-            maxR = if (rgb.colorRed > maxR) rgb.colorRed else maxR
+            minR = if (color.colorRed < minR) color.colorRed else minR
+            maxR = if (color.colorRed > maxR) color.colorRed else maxR
 
-            minG = if (rgb.colorGreen < minG) rgb.colorGreen else minG
-            maxG = if (rgb.colorGreen > maxG) rgb.colorGreen else maxG
+            minG = if (color.colorGreen < minG) color.colorGreen else minG
+            maxG = if (color.colorGreen > maxG) color.colorGreen else maxG
 
-            minB = if (rgb.colorBlue < minB) rgb.colorBlue else minB
-            maxB = if (rgb.colorBlue > maxB) rgb.colorBlue else maxB
-        }
+            minB = if (color.colorBlue < minB) color.colorBlue else minB
+            maxB = if (color.colorBlue > maxB) color.colorBlue else maxB
 
-        bufferedImage.withLine { y, x ->
-            val newColor = bufferedImage.getRGB(x, y).let {
-                val color = ColorInt(it)
-                val toDouble = (color.colorRed - minR).toDouble()
-                val i = maxR - minR
-                val colorRed = toDouble / i
-                val colorGreen = (color.colorGreen - minG).toDouble() / (maxG - minG)
-                val colorBlue = (color.colorBlue - minB).toDouble() / (maxB - minB)
+            val colorRed = (color.colorRed - minR).toDouble() / (maxR - minR)
+            val colorGreen = (color.colorGreen - minG).toDouble() / (maxG - minG)
+            val colorBlue = (color.colorBlue - minB).toDouble() / (maxB - minB)
 
-                ColorInt.from(
-                    color.colorAlpha,
-                    (colorRed * 255).toInt(),
-                    (colorGreen * 255).toInt(),
-                    (colorBlue * 255).toInt()
-                )
-            }
-            bufferedImage.setRGB(x, y, newColor.color)
+            ColorInt.from(
+                color.colorAlpha,
+                (colorRed * 255).toInt(),
+                (colorGreen * 255).toInt(),
+                (colorBlue * 255).toInt()
+            )
         }
     }
 }

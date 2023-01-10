@@ -12,7 +12,6 @@ import io.ktor.utils.io.errors.*
 import org.apache.commons.codec.digest.DigestUtils
 import org.koin.core.component.inject
 import org.slf4j.Logger
-import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
 import java.io.ByteArrayInputStream
 import java.io.File
@@ -32,7 +31,7 @@ class PostUpdateRoute : RouteHandler {
         // this is ok, just making sure it is there
     }
 
-    private fun saveProcessedImage(scaledImage: BufferedImage) {
+    private fun saveProcessedImage(scaledImage: ImageList2D) {
         ensureDirectory(Const.UPLOAD_DIRECTORY_NAME)
         val md5 = DigestUtils.md5Hex(scaledImage.getByteData())
         logger.info(md5)
@@ -46,7 +45,7 @@ class PostUpdateRoute : RouteHandler {
         attemptToWriteLast(scaledImage)
     }
 
-    private fun attemptToWriteLast(scaledImage: BufferedImage) {
+    private fun attemptToWriteLast(scaledImage: ImageList2D) {
         // needed in case multiple users access the server at the same time
         try {
             ImageIO.write(scaledImage, "png", File(Const.LAST_IMAGE_NAME))
@@ -112,7 +111,7 @@ class PostUpdateRoute : RouteHandler {
     }
 }
 
-fun BufferedImage.getByteData(): ByteArray {
+fun ImageList2D.getByteData(): ByteArray {
     val buffer = raster.dataBuffer as DataBufferByte
     return buffer.data
 }

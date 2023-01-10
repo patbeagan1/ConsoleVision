@@ -6,9 +6,9 @@ import dev.patbeagan.consolevision.imagefilter.ColorNormalization
 import dev.patbeagan.consolevision.types.ColorInt
 import dev.patbeagan.consolevision.types.ColorPalette
 import dev.patbeagan.consolevision.types.CompressionStyle
-import dev.patbeagan.consolevision.types.CompressionStyle.LOWER_HALF
+import dev.patbeagan.consolevision.types.CompressionStyle.UPPER_HALF
+import dev.patbeagan.consolevision.types.List2D
 import dev.patbeagan.consolevision.util.memoize
-import java.awt.image.BufferedImage
 
 /**
  * A class that will return an Ansi image frame as a string.
@@ -19,26 +19,27 @@ class ImagePrinter(
     private val shouldNormalizeColors: Boolean,
     private val shouldMutateColors: Boolean = false,
     private val paletteColors: ColorPalette? = null,
-    private val compressionStyle: CompressionStyle = LOWER_HALF,
+    private val compressionStyle: CompressionStyle = UPPER_HALF,
 ) {
     private val applyPalette: (ColorInt, ColorPalette?) -> ColorInt =
         { colorInt: ColorInt, palette: ColorPalette? ->
             palette?.matchColor(colorInt) ?: colorInt
         }.memoize()
 
-    fun getFrame(read: BufferedImage): String {
-        applyFilters(read)
-        val out = buildOutput(read, compressionStyle, paletteColors)
-        return out.toString()
+    fun getFrame(frame: List2D<ColorInt>): String {
+        applyFilters(frame)
+        return frame.buildOutput(
+            compressionStyle,
+            paletteColors
+        ).toString()
     }
 
-    private fun buildOutput(
-        read: BufferedImage,
+    private fun List2D<ColorInt>.buildOutput(
         compressionStyle: CompressionStyle,
         paletteColors: ColorPalette?
     ): StringBuilder {
         val out = StringBuilder()
-        read.withDoubledLine({ out.append("\n") }) { (firstY, secondY), x ->
+        withDoubledLine({ out.append("\n") }) { firstY, secondY, x ->
 
             // since there will be 2 colors printed per row,
             // we actually have 2 y values per row.
@@ -48,15 +49,14 @@ class ImagePrinter(
             val background = if (foreground != firstY) firstY else null
 
             compressionStyle.symbol.style(
-                colorForeground = ansiColor(read, paletteColors, foreground, x),
-                colorBackground = ansiColor(read, paletteColors, background, x),
+                colorForeground = ansiColor(paletteColors, foreground, x),
+                colorBackground = ansiColor(paletteColors, background, x),
             ).also { out.append(it) }
         }
         return out
     }
 
-    private fun ansiColor(
-        read: BufferedImage,
+    private fun List2D<ColorInt>.ansiColor(
         paletteColors: ColorPalette?,
         y: Int?,
         x: Int
@@ -66,37 +66,33 @@ class ImagePrinter(
             // we'll need to fill with the default color
             null
         } else {
-            applyPalette(
-                ColorInt(read.getRGB(x, y)).reduceColorSpaceBy(reductionRate),
+            this@ImagePrinter.applyPalette(
+                at(x, y).reduceColorSpaceBy(reductionRate),
                 paletteColors
             )
         }
     )
 
-    private fun applyFilters(read: BufferedImage) {
+    private fun applyFilters(read: List2D<ColorInt>) {
         if (shouldMutateColors) {
-            read.applyFilter(ColorMutation(50))
+            ColorMutation(50)(read)
         }
         if (shouldNormalizeColors) {
-            read.applyFilter(ColorNormalization())
+            ColorNormalization()(read)
         }
     }
 
-    private inline fun BufferedImage.withDoubledLine(
+    private inline fun List2D<ColorInt>.withDoubledLine(
         onLineEnd: () -> Unit = {},
-        action: (Pair<Int?, Int?>, Int) -> Unit,
+        action: (Int?, Int?, Int) -> Unit,
     ) {
-        val chunked = if ((height - minY) % 2 == 0) {
-            (minY until height).chunked(2)
-        } else {
-            // if there are an odd number of lines, we want to start with an odd chunk.
-            // this will make it start on a foreground, instead of a background.
-            // Otherwise, the last line would be 2 pixels tall.
-            listOf(listOf(minY)) + (minY + 1 until height).chunked(2)
-        }
+        val minY = 0
+        val minX = 0
+
+        val chunked = (minY until height).chunked(2)
         chunked.forEach { y ->
             (minX until width).forEach { x ->
-                action(y.getOrNull(0) to y.getOrNull(1), x)
+                action(y.getOrNull(1), y.getOrNull(0), x)
             }
             onLineEnd()
         }
