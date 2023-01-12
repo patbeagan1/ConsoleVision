@@ -78,3 +78,19 @@ curl 3.221.34.94/im/eefbb5b84ef2d8824f3fcaf64c54a63a
 ## Other things to note? 
 
 Initial functionality that allowed for playing videos has been taken out. The video player that was being used, [humble](https://github.com/artclarke/humble-video/blob/master/humble-video-demos/src/main/java/io/humble/video/demos/DecodeAndPlayVideo.java),  was not able to be packaged into a shadow jar.
+
+## Roadmap
+
+- [] Convert all functionality to multiplatform
+- [] Display as [quad blocks](https://en.wikipedia.org/wiki/Block_Elements)
+- [] Create graphics library
+- [] Standardize screen size
+- [] Handle click events
+- [] Handle keyboard input
+- [] More filters
+- [] Widget library
+- [] Publish to package managers
+- [] Only rerender screen diff
+- [] Verify terminal compatibility
+- [] Gif support
+- [] Pass compression style in as an argument
