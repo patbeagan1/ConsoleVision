@@ -6,10 +6,6 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    commonMainApi(project(":consolevision-style"))
-}
-
 kotlin {
     jvm {
         compilations.all {
@@ -21,9 +17,7 @@ kotlin {
         }
     }
     js(IR) {
-        nodejs {
-
-        }
+        nodejs()
     }
     val hostOs = System.getProperty("os.name")
     val isMingwX64 = hostOs.startsWith("Windows")

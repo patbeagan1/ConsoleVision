@@ -2,7 +2,8 @@ package dev.patbeagan.consolevision
 
 import dev.patbeagan.consolevision.ansi.AnsiColor
 import dev.patbeagan.consolevision.ansi.Color256
-import dev.patbeagan.consolevision.types.ColorInt
+import dev.patbeagan.consolevision.style.ColorInt
+import dev.patbeagan.consolevision.types.colorDistanceFrom
 
 /**
  * Maps a given [ColorInt] into an appropriate Ansi color

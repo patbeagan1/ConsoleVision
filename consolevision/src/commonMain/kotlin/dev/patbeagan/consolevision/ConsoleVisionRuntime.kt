@@ -1,6 +1,6 @@
 package dev.patbeagan.consolevision
 
-import dev.patbeagan.consolevision.types.ColorInt
+import dev.patbeagan.consolevision.style.ColorInt
 import dev.patbeagan.consolevision.types.ColorPalette
 import dev.patbeagan.consolevision.types.List2D
 import dev.patbeagan.consolevision.util.createColorPalette
@@ -13,7 +13,7 @@ class ConsoleVisionRuntime(
     private val paletteColors: ColorPalette? = paletteImage
         ?.createColorPalette(config.paletteReductionRate)
 
-    private val imagePrinter = ImagePrinter(
+    private val framePrinter = FramePrinter(
         config.reductionRate,
         ColorMapToAnsi(config.isCompatPalette),
         config.shouldNormalize,
@@ -24,7 +24,7 @@ class ConsoleVisionRuntime(
     fun printFrame(file: List2D<ColorInt>): String {
 //        // todo make this an option
 //        print(CURSOR_TO_START)
-        return imagePrinter.getFrame(file)
+        return framePrinter.getFrame(file)
     }
 
     data class Config(

@@ -1,10 +1,13 @@
 package dev.patbeagan.consolevision.types
 
+import dev.patbeagan.consolevision.types.annotation.WillInline
+
 /**
  * This is a representation of a 2D grid.
  *
  * Common operations on 2D arrays can be done within this class.
  */
+@WillInline
 class List2D<T> private constructor(private val value: MutableList<MutableList<T>>) :
     Iterable<T> {
 

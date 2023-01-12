@@ -1,5 +1,6 @@
 package dev.patbeagan.consolevision.types
 
+import dev.patbeagan.consolevision.types.annotation.WillInline
 import dev.patbeagan.consolevision.util.distance
 import kotlin.math.absoluteValue
 import kotlin.math.pow
@@ -12,6 +13,7 @@ infix fun CompressedPoint.coordRect(other: CompressedPoint) = CoordRect(this, ot
  * Holds an X,Y coordinate as a single Long.
  * The X portion is the leading half, and the Y portion is the trailing half.
  */
+@WillInline
 class CompressedPoint(private val base: Long) : Comparable<CompressedPoint> {
 
     override fun compareTo(other: CompressedPoint): Int = when {

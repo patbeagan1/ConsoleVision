@@ -1,8 +1,30 @@
-package dev.patbeagan.consolevision.ext
+package dev.patbeagan.consolevision
 
 import dev.patbeagan.consolevision.ansi.AnsiColor
-import dev.patbeagan.consolevision.ansi.AnsiConstants
+import dev.patbeagan.consolevision.ansi.AnsiConstants.CSI
 import dev.patbeagan.consolevision.ansi.AnsiSGR
+
+/**
+ * Defines the style for a single character
+ */
+data class TerminalStyle(
+    /**
+     * The foreground color of this character
+     */
+    val colorForeground: AnsiColor = AnsiColor.Default,
+    /**
+     * The background color of this character
+     */
+    val colorBackground: AnsiColor = AnsiColor.Default,
+    /**
+     * The graphics applied to this character. See [AnsiSGR] for more info.
+     */
+    val sgr: AnsiSGR = AnsiSGR.Normal
+)
+
+fun String.style(
+    style: TerminalStyle
+): String = this.style(style.colorForeground, style.colorBackground, style.sgr)
 
 /**
  * An extension for styling strings via ansi.
@@ -30,8 +52,8 @@ fun String.style(
     sgr: Array<AnsiSGR>
 ): String {
     val startColor =
-        "${AnsiConstants.CSI}${sgr.joinToString(";") { it.enable.toString() }};${colorForeground.foreground};${colorBackground.background}m"
+        "${CSI}${sgr.joinToString(";") { it.enable.toString() }};${colorForeground.foreground};${colorBackground.background}m"
     val endColor =
-        "${AnsiConstants.CSI}${sgr.joinToString(";") { it.disable.toString() }};${AnsiColor.Default.foreground};${AnsiColor.Default.background}m"
+        "${CSI}${sgr.joinToString(";") { it.disable.toString() }};${AnsiColor.Default.foreground};${AnsiColor.Default.background}m"
     return startColor + this + endColor
 }

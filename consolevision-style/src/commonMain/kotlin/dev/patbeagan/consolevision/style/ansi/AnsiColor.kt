@@ -1,6 +1,7 @@
 package dev.patbeagan.consolevision.ansi
 
-import dev.patbeagan.consolevision.types.ColorInt
+import dev.patbeagan.consolevision.style.ColorInt
+
 
 sealed class AnsiColor(val foreground: String, val background: String) {
     object Default : AnsiColor("39", "49")

@@ -10,20 +10,24 @@ import dev.patbeagan.consolevision.ansi.AnsiConstants.ESC
 import dev.patbeagan.consolevision.ansi.AnsiSGR
 import dev.patbeagan.consolevision.ansi.Color256
 import dev.patbeagan.consolevision.style
-import dev.patbeagan.consolevision.types.ColorInt
+import dev.patbeagan.consolevision.style.ColorInt
+import dev.patbeagan.consolevision.types.colorDistanceFrom
 import org.junit.Test
 
 internal class TerminalColorStyleTest {
     @Test
     fun demoSGRValues() {
         AnsiSGR::class.sealedSubclasses.forEach {
-            println(it.simpleName?.style(sgr = it.objectInstance!!))
+            println(it.simpleName?.style(sgr = it.objectInstance ?: return@forEach))
         }
     }
 
     @Test
     fun demoPresetColors() {
-        (0..255).forEach { "$it ".style(CustomPreset(it)).also { print(it) } }
+        (0..255).forEach {
+            if (it % 17 == 0) println()
+            "$it".padEnd(4).style(CustomPreset(it)).also { print(it) }
+        }
     }
 
     @Test
@@ -80,11 +84,12 @@ internal class TerminalColorStyleTest {
     @Test
     fun testGreyscaleColors() {
         (0..255).forEach {
-            println(
-                "$ESC[38;2;$it;$it;${it}m test" +
-                    " ".style(colorBackground = Custom(ColorInt(it)))
+            if (it % 16 == 0) println()
+            print(
+                "X".style(colorBackground = Custom(ColorInt.from(255, it)))
             )
         }
+        println()
     }
 
     @Test
@@ -93,7 +98,7 @@ internal class TerminalColorStyleTest {
         val set2 = Color256.values().toSet().shuffled()
             .sortedBy { ColorInt(it.color).colorDistanceFrom(ColorInt(0)) }
         set.forEachIndexed { index, it ->
-            "▄".also { println(it) }
+            " ".also { print(it) }
             print(
                 " ".style(
                     colorBackground = CustomPreset(it.number),
