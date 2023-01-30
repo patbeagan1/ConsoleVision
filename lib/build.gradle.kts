@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-    api(project(":consolevision"))
+    api(project(":consolevision-base"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.8.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     implementation("org.mod4j.org.apache.commons:cli:1.0.0")
