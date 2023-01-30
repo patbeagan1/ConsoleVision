@@ -1,18 +1,87 @@
 package dev.patbeagan.consolevision
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ImageComposeScene
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.application
+import androidx.compose.ui.window.rememberWindowState
+import dev.patbeagan.consolevision.types.List2D
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.CommandLineParser
 import org.apache.commons.cli.HelpFormatter
 import org.apache.commons.cli.Options
 import org.apache.commons.cli.ParseException
 import org.apache.commons.cli.PosixParser
+import org.jetbrains.skia.Bitmap
+import org.jetbrains.skiko.toBufferedImage
 import java.io.File
 import java.io.IOException
 import javax.imageio.ImageIO
 import kotlin.system.exitProcess
 
+fun main() = application {
+
+    ImageComposeScene(
+        20,
+        20,
+    ) {
+        androidx.compose.foundation.Canvas(Modifier.fillMaxSize()) {
+            drawCircle(Color.Red)
+        }
+    }.render().use {
+        val bitmap = Bitmap.makeFromImage(it)
+        val image = bitmap.toBufferedImage()
+        val l2d = image.toList2D()
+        ConsoleVisionRuntime(
+            null,
+            ConsoleVisionRuntime.Config(
+                reductionRate = 0,
+                paletteReductionRate = 0,
+                isCompatPalette = false,
+                shouldNormalize = false,
+            )
+        ).printFrame(l2d).also { println(it) }
+    }
+
+    Window(
+        onCloseRequest = ::exitApplication,
+        title = "Compose for Desktop",
+        state = rememberWindowState(width = 300.dp, height = 300.dp)
+    ) {
+        val count = remember { mutableStateOf(0) }
+        MaterialTheme {
+            Column(Modifier.fillMaxSize(), Arrangement.spacedBy(5.dp)) {
+                Button(modifier = Modifier.align(Alignment.CenterHorizontally),
+                    onClick = {
+                        count.value++
+                    }) {
+                    Text(if (count.value == 0) "Hello World" else "Clicked ${count.value}!")
+                }
+                Button(modifier = Modifier.align(Alignment.CenterHorizontally),
+                    onClick = {
+                        count.value = 0
+                    }) {
+                    Text("Reset")
+                }
+            }
+        }
+    }
+}
+
 @Throws(InterruptedException::class, IOException::class)
-fun main(args: Array<String>) {
+fun main2(args: Array<String>) {
     val options = getOptions()
     val parser: CommandLineParser = PosixParser()
 
