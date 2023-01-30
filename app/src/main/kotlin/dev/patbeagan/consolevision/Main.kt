@@ -11,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ImageComposeScene
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -34,11 +35,12 @@ import kotlin.system.exitProcess
 fun main() = application {
 
     ImageComposeScene(
-        20,
-        20,
+        40,
+        40,
     ) {
         androidx.compose.foundation.Canvas(Modifier.fillMaxSize()) {
             drawCircle(Color.Red)
+            drawLine(Color.Green, Offset(1f, 3f), Offset(30f, 10f))
         }
     }.render().use {
         val bitmap = Bitmap.makeFromImage(it)
