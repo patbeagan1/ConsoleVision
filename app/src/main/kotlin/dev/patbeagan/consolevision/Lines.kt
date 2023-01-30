@@ -4,7 +4,7 @@ import dev.patbeagan.consolevision.ansi.AnsiColor
 import dev.patbeagan.consolevision.ansi.AnsiConstants.HIDE_CURSOR
 
 import dev.patbeagan.consolevision.ansi.AnsiConstants.RIS
-import dev.patbeagan.consolevision.types.ColorInt
+import dev.patbeagan.consolevision.style.ColorInt
 import dev.patbeagan.consolevision.types.CompressedPoint
 import dev.patbeagan.consolevision.types.CoordRect
 import dev.patbeagan.consolevision.types.List2D

@@ -47,6 +47,16 @@ class List2D<T> private constructor(private val value: MutableList<MutableList<T
         row.forEachIndexed { x, t -> value[y][x] = onElement(x, y, t) }
     }
 
+    fun diff(otherT: T): MutableMap<CompressedPoint, Pair<T, T>> {
+        val difference = mutableMapOf<CompressedPoint, Pair<T, T>>()
+        traverse { x, y, t ->
+            if (otherT != t) {
+                difference[x coord y] = t to otherT
+            }
+        }
+        return difference
+    }
+
     /**
      * Analogous to [List.mapIndexed]
      *

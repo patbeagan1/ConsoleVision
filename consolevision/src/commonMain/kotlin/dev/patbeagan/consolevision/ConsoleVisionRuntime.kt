@@ -1,5 +1,7 @@
 package dev.patbeagan.consolevision
 
+import dev.patbeagan.consolevision.ansi.AnsiConstants
+import dev.patbeagan.consolevision.ansi.AnsiConstants.CSI
 import dev.patbeagan.consolevision.style.ColorInt
 import dev.patbeagan.consolevision.types.ColorPalette
 import dev.patbeagan.consolevision.types.List2D
@@ -22,8 +24,8 @@ class ConsoleVisionRuntime(
     )
 
     fun printFrame(file: List2D<ColorInt>): String {
-//        // todo make this an option
-//        print(CURSOR_TO_START)
+        // todo make this an option
+        print(AnsiConstants.cursorToPosition(1, 1))
         return framePrinter.getFrame(file)
     }
 

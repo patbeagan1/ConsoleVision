@@ -6,7 +6,7 @@ import dev.patbeagan.consolevision.ansi.AnsiColor.Custom
 import dev.patbeagan.consolevision.ansi.AnsiColor.CustomPreset
 import dev.patbeagan.consolevision.ansi.AnsiColor.Green
 import dev.patbeagan.consolevision.ansi.AnsiColor.Red
-import dev.patbeagan.consolevision.ansi.AnsiConstants.ESC
+import dev.patbeagan.consolevision.ansi.AnsiConstants.cursorToPosition
 import dev.patbeagan.consolevision.ansi.AnsiSGR
 import dev.patbeagan.consolevision.ansi.Color256
 import dev.patbeagan.consolevision.style
@@ -50,6 +50,13 @@ internal class TerminalColorStyleTest {
                 println(name.style(color) + "test")
             }
         }
+    }
+
+    @Test
+    fun `cursor position`() {
+        "Hello".style(colorForeground = Red).also { println(it) }
+        println(cursorToPosition(3, 10))
+        "World".style(colorForeground = Blue).also { println(it) }
     }
 
     @Test

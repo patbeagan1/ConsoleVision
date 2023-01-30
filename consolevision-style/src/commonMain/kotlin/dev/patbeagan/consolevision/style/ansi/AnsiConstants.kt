@@ -45,5 +45,5 @@ object AnsiConstants {
      *
      * It allows you to choose which coordinate you would like to go to
      */
-    fun getCursorToPosition(x: Int, y: Int): String = "$CSI$y;${x}H"
+    fun cursorToPosition(x: Int, y: Int): String = "$CSI$y;${x}H"
 }
