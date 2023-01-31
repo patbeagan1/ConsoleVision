@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
@@ -29,6 +30,9 @@ import org.apache.commons.cli.ParseException
 import org.apache.commons.cli.PosixParser
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skiko.toBufferedImage
+import java.awt.geom.AffineTransform
+import java.awt.image.AffineTransformOp
+import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
 import javax.imageio.ImageIO
@@ -37,30 +41,44 @@ import kotlin.system.exitProcess
 fun main() = application {
 
     ImageComposeScene(
-        40,
+        80,
         40,
     ) {
         Column(Modifier.background(Color.White)) {
-            Text("Hello")
-            androidx.compose.foundation.Canvas(Modifier.fillMaxSize()) {
-                this.drawContext.canvas.nativeCanvas.drawPaint(Paint().asFrameworkPaint().apply {
-                    this.isAntiAlias = false
-                })
+//            Text("Hello")
+            androidx.compose.foundation.Canvas(
+                Modifier
+                    .fillMaxSize()
+                    .background(Color.Black)
+            ) {
 
-//                drawIntoCanvas {
-//it.nativeCanvas.drawPaint(Paint().asFrameworkPaint().apply {
-//    isAntiAlias
-//    this.
-//
-//})
-//                }
-                drawIntoCanvas {
-                    it.drawCircle(center, 20f, Paint().apply {
+                drawIntoCanvas { canvas ->
+                    canvas.drawCircle(center, 20f, Paint().apply {
                         color = Color.Blue
                         isAntiAlias = false
-                        filterQuality = androidx.compose.ui.graphics.FilterQuality.None })
+                        filterQuality = androidx.compose.ui.graphics.FilterQuality.None
+                    })
+                    canvas.drawImage(
+                        ImageIO.read(File("./assets/mona-lisa.jpeg")).let {
+                            AffineTransformOp(
+                                AffineTransform().apply {
+                                    scale(0.01, 0.01)
+                                },
+                                AffineTransformOp.TYPE_BILINEAR
+                            ).filter(
+                                it,
+                                BufferedImage(
+                                    it.width,
+                                    it.height,
+                                    BufferedImage.TYPE_INT_ARGB
+                                )
+                            )
+                        }.toComposeImageBitmap(),
+                        Offset(0f, 3f),
+                        Paint()
+                    )
                 }
-                drawCircle(Color.Red)
+                drawCircle(Color.Red, 5f)
                 drawLine(Color.Green, Offset(1f, 3f), Offset(30f, 10f))
             }
         }
@@ -76,29 +94,29 @@ fun main() = application {
         ).printFrame(Bitmap.makeFromImage(it).toBufferedImage().toList2D()).also { println(it) }
     }
 
-    Window(
-        onCloseRequest = ::exitApplication,
-        title = "Compose for Desktop",
-        state = rememberWindowState(width = 300.dp, height = 300.dp)
-    ) {
-        val count = remember { mutableStateOf(0) }
-        MaterialTheme {
-            Column(Modifier.fillMaxSize(), Arrangement.spacedBy(5.dp)) {
-                Button(modifier = Modifier.align(Alignment.CenterHorizontally),
-                    onClick = {
-                        count.value++
-                    }) {
-                    Text(if (count.value == 0) "Hello World" else "Clicked ${count.value}!")
-                }
-                Button(modifier = Modifier.align(Alignment.CenterHorizontally),
-                    onClick = {
-                        count.value = 0
-                    }) {
-                    Text("Reset")
-                }
-            }
-        }
-    }
+//    Window(
+//        onCloseRequest = ::exitApplication,
+//        title = "Compose for Desktop",
+//        state = rememberWindowState(width = 300.dp, height = 300.dp)
+//    ) {
+//        val count = remember { mutableStateOf(0) }
+//        MaterialTheme {
+//            Column(Modifier.fillMaxSize(), Arrangement.spacedBy(5.dp)) {
+//                Button(modifier = Modifier.align(Alignment.CenterHorizontally),
+//                    onClick = {
+//                        count.value++
+//                    }) {
+//                    Text(if (count.value == 0) "Hello World" else "Clicked ${count.value}!")
+//                }
+//                Button(modifier = Modifier.align(Alignment.CenterHorizontally),
+//                    onClick = {
+//                        count.value = 0
+//                    }) {
+//                    Text("Reset")
+//                }
+//            }
+//        }
+//    }
 }
 
 @Throws(InterruptedException::class, IOException::class)
