@@ -1,5 +1,6 @@
 package dev.patbeagan.consolevision
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,13 +13,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ImageComposeScene
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import dev.patbeagan.consolevision.types.List2D
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.CommandLineParser
 import org.apache.commons.cli.HelpFormatter
@@ -38,14 +40,31 @@ fun main() = application {
         40,
         40,
     ) {
-        androidx.compose.foundation.Canvas(Modifier.fillMaxSize()) {
-            drawCircle(Color.Red)
-            drawLine(Color.Green, Offset(1f, 3f), Offset(30f, 10f))
+        Column(Modifier.background(Color.White)) {
+            Text("Hello")
+            androidx.compose.foundation.Canvas(Modifier.fillMaxSize()) {
+                this.drawContext.canvas.nativeCanvas.drawPaint(Paint().asFrameworkPaint().apply {
+                    this.isAntiAlias = false
+                })
+
+//                drawIntoCanvas {
+//it.nativeCanvas.drawPaint(Paint().asFrameworkPaint().apply {
+//    isAntiAlias
+//    this.
+//
+//})
+//                }
+                drawIntoCanvas {
+                    it.drawCircle(center, 20f, Paint().apply {
+                        color = Color.Blue
+                        isAntiAlias = false
+                        filterQuality = androidx.compose.ui.graphics.FilterQuality.None })
+                }
+                drawCircle(Color.Red)
+                drawLine(Color.Green, Offset(1f, 3f), Offset(30f, 10f))
+            }
         }
     }.render().use {
-        val bitmap = Bitmap.makeFromImage(it)
-        val image = bitmap.toBufferedImage()
-        val l2d = image.toList2D()
         ConsoleVisionRuntime(
             null,
             ConsoleVisionRuntime.Config(
@@ -54,7 +73,7 @@ fun main() = application {
                 isCompatPalette = false,
                 shouldNormalize = false,
             )
-        ).printFrame(l2d).also { println(it) }
+        ).printFrame(Bitmap.makeFromImage(it).toBufferedImage().toList2D()).also { println(it) }
     }
 
     Window(
