@@ -61,6 +61,7 @@ fun main() = application {
 
     measureTimeMillis { loop() }.also { println("loop $it") }
 }
+
 @Composable
 private fun loop() {
     val infiniteTransition = rememberInfiniteTransition()
@@ -129,7 +130,7 @@ private fun extracted(
             }.let { println("render $it") }
             a
         }.use {
-            render(it)
+            measureTimeMillis { render(it) }.also { println("render: $it") }
             println(count1++)
         }
 
@@ -140,38 +141,34 @@ private fun DrawScope.draw(
     imageFile: ImageBitmap,
     value: Float
 ) {
-    measureTimeMillis {
-        drawIntoCanvas { canvas ->
-            canvas.drawImage(
-                imageFile,
-                Offset(0f, 3f),
-                Paint()
-            )
-            canvas.drawCircle(center, 20f * value, Paint().apply {
-                color = Color.Blue
-                isAntiAlias = false
-                filterQuality =
-                    FilterQuality.None
-            })
-        }
-        drawCircle(Color.Red, 5f)
-        drawLine(Color.Green, Offset(1f, 3f), Offset(30f, 10f))
-    }.also { println("canvas: $it") }
+    drawIntoCanvas { canvas ->
+        canvas.drawImage(
+            imageFile,
+            Offset(0f, 3f),
+            Paint()
+        )
+        canvas.drawCircle(center, 20f * value, Paint().apply {
+            color = Color.Blue
+            isAntiAlias = false
+            filterQuality =
+                FilterQuality.None
+        })
+    }
+    drawCircle(Color.Red, 5f)
+    drawLine(Color.Green, Offset(1f, 3f), Offset(30f, 10f))
 }
 
 private fun render(it: Image) {
-    measureTimeMillis {
-        ConsoleVisionRuntime(
-            null,
-            ConsoleVisionRuntime.Config(
-                reductionRate = 0,
-                paletteReductionRate = 0,
-                isCompatPalette = false,
-                shouldNormalize = false,
-            )
-        ).printFrame(Bitmap.makeFromImage(it).toBufferedImage().toList2D())
-            .also { println(it) }
-    }.let { println("print $it") }
+    ConsoleVisionRuntime(
+        null,
+        ConsoleVisionRuntime.Config(
+            reductionRate = 0,
+            paletteReductionRate = 0,
+            isCompatPalette = false,
+            shouldNormalize = false,
+        )
+    ).printFrame(Bitmap.makeFromImage(it).toBufferedImage().toList2D())
+        .also { println(it) }
 }
 
 //    Window(
