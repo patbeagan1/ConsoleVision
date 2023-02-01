@@ -16,6 +16,8 @@ dependencies {
     implementation("org.mod4j.org.apache.commons:cli:1.0.0")
     implementation(project(":lib"))
     implementation(compose.desktop.currentOs)
+    // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-core
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 }
 
 compose.desktop {

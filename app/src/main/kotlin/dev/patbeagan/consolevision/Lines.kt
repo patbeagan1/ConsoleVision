@@ -15,7 +15,7 @@ import kotlin.math.max
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
-fun main() {
+fun mainl() {
     (1 coord 1).lineByDDATo(3 coord 4)
     getCircleByBresenham(1 coord 1, 3)
 }
