@@ -7,14 +7,12 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.ImageComposeScene
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -34,7 +32,6 @@ import org.apache.commons.cli.Options
 import org.apache.commons.cli.ParseException
 import org.apache.commons.cli.PosixParser
 import org.jetbrains.skia.Bitmap
-import org.jetbrains.skia.Image
 import org.jetbrains.skiko.toBufferedImage
 import java.awt.geom.AffineTransform
 import java.awt.image.AffineTransformOp
@@ -43,145 +40,88 @@ import java.io.File
 import java.io.IOException
 import javax.imageio.ImageIO
 import kotlin.system.exitProcess
-import kotlin.system.measureTimeMillis
 
-//val frame: MutableSharedFlow<Image> = MutableSharedFlow()
+val mona: ImageBitmap by lazy {
+    ImageIO.read(File("./assets/mona-lisa.jpeg")).let {
+        AffineTransformOp(
+            AffineTransform().apply {
+                scale(0.01, 0.01)
+            }, AffineTransformOp.TYPE_BILINEAR
+        ).filter(
+            it, BufferedImage(
+                it.width, it.height, BufferedImage.TYPE_INT_ARGB
+            )
+        )
+    }.toComposeImageBitmap()
+}
 
 fun main() = runBlocking {
-//    launch {
-//        frame.filterNotNull().collect { render(it) }
-//    }
-    val imageFile = ImageIO.read(File("./assets/mona-lisa.jpeg"))
-        .let {
-            AffineTransformOp(
-                AffineTransform().apply {
-                    scale(0.01, 0.01)
-                },
-                AffineTransformOp.TYPE_BILINEAR
-            ).filter(
-                it,
-                BufferedImage(
-                    it.width,
-                    it.height,
-                    BufferedImage.TYPE_INT_ARGB
-                )
-            )
-        }.toComposeImageBitmap()
     application {
-        measureTimeMillis {
-            loop(
-                imageFile
+        val infiniteTransition = rememberInfiniteTransition()
+        val value by infiniteTransition.animateFloat(
+            0.5f, 0.8f, animationSpec = infiniteRepeatable(
+                animation = tween(durationMillis = 500),//AnimationConstants.DefaultDurationMillis),
+                repeatMode = RepeatMode.Reverse
             )
-        }.also { println("loopouter $it") }
-    }
-}
-
-@Composable
-private fun loop(imageFile: ImageBitmap) {
-    val infiniteTransition = rememberInfiniteTransition()
-    val value by infiniteTransition.animateFloat(
-        0.5f,
-        0.8f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 500),//AnimationConstants.DefaultDurationMillis),
-            repeatMode = RepeatMode.Reverse
         )
-    )
-    var count by remember { mutableStateOf(0) }
+        var count by remember { mutableStateOf(0) }
 
-    println(count++)
-
-    measureTimeMillis {
-        LaunchedEffect(imageFile, value) {
-            extracted(imageFile, value)
-        }
-    }.also { println("loop $it") }
-}
-
-private suspend fun extracted(
-    imageFile: ImageBitmap,
-    value: Float,
-) {
-    val sc: ImageComposeScene
-    sc = ImageComposeScene(
-        80,
-        72,
-    ) {
-        Column(Modifier.background(Color.White)) {
-//            Text("Hello")
-            Canvas(
-                Modifier
-                    .fillMaxSize()
-                    .background(Color.Black)
-            ) {
-                draw(imageFile, value)
+        TerminalCanvas(Modifier.background(Color.Black), 80, 72) {
+            drawIntoCanvas { canvas ->
+                canvas.drawImage(
+                    mona,
+                    Offset(0f, 10f * value), Paint()
+                )
+                canvas.drawCircle(center, 20f * value, Paint().apply {
+                    color = Color.Blue
+                    isAntiAlias = false
+                    filterQuality = FilterQuality.None
+                })
             }
+            drawCircle(Color.Red, 5f)
+            drawLine(Color.Green, Offset(1f, 3f), Offset(30f, 10f))
         }
-    }
-    val im: Image
-    measureTimeMillis { im = sc.render() }.also { println("render pure: $it") }
-    im.use {
-//        GlobalScope.launch {
-//            frame.emit(it)
-//        }
-        render(it).also { println(it) }
+        println("frame: ${count++}")
     }
 }
 
-private fun DrawScope.draw(
-    imageFile: ImageBitmap,
-    value: Float
+/**
+ * Creates a canvas which will render colorized output to the terminal
+ * via ANSI escape codes.
+ */
+@Composable
+fun TerminalCanvas(
+    modifier: Modifier = Modifier,
+    width: Int = 80,
+    height: Int = 72,
+    content: DrawScope.() -> Unit,
 ) {
-    drawIntoCanvas { canvas ->
-        canvas.drawImage(
-            imageFile,
-            Offset(0f, 3f),
-            Paint()
-        )
-        canvas.drawCircle(center, 20f * value, Paint().apply {
-            color = Color.Blue
-            isAntiAlias = false
-            filterQuality =
-                FilterQuality.None
-        })
+    ImageComposeScene(
+        width,
+        height,
+    ) {
+        Canvas(
+            modifier.fillMaxSize()
+        ) {
+            content()
+        }
+    }.render().use { image ->
+        Bitmap
+            .makeFromImage(image)
+            .toBufferedImage()
+            .toList2D()
+            .let {
+                ConsoleVisionRuntime(
+                    null, ConsoleVisionRuntime.Config(
+                        reductionRate = 0,
+                        paletteReductionRate = 0,
+                        isCompatPalette = false,
+                        shouldNormalize = false,
+                    )
+                ).printFrame(it)
+            }.also { println(it) }
     }
-    drawCircle(Color.Red, 5f)
-    drawLine(Color.Green, Offset(1f, 3f), Offset(30f, 10f))
 }
-
-private fun render(it: Image): String = ConsoleVisionRuntime(
-    null,
-    ConsoleVisionRuntime.Config(
-        reductionRate = 0,
-        paletteReductionRate = 0,
-        isCompatPalette = false,
-        shouldNormalize = false,
-    )
-).printFrame(Bitmap.makeFromImage(it).toBufferedImage().toList2D())
-
-//    Window(
-//        onCloseRequest = ::exitApplication,
-//        title = "Compose for Desktop",
-//        state = rememberWindowState(width = 300.dp, height = 300.dp)
-//    ) {
-//        val count = remember { mutableStateOf(0) }
-//        MaterialTheme {
-//            Column(Modifier.fillMaxSize(), Arrangement.spacedBy(5.dp)) {
-//                Button(modifier = Modifier.align(Alignment.CenterHorizontally),
-//                    onClick = {
-//                        count.value++
-//                    }) {
-//                    Text(if (count.value == 0) "Hello World" else "Clicked ${count.value}!")
-//                }
-//                Button(modifier = Modifier.align(Alignment.CenterHorizontally),
-//                    onClick = {
-//                        count.value = 0
-//                    }) {
-//                    Text("Reset")
-//                }
-//            }
-//        }
-//    }
 
 @Throws(InterruptedException::class, IOException::class)
 fun main2(args: Array<String>) {
