@@ -9,10 +9,14 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.ImageComposeScene
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -24,6 +28,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.window.application
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.runBlocking
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.CommandLineParser
@@ -65,6 +70,7 @@ fun main() = runBlocking {
             )
         )
         var count by remember { mutableStateOf(0) }
+        val frameRate by rememberFrameRate()
 
         TerminalCanvas(Modifier.background(Color.Black), 80, 72) {
             drawIntoCanvas { canvas ->
@@ -81,8 +87,33 @@ fun main() = runBlocking {
             drawCircle(Color.Red, 5f)
             drawLine(Color.Green, Offset(1f, 3f), Offset(30f, 10f))
         }
+
+        println("framerate: $frameRate")
         println("frame: ${count++}")
     }
+}
+
+@Composable
+private fun rememberFrameRate(): State<Int> {
+    val frameRate = remember { mutableStateOf(0) }
+    LaunchedEffect(Unit) {
+        var frameCount = 0
+        var prevTime = withFrameNanos { it }
+
+        while (isActive) {
+            withFrameNanos {
+                frameCount++
+
+                val seconds = (it - prevTime) / 1E9 // 1E9 nanoseconds is 1 second
+                if (seconds >= 1) {
+                    frameRate.value = ((frameCount / seconds).toInt())
+                    prevTime = it
+                    frameCount = 0
+                }
+            }
+        }
+    }
+    return frameRate
 }
 
 /**
