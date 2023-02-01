@@ -1,12 +1,25 @@
 package dev.patbeagan.consolevision
 
+import androidx.compose.animation.core.AnimationConstants
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -14,7 +27,10 @@ import androidx.compose.ui.ImageComposeScene
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toComposeImageBitmap
@@ -29,6 +45,7 @@ import org.apache.commons.cli.Options
 import org.apache.commons.cli.ParseException
 import org.apache.commons.cli.PosixParser
 import org.jetbrains.skia.Bitmap
+import org.jetbrains.skia.Image
 import org.jetbrains.skiko.toBufferedImage
 import java.awt.geom.AffineTransform
 import java.awt.image.AffineTransformOp
@@ -37,52 +54,113 @@ import java.io.File
 import java.io.IOException
 import javax.imageio.ImageIO
 import kotlin.system.exitProcess
+import kotlin.system.measureNanoTime
+import kotlin.system.measureTimeMillis
 
 fun main() = application {
 
-    ImageComposeScene(
-        80,
-        40,
-    ) {
-        Column(Modifier.background(Color.White)) {
-//            Text("Hello")
-            androidx.compose.foundation.Canvas(
-                Modifier
-                    .fillMaxSize()
-                    .background(Color.Black)
-            ) {
-
-                drawIntoCanvas { canvas ->
-                    canvas.drawCircle(center, 20f, Paint().apply {
-                        color = Color.Blue
-                        isAntiAlias = false
-                        filterQuality = androidx.compose.ui.graphics.FilterQuality.None
-                    })
-                    canvas.drawImage(
-                        ImageIO.read(File("./assets/mona-lisa.jpeg")).let {
-                            AffineTransformOp(
-                                AffineTransform().apply {
-                                    scale(0.01, 0.01)
-                                },
-                                AffineTransformOp.TYPE_BILINEAR
-                            ).filter(
-                                it,
-                                BufferedImage(
-                                    it.width,
-                                    it.height,
-                                    BufferedImage.TYPE_INT_ARGB
-                                )
-                            )
-                        }.toComposeImageBitmap(),
-                        Offset(0f, 3f),
-                        Paint()
+    measureTimeMillis { loop() }.also { println("loop $it") }
+}
+@Composable
+private fun loop() {
+    val infiniteTransition = rememberInfiniteTransition()
+    val value by infiniteTransition.animateFloat(
+        0.5f,
+        0.8f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 500),//AnimationConstants.DefaultDurationMillis),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+    var count by remember { mutableStateOf(0) }
+    val imageFile by derivedStateOf {
+        ImageIO.read(File("./assets/mona-lisa.jpeg"))
+            .let {
+                AffineTransformOp(
+                    AffineTransform().apply {
+                        scale(0.01, 0.01)
+                    },
+                    AffineTransformOp.TYPE_BILINEAR
+                ).filter(
+                    it,
+                    BufferedImage(
+                        it.width,
+                        it.height,
+                        BufferedImage.TYPE_INT_ARGB
                     )
+                )
+            }.toComposeImageBitmap()
+    }
+
+    val a = measureTimeMillis { extracted(imageFile, value, count) }
+    println("hi $a")
+}
+
+private fun extracted(
+    imageFile: ImageBitmap,
+    value: Float,
+    count: Int
+) {
+    var count1 = count
+    measureTimeMillis {
+        val imageComposeScene: ImageComposeScene
+        measureTimeMillis {
+            imageComposeScene = ImageComposeScene(
+                80,
+                72,
+            ) {
+                Column(Modifier.background(Color.White)) {
+//            Text("Hello")
+                    Canvas(
+                        Modifier
+                            .fillMaxSize()
+                            .background(Color.Black)
+                    ) {
+                        draw(imageFile, value)
+                    }
                 }
-                drawCircle(Color.Red, 5f)
-                drawLine(Color.Green, Offset(1f, 3f), Offset(30f, 10f))
             }
+        }.also {
+            println("img composescene: $it")
+        }.let { scene ->
+            val a: Image
+            measureTimeMillis {
+                a = imageComposeScene.render()
+            }.let { println("render $it") }
+            a
+        }.use {
+            render(it)
+            println(count1++)
         }
-    }.render().use {
+
+    }.let { println("tot $it") }
+}
+
+private fun DrawScope.draw(
+    imageFile: ImageBitmap,
+    value: Float
+) {
+    measureTimeMillis {
+        drawIntoCanvas { canvas ->
+            canvas.drawImage(
+                imageFile,
+                Offset(0f, 3f),
+                Paint()
+            )
+            canvas.drawCircle(center, 20f * value, Paint().apply {
+                color = Color.Blue
+                isAntiAlias = false
+                filterQuality =
+                    FilterQuality.None
+            })
+        }
+        drawCircle(Color.Red, 5f)
+        drawLine(Color.Green, Offset(1f, 3f), Offset(30f, 10f))
+    }.also { println("canvas: $it") }
+}
+
+private fun render(it: Image) {
+    measureTimeMillis {
         ConsoleVisionRuntime(
             null,
             ConsoleVisionRuntime.Config(
@@ -91,8 +169,10 @@ fun main() = application {
                 isCompatPalette = false,
                 shouldNormalize = false,
             )
-        ).printFrame(Bitmap.makeFromImage(it).toBufferedImage().toList2D()).also { println(it) }
-    }
+        ).printFrame(Bitmap.makeFromImage(it).toBufferedImage().toList2D())
+            .also { println(it) }
+    }.let { println("print $it") }
+}
 
 //    Window(
 //        onCloseRequest = ::exitApplication,
@@ -117,7 +197,6 @@ fun main() = application {
 //            }
 //        }
 //    }
-}
 
 @Throws(InterruptedException::class, IOException::class)
 fun main2(args: Array<String>) {
