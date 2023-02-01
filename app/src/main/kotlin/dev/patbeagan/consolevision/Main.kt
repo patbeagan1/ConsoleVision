@@ -19,7 +19,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.ImageComposeScene
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
@@ -27,6 +29,7 @@ import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.toComposeImageBitmap
+import androidx.compose.ui.use
 import androidx.compose.ui.window.application
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.runBlocking
@@ -71,12 +74,12 @@ val consoleVisionRuntime = ConsoleVisionRuntime(
         )
 )
 
-var latestFrame: String = ""
+//var latestFrame: String = ""
 
 fun main() = runBlocking {
-    fixedRateTimer(period = 500L) {
-        println(latestFrame)
-    }
+//    fixedRateTimer(period = 500L) {
+//        println(latestFrame)
+//    }
     application {
         val infiniteTransition = rememberInfiniteTransition()
         val value by infiniteTransition.animateFloat(
@@ -91,6 +94,10 @@ fun main() = runBlocking {
 
         TerminalCanvas(
             Modifier.background(Color.Black), 80, 72, {
+                drawRoundRect(
+                    Brush.horizontalGradient(listOf(Color.Gray, Color(66, 0, 66))),
+                    size = this.size, cornerRadius = CornerRadius(10f, 10f)
+                )
                 drawIntoCanvas { canvas ->
                     canvas.drawImage(
                         mona,
@@ -158,14 +165,24 @@ fun TerminalCanvas(
         ) {
             content()
         }
-    }.render().use { image ->
-        image
-            .use { Bitmap.makeFromImage(it) }
-            .use { it.toBufferedImage() }
-            .toList2D()
-            .let {
-                consoleVisionRuntime.printFrame(it)
-            }.also { latestFrame = it }
+    }.use {
+        it.render()
+            .use { image ->
+                Bitmap
+                    .makeFromImage(image)
+                    .toBufferedImage()
+                    .toList2D()
+                    .let {
+                        ConsoleVisionRuntime(
+                            null, ConsoleVisionRuntime.Config(
+                                reductionRate = 0,
+                                paletteReductionRate = 0,
+                                isCompatPalette = false,
+                                shouldNormalize = false,
+                            )
+                        ).printFrame(it)
+                    }.also { println(it) }
+            }
     }
 }
 
