@@ -10,8 +10,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,6 +44,7 @@ import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
 import javax.imageio.ImageIO
+import kotlin.concurrent.fixedRateTimer
 import kotlin.system.exitProcess
 
 val mona: ImageBitmap by lazy {
@@ -60,7 +61,22 @@ val mona: ImageBitmap by lazy {
     }.toComposeImageBitmap()
 }
 
+val consoleVisionRuntime = ConsoleVisionRuntime(
+    null, ConsoleVisionRuntime.Config(
+        reductionRate = 0,
+        paletteReductionRate = 0,
+        isCompatPalette = false,
+        shouldNormalize = false,
+
+        )
+)
+
+var latestFrame: String = ""
+
 fun main() = runBlocking {
+    fixedRateTimer(period = 500L) {
+        println(latestFrame)
+    }
     application {
         val infiniteTransition = rememberInfiniteTransition()
         val value by infiniteTransition.animateFloat(
@@ -71,22 +87,27 @@ fun main() = runBlocking {
         )
         var count by remember { mutableStateOf(0) }
         val frameRate by rememberFrameRate()
+        val paint by remember { mutableStateOf(Paint()) }
 
-        TerminalCanvas(Modifier.background(Color.Black), 80, 72) {
-            drawIntoCanvas { canvas ->
-                canvas.drawImage(
-                    mona,
-                    Offset(0f, 10f * value), Paint()
-                )
-                canvas.drawCircle(center, 20f * value, Paint().apply {
-                    color = Color.Blue
-                    isAntiAlias = false
-                    filterQuality = FilterQuality.None
-                })
-            }
-            drawCircle(Color.Red, 5f)
-            drawLine(Color.Green, Offset(1f, 3f), Offset(30f, 10f))
-        }
+        TerminalCanvas(
+            Modifier.background(Color.Black), 80, 72, {
+                drawIntoCanvas { canvas ->
+                    canvas.drawImage(
+                        mona,
+                        Offset(0f, 10f * value),
+                        paint
+                    )
+                    canvas.drawCircle(center, 20f * value, paint.apply {
+                        color = Color.Blue
+                        isAntiAlias = false
+                        filterQuality = FilterQuality.None
+                    })
+                }
+                drawCircle(Color.Red, 5f)
+                drawLine(Color.Green, Offset(1f, 3f), Offset(30f, 10f))
+            },
+            consoleVisionRuntime
+        )
 
         println("framerate: $frameRate")
         println("frame: ${count++}")
@@ -126,6 +147,7 @@ fun TerminalCanvas(
     width: Int = 80,
     height: Int = 72,
     content: DrawScope.() -> Unit,
+    consoleVisionRuntime: ConsoleVisionRuntime,
 ) {
     ImageComposeScene(
         width,
@@ -137,20 +159,13 @@ fun TerminalCanvas(
             content()
         }
     }.render().use { image ->
-        Bitmap
-            .makeFromImage(image)
-            .toBufferedImage()
+        image
+            .use { Bitmap.makeFromImage(it) }
+            .use { it.toBufferedImage() }
             .toList2D()
             .let {
-                ConsoleVisionRuntime(
-                    null, ConsoleVisionRuntime.Config(
-                        reductionRate = 0,
-                        paletteReductionRate = 0,
-                        isCompatPalette = false,
-                        shouldNormalize = false,
-                    )
-                ).printFrame(it)
-            }.also { println(it) }
+                consoleVisionRuntime.printFrame(it)
+            }.also { latestFrame = it }
     }
 }
 
