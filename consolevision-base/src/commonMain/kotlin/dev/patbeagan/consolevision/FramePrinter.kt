@@ -1,9 +1,10 @@
 package dev.patbeagan.consolevision
 
-import dev.patbeagan.consolevision.ansi.AnsiColor
 import dev.patbeagan.consolevision.imagefilter.ColorMutation
 import dev.patbeagan.consolevision.imagefilter.ColorNormalization
 import dev.patbeagan.consolevision.style.ColorInt
+import dev.patbeagan.consolevision.style.ansi.ConsoleVision
+import dev.patbeagan.consolevision.style.style
 import dev.patbeagan.consolevision.types.ColorPalette
 import dev.patbeagan.consolevision.types.CompressionStyle
 import dev.patbeagan.consolevision.types.CompressionStyle.UPPER_HALF
@@ -62,7 +63,7 @@ class FramePrinter(
         paletteColors: ColorPalette?,
         y: Int?,
         x: Int
-    ): AnsiColor = colorMapToAnsi.convertToAnsi(
+    ): ConsoleVision.Color = colorMapToAnsi.convertToAnsi(
         if (y == null) {
             // there are an odd number of lines
             // we'll need to fill with the default color

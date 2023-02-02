@@ -1,15 +1,15 @@
 package dev.patbeagan.consolevision.util
 
-import dev.patbeagan.consolevision.ansi.AnsiColor
-import dev.patbeagan.consolevision.ansi.AnsiColor.Blue
-import dev.patbeagan.consolevision.ansi.AnsiColor.Custom
-import dev.patbeagan.consolevision.ansi.AnsiColor.CustomPreset
-import dev.patbeagan.consolevision.ansi.AnsiColor.Green
-import dev.patbeagan.consolevision.ansi.AnsiColor.Red
-import dev.patbeagan.consolevision.ansi.AnsiConstants.cursorToPosition
-import dev.patbeagan.consolevision.ansi.AnsiSGR
-import dev.patbeagan.consolevision.ansi.Color256
-import dev.patbeagan.consolevision.style
+import dev.patbeagan.consolevision.style.ansi.AnsiColor
+import dev.patbeagan.consolevision.style.ansi.AnsiColor.Blue
+import dev.patbeagan.consolevision.style.ansi.AnsiColor.Custom
+import dev.patbeagan.consolevision.style.ansi.AnsiColor.CustomPreset
+import dev.patbeagan.consolevision.style.ansi.AnsiColor.Green
+import dev.patbeagan.consolevision.style.ansi.AnsiColor.Red
+import dev.patbeagan.consolevision.style.ansi.AnsiConstants.cursorToPosition
+import dev.patbeagan.consolevision.style.ansi.AnsiSGR
+import dev.patbeagan.consolevision.style.ansi.Color256
+import dev.patbeagan.consolevision.style.style
 import dev.patbeagan.consolevision.style.ColorInt
 import dev.patbeagan.consolevision.types.colorDistanceFrom
 import org.junit.Test
@@ -33,13 +33,13 @@ internal class TerminalColorStyleTest {
     @Test
     fun demoInlineUsage() {
         println("Todd wanted a ${"blue".style(Blue)} car")
-        val styledText = "redOnGreen".style(
+        val styledText = dev.patbeagan.consolevision.style.style(
             Red,
             Green,
             AnsiSGR.Bold
         )
         println(
-            "Todd ${"wanted".style(sgr = AnsiSGR.Italic)} a $styledText car"
+            "Todd ${dev.patbeagan.consolevision.style.style(sgr = AnsiSGR.Italic)} a $styledText car"
         )
     }
 
@@ -67,7 +67,7 @@ internal class TerminalColorStyleTest {
             }
         }
         println()
-        val styledText = "3test".style(
+        val styledText = dev.patbeagan.consolevision.style.style(
             sgr = arrayOf(
                 AnsiSGR.Bold,
                 AnsiSGR.Framed

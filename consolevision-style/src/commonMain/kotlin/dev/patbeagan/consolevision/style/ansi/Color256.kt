@@ -1,4 +1,4 @@
-package dev.patbeagan.consolevision.ansi
+package dev.patbeagan.consolevision.style.ansi
 
 /**
  * A resource that stands for a color

@@ -1,8 +1,8 @@
-package dev.patbeagan.consolevision
+package dev.patbeagan.consolevision.style
 
-import dev.patbeagan.consolevision.ansi.AnsiColor
-import dev.patbeagan.consolevision.ansi.AnsiConstants.CSI
-import dev.patbeagan.consolevision.ansi.AnsiSGR
+import dev.patbeagan.consolevision.style.ansi.ConsoleVision.Color
+import dev.patbeagan.consolevision.style.ansi.ConsoleVision.Special.CSI
+import dev.patbeagan.consolevision.style.ansi.ConsoleVision.SGR
 
 /**
  * Defines the style for a single character
@@ -11,15 +11,15 @@ data class TerminalStyle(
     /**
      * The foreground color of this character
      */
-    val colorForeground: AnsiColor = AnsiColor.Default,
+    val colorForeground: Color = Color.Default,
     /**
      * The background color of this character
      */
-    val colorBackground: AnsiColor = AnsiColor.Default,
+    val colorBackground: Color = Color.Default,
     /**
-     * The graphics applied to this character. See [AnsiSGR] for more info.
+     * The graphics applied to this character. See [SGR] for more info.
      */
-    val sgr: AnsiSGR = AnsiSGR.Normal
+    val sgr: SGR = SGR.Normal
 )
 
 fun String.style(
@@ -34,9 +34,9 @@ fun String.style(
  * @param sgr a list of special effects to apply to the text, such as **bold**
  */
 fun String.style(
-    colorForeground: AnsiColor = AnsiColor.Default,
-    colorBackground: AnsiColor = AnsiColor.Default,
-    sgr: AnsiSGR = AnsiSGR.Normal
+    colorForeground: Color = Color.Default,
+    colorBackground: Color = Color.Default,
+    sgr: SGR = SGR.Normal
 ): String = this.style(colorForeground, colorBackground, arrayOf(sgr))
 
 /**
@@ -47,13 +47,13 @@ fun String.style(
  * @param sgr a list of special effects to apply to the text, such as **bold**
  */
 fun String.style(
-    colorForeground: AnsiColor = AnsiColor.Default,
-    colorBackground: AnsiColor = AnsiColor.Default,
-    sgr: Array<AnsiSGR>
+    colorForeground: Color = Color.Default,
+    colorBackground: Color = Color.Default,
+    sgr: Array<SGR>
 ): String {
     val startColor =
         "${CSI}${sgr.joinToString(";") { it.enable.toString() }};${colorForeground.foreground};${colorBackground.background}m"
     val endColor =
-        "${CSI}${sgr.joinToString(";") { it.disable.toString() }};${AnsiColor.Default.foreground};${AnsiColor.Default.background}m"
+        "${CSI}${sgr.joinToString(";") { it.disable.toString() }};${Color.Default.foreground};${Color.Default.background}m"
     return startColor + this + endColor
 }

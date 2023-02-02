@@ -1,7 +1,8 @@
 package dev.patbeagan.consolevision
 
-import dev.patbeagan.consolevision.ansi.AnsiColor
-import dev.patbeagan.consolevision.ansi.AnsiConstants
+import dev.patbeagan.consolevision.style.ansi.AnsiColor
+import dev.patbeagan.consolevision.style.ansi.AnsiConstants
+import dev.patbeagan.consolevision.style.style
 import kotlin.test.Test
 
 class MainTest {

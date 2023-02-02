@@ -1,12 +1,15 @@
 package dev.patbeagan.consolevision.style
 
+import kotlin.jvm.JvmInline
+
 /**
  * A class which ensures that an Int will be treated as a color.
  *
  * This increases type safety when dealing with colors,
  * without any tradeoff for performance.
  */
-class ColorInt(
+@JvmInline
+value class ColorInt(
     /**
      * The backing field that represents the color as an int.
      */

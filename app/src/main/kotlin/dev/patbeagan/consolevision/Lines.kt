@@ -1,10 +1,10 @@
 package dev.patbeagan.consolevision
 
-import dev.patbeagan.consolevision.ansi.AnsiColor
-import dev.patbeagan.consolevision.ansi.AnsiConstants.HIDE_CURSOR
-
-import dev.patbeagan.consolevision.ansi.AnsiConstants.RIS
 import dev.patbeagan.consolevision.style.ColorInt
+import dev.patbeagan.consolevision.style.ansi.ConsoleVision
+import dev.patbeagan.consolevision.style.ansi.ConsoleVision.Special.HIDE_CURSOR
+import dev.patbeagan.consolevision.style.ansi.ConsoleVision.Special.RIS
+import dev.patbeagan.consolevision.style.style
 import dev.patbeagan.consolevision.types.CompressedPoint
 import dev.patbeagan.consolevision.types.CoordRect
 import dev.patbeagan.consolevision.types.List2D
@@ -273,7 +273,7 @@ private fun List2D<Boolean>.printScreen() {
 private fun List2D<ColorInt>.printScreenColor() {
     traverseMap { t ->
         "  ".style(
-            colorBackground = AnsiColor.Custom(t)
+            colorBackground = ConsoleVision.Color.Custom(t)
         )
     }.printAll("")
 }

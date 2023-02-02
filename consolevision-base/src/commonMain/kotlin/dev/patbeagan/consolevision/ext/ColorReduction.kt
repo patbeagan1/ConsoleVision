@@ -1,6 +1,6 @@
 package dev.patbeagan.consolevision.ext
 
-import dev.patbeagan.consolevision.ansi.Color256
+import dev.patbeagan.consolevision.style.ansi.Color256
 import dev.patbeagan.consolevision.util.distance
 import kotlin.math.abs
 

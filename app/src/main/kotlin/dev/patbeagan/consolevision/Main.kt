@@ -30,7 +30,7 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.use
 import androidx.compose.ui.window.application
-import dev.patbeagan.consolevision.ansi.AnsiConstants
+import dev.patbeagan.consolevision.style.ansi.ConsoleVision
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.runBlocking
 import org.apache.commons.cli.CommandLine
@@ -77,7 +77,7 @@ var latestFrame: String = ""
 
 fun main() = runBlocking {
     fixedRateTimer(period = 1000 / 30) {
-        print(AnsiConstants.CURSOR_TO_START + latestFrame)
+        print(ConsoleVision.Special.CURSOR_TO_START + latestFrame)
     }
     application {
         val infiniteTransition = rememberInfiniteTransition()
