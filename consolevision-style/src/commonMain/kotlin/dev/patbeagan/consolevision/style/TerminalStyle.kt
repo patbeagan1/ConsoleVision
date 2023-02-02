@@ -51,9 +51,13 @@ fun String.style(
     colorBackground: Color = Color.Default,
     sgr: Array<SGR>
 ): String {
+    val enableString =
+        sgr.joinToString(";") { it.enable.toString() }
     val startColor =
-        "${CSI}${sgr.joinToString(";") { it.enable.toString() }};${colorForeground.foreground};${colorBackground.background}m"
+        "${CSI}$enableString;${colorForeground.foreground};${colorBackground.background}m"
+    val disableString =
+        sgr.joinToString(";") { it.disable.toString() }
     val endColor =
-        "${CSI}${sgr.joinToString(";") { it.disable.toString() }};${Color.Default.foreground};${Color.Default.background}m"
+        "${CSI}$disableString;${Color.Default.foreground};${Color.Default.background}m"
     return startColor + this + endColor
 }
