@@ -7,7 +7,6 @@ import kotlin.math.pow
 import kotlin.math.roundToInt
 
 infix fun Int.coord(other: Int) = CompressedPoint.from(this, other)
-infix fun CompressedPoint.coordRect(other: CompressedPoint) = CoordRect(this, other)
 
 /**
  * Holds an X,Y coordinate as a single Long.

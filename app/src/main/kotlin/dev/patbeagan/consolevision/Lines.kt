@@ -6,10 +6,8 @@ import dev.patbeagan.consolevision.style.ansi.ConsoleVision.Special.HIDE_CURSOR
 import dev.patbeagan.consolevision.style.ansi.ConsoleVision.Special.RIS
 import dev.patbeagan.consolevision.style.style
 import dev.patbeagan.consolevision.types.CompressedPoint
-import dev.patbeagan.consolevision.types.CoordRect
 import dev.patbeagan.consolevision.types.List2D
 import dev.patbeagan.consolevision.types.coord
-import dev.patbeagan.consolevision.types.coordRect
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.roundToInt
@@ -192,6 +190,8 @@ fun List2D<Boolean>.drawCircleFilled(
     }
 }
 
+infix fun CompressedPoint.coordRect(other: CompressedPoint) = CoordRect(this, other)
+
 private fun previewCircle() {
     val screen = (Array(43) {
         Array(80) { false }
@@ -296,4 +296,20 @@ fun List2D<Int>.addLayer(
         }
         return@traverseMutate each
     }
+}
+
+
+data class CoordRect(
+    val lesser: CompressedPoint,
+    val greater: CompressedPoint
+) {
+    fun modifyBy(
+        lx: Int = 0,
+        ly: Int = 0,
+        gx: Int = 0,
+        gy: Int = 0
+    ) = CoordRect(
+        (this.lesser.x + lx) coord (this.lesser.y + ly),
+        (this.greater.x + gx) coord (this.greater.y + gy)
+    )
 }
