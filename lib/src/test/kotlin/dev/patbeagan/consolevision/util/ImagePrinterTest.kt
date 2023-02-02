@@ -7,6 +7,7 @@ import dev.patbeagan.consolevision.getScaleToBoundBy
 import dev.patbeagan.consolevision.scale
 import dev.patbeagan.consolevision.style.ColorInt
 import dev.patbeagan.consolevision.toList2D
+import dev.patbeagan.consolevision.types.ColorPalette
 import dev.patbeagan.consolevision.types.CompressionStyle
 import dev.patbeagan.consolevision.types.List2D
 import org.junit.Before
@@ -217,7 +218,7 @@ internal class ImagePrinterTest {
                 ColorMapToAnsi(false),
                 shouldNormalizeColors = false,
                 compressionStyle = CompressionStyle.UPPER_HALF,
-                paletteColors = second?.toList2D()?.createColorPalette(0),
+                paletteColors = second?.toList2D()?.let { ColorPalette.from(it, 0) },
             ).getFrame(
                 read.scale(scale, transformOp).toList2D()
             ).also { println(it) }

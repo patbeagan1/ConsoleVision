@@ -19,26 +19,26 @@ class ColorMapToAnsi(
      * It will also cache the mapped color, so if there are a limited number
      * of colors in the source image, it will be rendered much faster.
      */
-    fun convertToAnsi(colorInt: ColorInt?): Color = applyPaletteInternal(colorInt)
+    fun convertToAnsi(colorInt: ColorInt?): Color = if (isCompatPalette) {
+        compatConversion(colorInt)
+    } else {
+        normalConversion(colorInt)
+    }
 
-    private fun toPresetColor(i: Color256?): Color.CustomPreset =
-        Color.CustomPreset(i?.number ?: 0)
+    private fun normalConversion(colorInt: ColorInt?) = colorInt
+        ?.let { Color.Custom(it) }
+        ?: Color.Default
 
-    private fun toFullColor(i: ColorInt?): Color =
-        if (i == null) Color.Default else Color.Custom(i)
+    private fun compatConversion(colorInt: ColorInt?): Color.CustomPreset {
+        val value = colorInt
+            ?.let {
+                Color256
+                    .values()
+                    .minByOrNull { each ->
+                        colorInt.colorDistanceFrom(ColorInt(each.color))
+                    }
+            }?.number
 
-    private fun reducedSetApplicator(color: ColorInt?): Color256? =
-        if (color == null) null else Color256
-            .values()
-            .minByOrNull { each ->
-                color.colorDistanceFrom(ColorInt(each.color))
-            }
-
-    private val applyPaletteInternal = { colorInt: ColorInt? ->
-        if (isCompatPalette) {
-            toPresetColor(reducedSetApplicator(colorInt))
-        } else {
-            toFullColor(colorInt)
-        }
+        return Color.CustomPreset(value ?: 0)
     }
 }

@@ -1,7 +1,7 @@
 package dev.patbeagan.consolevision
 
-import dev.patbeagan.consolevision.style.ansi.AnsiColor
-import dev.patbeagan.consolevision.style.ansi.AnsiConstants
+import dev.patbeagan.consolevision.style.ansi.ConsoleVision.Color
+import dev.patbeagan.consolevision.style.ansi.ConsoleVision.Special
 import dev.patbeagan.consolevision.style.style
 import kotlin.test.Test
 
@@ -13,14 +13,14 @@ class MainTest {
 
     @Test
     fun movingTheCursor() {
-        println(AnsiConstants.RIS)
-        println(AnsiConstants.cursorToPosition(1, 5))
-        "Hello".style(colorForeground = AnsiColor.Red).also { println(it) }
-        println(AnsiConstants.cursorToPosition(20, 4))
-        "World".style(colorForeground = AnsiColor.Blue).also { println(it) }
-        println(AnsiConstants.cursorToPosition(4, 3))
-        "World".style(colorForeground = AnsiColor.Green).also { println(it) }
-        println(AnsiConstants.cursorToPosition(4, 2))
+        println(Special.RIS)
+        println(Special.cursorToPosition(1, 5))
+        "Hello".style(colorForeground = Color.Red).also { println(it) }
+        println(Special.cursorToPosition(20, 4))
+        "World".style(colorForeground = Color.Blue).also { println(it) }
+        println(Special.cursorToPosition(4, 3))
+        "World".style(colorForeground = Color.Green).also { println(it) }
+        println(Special.cursorToPosition(4, 2))
         "Kenobi".also { println(it) }
     }
 }

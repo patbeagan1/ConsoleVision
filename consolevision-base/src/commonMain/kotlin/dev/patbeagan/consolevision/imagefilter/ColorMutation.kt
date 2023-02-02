@@ -9,8 +9,8 @@ import kotlin.random.Random
  * mutating the color of each pixel a certain amount.
  */
 class ColorMutation(private val variance: Int) : ImageFilter {
-    override fun invoke(ImageList2D: List2D<ColorInt>) {
-        ImageList2D.traverseMutate { _, _, color ->
+    override fun invoke(image: List2D<ColorInt>) {
+        image.traverseMutate { _, _, color ->
             color.mutate(variance)
         }
     }

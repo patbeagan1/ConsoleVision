@@ -1,23 +1,23 @@
 package dev.patbeagan.consolevision.util
 
-import dev.patbeagan.consolevision.style.ansi.AnsiColor
-import dev.patbeagan.consolevision.style.ansi.AnsiColor.Blue
-import dev.patbeagan.consolevision.style.ansi.AnsiColor.Custom
-import dev.patbeagan.consolevision.style.ansi.AnsiColor.CustomPreset
-import dev.patbeagan.consolevision.style.ansi.AnsiColor.Green
-import dev.patbeagan.consolevision.style.ansi.AnsiColor.Red
-import dev.patbeagan.consolevision.style.ansi.AnsiConstants.cursorToPosition
-import dev.patbeagan.consolevision.style.ansi.AnsiSGR
-import dev.patbeagan.consolevision.style.ansi.Color256
-import dev.patbeagan.consolevision.style.style
 import dev.patbeagan.consolevision.style.ColorInt
+import dev.patbeagan.consolevision.style.ansi.Color256
+import dev.patbeagan.consolevision.style.ansi.ConsoleVision
+import dev.patbeagan.consolevision.style.ansi.ConsoleVision.Color.Blue
+import dev.patbeagan.consolevision.style.ansi.ConsoleVision.Color.Custom
+import dev.patbeagan.consolevision.style.ansi.ConsoleVision.Color.CustomPreset
+import dev.patbeagan.consolevision.style.ansi.ConsoleVision.Color.Green
+import dev.patbeagan.consolevision.style.ansi.ConsoleVision.Color.Red
+import dev.patbeagan.consolevision.style.ansi.ConsoleVision.SGR
+import dev.patbeagan.consolevision.style.ansi.ConsoleVision.Special.cursorToPosition
+import dev.patbeagan.consolevision.style.style
 import dev.patbeagan.consolevision.types.colorDistanceFrom
 import org.junit.Test
 
 internal class TerminalColorStyleTest {
     @Test
     fun demoSGRValues() {
-        AnsiSGR::class.sealedSubclasses.forEach {
+        SGR::class.sealedSubclasses.forEach {
             println(it.simpleName?.style(sgr = it.objectInstance ?: return@forEach))
         }
     }
@@ -33,19 +33,19 @@ internal class TerminalColorStyleTest {
     @Test
     fun demoInlineUsage() {
         println("Todd wanted a ${"blue".style(Blue)} car")
-        val styledText = dev.patbeagan.consolevision.style.style(
+        val styledText = "red on green".style(
             Red,
             Green,
-            AnsiSGR.Bold
+            SGR.Bold
         )
         println(
-            "Todd ${dev.patbeagan.consolevision.style.style(sgr = AnsiSGR.Italic)} a $styledText car"
+            "Todd ${"wanted".style(sgr = SGR.Italic)} a $styledText car"
         )
     }
 
     @Test
     fun demoNamedColors() {
-        AnsiColor::class.sealedSubclasses.forEach {
+        ConsoleVision.Color::class.sealedSubclasses.forEach {
             safeLet(it.simpleName, it.objectInstance) { name, color ->
                 println(name.style(color) + "test")
             }
@@ -61,20 +61,20 @@ internal class TerminalColorStyleTest {
 
     @Test
     fun demoInlineSGR() {
-        AnsiSGR::class.sealedSubclasses.forEach {
+        SGR::class.sealedSubclasses.forEach {
             safeLet(it.simpleName, it.objectInstance) { name, sgr ->
                 println("test${name.style(sgr = sgr)}test")
             }
         }
         println()
-        val styledText = dev.patbeagan.consolevision.style.style(
+        val styledText = "test bold framed".style(
             sgr = arrayOf(
-                AnsiSGR.Bold,
-                AnsiSGR.Framed
+                SGR.Bold,
+                SGR.Framed
             )
         )
         println(
-            "1test${AnsiSGR.Underline.enableString()}2test${styledText}4test"
+            "1test${SGR.Underline.enableString()}2test${styledText}4test"
         )
     }
 

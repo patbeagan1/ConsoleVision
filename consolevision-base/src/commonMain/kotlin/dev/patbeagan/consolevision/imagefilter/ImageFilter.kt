@@ -5,5 +5,5 @@ import dev.patbeagan.consolevision.types.List2D
 
 
 interface ImageFilter {
-    operator fun invoke(ImageList2D: List2D<ColorInt>)
+    operator fun invoke(image: List2D<ColorInt>)
 }
