@@ -4,15 +4,15 @@ import dev.patbeagan.consolevision.style.ColorInt
 import dev.patbeagan.consolevision.style.ansi.ConsoleVision.Special
 import dev.patbeagan.consolevision.types.ColorPalette
 import dev.patbeagan.consolevision.types.List2D
-import dev.patbeagan.consolevision.util.createColorPalette
 
 class ConsoleVisionRuntime(
     paletteImage: List2D<ColorInt>?,
     config: Config
 ) {
 
-    private val paletteColors: ColorPalette? = paletteImage
-        ?.createColorPalette(config.paletteReductionRate)
+    private val paletteColors: ColorPalette? = paletteImage?.let {
+        ColorPalette.from(it, config.paletteReductionRate)
+    }
 
     private val framePrinter = FramePrinter(
         config.reductionRate,
