@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.use
 import androidx.compose.ui.window.application
+import dev.patbeagan.consolevision.ansi.AnsiConstants
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.runBlocking
 import org.apache.commons.cli.CommandLine
@@ -46,6 +47,7 @@ import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
 import javax.imageio.ImageIO
+import kotlin.concurrent.fixedRateTimer
 import kotlin.system.exitProcess
 
 val mona: ImageBitmap by lazy {
@@ -68,16 +70,15 @@ val consoleVisionRuntime = ConsoleVisionRuntime(
         paletteReductionRate = 0,
         isCompatPalette = false,
         shouldNormalize = false,
-
-        )
+    )
 )
 
-//var latestFrame: String = ""
+var latestFrame: String = ""
 
 fun main() = runBlocking {
-//    fixedRateTimer(period = 500L) {
-//        println(latestFrame)
-//    }
+    fixedRateTimer(period = 1000 / 30) {
+        print(AnsiConstants.CURSOR_TO_START + latestFrame)
+    }
     application {
         val infiniteTransition = rememberInfiniteTransition()
         val value by infiniteTransition.animateFloat(
@@ -94,7 +95,8 @@ fun main() = runBlocking {
             Modifier.background(Color.Black),
             consoleVisionRuntime,
             100,
-            100
+            100,
+            { latestFrame = it }
         ) {
             drawRoundRect(
                 Brush.horizontalGradient(listOf(Color.Gray, Color(66, 0, 66))),
@@ -116,8 +118,7 @@ fun main() = runBlocking {
             drawLine(Color.Green, Offset(1f, 3f), Offset(30f, 10f))
         }
 
-        println("framerate: $frameRate")
-        println("frame: ${count++}")
+//        println(AnsiConstants.CURSOR_TO_START + "framerate: $frameRate\nframe: ${count++}")
     }
 }
 
@@ -154,6 +155,7 @@ fun TerminalCanvas(
     consoleVisionRuntime: ConsoleVisionRuntime,
     width: Int = 80,
     height: Int = 72,
+    onRender: (String) -> Unit = { println(it) },
     content: DrawScope.() -> Unit,
 ) {
     ImageComposeScene(
@@ -171,7 +173,7 @@ fun TerminalCanvas(
             .toBufferedImage()
             .toList2D()
             .let { consoleVisionRuntime.printFrame(it) }
-            .also { println(it) }
+            .also { onRender(it) }
     }
 }
 
