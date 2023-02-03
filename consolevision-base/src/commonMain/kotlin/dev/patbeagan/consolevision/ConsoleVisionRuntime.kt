@@ -1,5 +1,7 @@
 package dev.patbeagan.consolevision
 
+import dev.patbeagan.consolevision.imagefilter.ColorMutation
+import dev.patbeagan.consolevision.imagefilter.ColorNormalization
 import dev.patbeagan.consolevision.style.ColorInt
 import dev.patbeagan.consolevision.style.ansi.ConsoleVision.Special
 import dev.patbeagan.consolevision.types.ColorPalette
@@ -10,16 +12,24 @@ class ConsoleVisionRuntime(
     config: Config
 ) {
 
-    private val paletteColors: ColorPalette? = paletteImage?.let {
-        ColorPalette.from(it, config.paletteReductionRate)
-    }
-
-    private val framePrinter = FramePrinter(
+    private val framePrinter: FramePrinter = FramePrinter(
         config.reductionRate,
-        ColorMapToAnsi(config.isCompatPalette),
-        config.shouldNormalize,
-        config.shouldMutateColors,
-        paletteColors,
+        paletteImage?.let {
+            ColorPalette.from(it, config.paletteReductionRate)
+        },
+        buildList {
+            if (config.shouldMutateColors) {
+                add(ColorMutation(50))
+            }
+            if (config.shouldNormalize) {
+                add(ColorNormalization())
+            }
+        },
+        if (config.isCompatPalette) {
+            ColorConverter.CompatColorConverter()
+        } else {
+            ColorConverter.NormalColorConverter()
+        }
     )
 
     fun printFrame(file: List2D<ColorInt>): String {

@@ -2,6 +2,7 @@ package dev.patbeagan.consolevision
 
 import dev.patbeagan.consolevision.imagefilter.ColorMutation
 import dev.patbeagan.consolevision.imagefilter.ColorNormalization
+import dev.patbeagan.consolevision.imagefilter.ImageFilter
 import dev.patbeagan.consolevision.style.ColorInt
 import dev.patbeagan.consolevision.style.ansi.ConsoleVision
 import dev.patbeagan.consolevision.style.style
@@ -16,15 +17,15 @@ import dev.patbeagan.consolevision.types.reduceColorSpaceBy
  */
 class FramePrinter(
     private val reductionRate: Int,
-    private val colorMapToAnsi: ColorMapToAnsi,
-    private val shouldNormalizeColors: Boolean,
-    private val shouldMutateColors: Boolean = false,
     private val paletteColors: ColorPalette? = null,
+    private val filters: List<ImageFilter>,
+    private val colorConverter: ColorConverter,
     private val compressionStyle: CompressionStyle = UPPER_HALF,
 ) {
 
     fun getFrame(frame: List2D<ColorInt>): String {
-        applyFilters(frame)
+        filters.forEach { it.invoke(frame) }
+
         return frame.buildOutput { foreground: Int?, background: Int?, x: Int ->
             compressionStyle.symbol.toString().style(
                 colorForeground = ansiColor(frame, paletteColors, foreground, x),
@@ -63,7 +64,7 @@ class FramePrinter(
         paletteColors: ColorPalette?,
         y: Int?,
         x: Int
-    ): ConsoleVision.Color = colorMapToAnsi.convertToAnsi(
+    ): ConsoleVision.Color = colorConverter.convert(
         if (y == null) {
             // there are an odd number of lines
             // we'll need to fill with the default color
@@ -75,14 +76,5 @@ class FramePrinter(
                 .let { paletteColors?.matchColor(it) ?: it }
         }
     )
-
-    private fun applyFilters(read: List2D<ColorInt>) {
-        if (shouldMutateColors) {
-            ColorMutation(50)(read)
-        }
-        if (shouldNormalizeColors) {
-            ColorNormalization()(read)
-        }
-    }
 
 }
