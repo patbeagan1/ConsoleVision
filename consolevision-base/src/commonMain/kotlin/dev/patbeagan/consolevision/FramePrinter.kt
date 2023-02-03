@@ -1,7 +1,5 @@
 package dev.patbeagan.consolevision
 
-import dev.patbeagan.consolevision.imagefilter.ColorMutation
-import dev.patbeagan.consolevision.imagefilter.ColorNormalization
 import dev.patbeagan.consolevision.imagefilter.ImageFilter
 import dev.patbeagan.consolevision.style.ColorInt
 import dev.patbeagan.consolevision.style.ansi.ConsoleVision
@@ -18,45 +16,33 @@ import dev.patbeagan.consolevision.types.reduceColorSpaceBy
 class FramePrinter(
     private val reductionRate: Int,
     private val paletteColors: ColorPalette? = null,
-    private val filters: List<ImageFilter>,
-    private val colorConverter: ColorConverter,
+    private val filters: List<ImageFilter> = listOf(),
+    private val colorConverter: ColorConverter = ColorConverter.NormalColorConverter(),
     private val compressionStyle: CompressionStyle = UPPER_HALF,
 ) {
 
     fun getFrame(frame: List2D<ColorInt>): String {
         filters.forEach { it.invoke(frame) }
 
-        return frame.buildOutput { foreground: Int?, background: Int?, x: Int ->
-            compressionStyle.symbol.toString().style(
-                colorForeground = ansiColor(frame, paletteColors, foreground, x),
-                colorBackground = ansiColor(frame, paletteColors, background, x),
-            )
-        }.toString()
-    }
-
-    private fun List2D<ColorInt>.buildOutput(
-        getColoredAnsiCharacter: (
-            foreground: Int?,
-            background: Int?,
-            x: Int
-        ) -> String
-    ): StringBuilder {
         val out = StringBuilder()
-        val chunked = (0 until height).chunked(2)
+        val chunked = (0 until frame.height).chunked(2)
         // since there will be 2 colors printed per row,
         // we actually have 2 y values per row.
         // this part decides which one will be
         // the foreground vs the background.
         chunked.forEach { y ->
-            (0 until width).forEach { x ->
+            (0 until frame.width).forEach { x ->
                 val p1 = y.getOrNull(1)
                 val foreground = y.getOrNull(0) ?: p1
                 val background = if (foreground != p1) p1 else null
-                getColoredAnsiCharacter(foreground, background, x).also { out.append(it) }
+                compressionStyle.symbol.toString().style(
+                    colorForeground = ansiColor(frame, paletteColors, foreground, x),
+                    colorBackground = ansiColor(frame, paletteColors, background, x),
+                ).also { out.append(it) }
             }
             out.append("\n")
         }
-        return out
+        return out.toString()
     }
 
     private fun ansiColor(
