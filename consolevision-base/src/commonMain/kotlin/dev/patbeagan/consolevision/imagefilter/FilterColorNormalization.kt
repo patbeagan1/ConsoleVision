@@ -24,7 +24,7 @@ import dev.patbeagan.consolevision.types.List2D
  * so that their proportions amongst themselves remain correct,
  * but they take up all of the available space.
  */
-class ColorNormalization : ImageFilter {
+class FilterColorNormalization : ImageFilter {
     override fun invoke(image: List2D<ColorInt>) {
         var minR = Int.MAX_VALUE
         var minG = Int.MAX_VALUE

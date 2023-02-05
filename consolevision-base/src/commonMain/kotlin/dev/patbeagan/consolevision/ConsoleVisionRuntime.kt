@@ -1,7 +1,9 @@
 package dev.patbeagan.consolevision
 
-import dev.patbeagan.consolevision.imagefilter.ColorMutation
-import dev.patbeagan.consolevision.imagefilter.ColorNormalization
+import dev.patbeagan.consolevision.imagefilter.FilterColorMutation
+import dev.patbeagan.consolevision.imagefilter.FilterColorNormalization
+import dev.patbeagan.consolevision.imagefilter.FilterColorPalette
+import dev.patbeagan.consolevision.imagefilter.FilterReducedColorSpace
 import dev.patbeagan.consolevision.style.ColorInt
 import dev.patbeagan.consolevision.style.ansi.ConsoleVision.Special
 import dev.patbeagan.consolevision.types.ColorPalette
@@ -13,16 +15,25 @@ class ConsoleVisionRuntime(
 ) {
 
     private val framePrinter: FramePrinter = FramePrinter(
-        config.reductionRate,
-        paletteImage?.let {
-            ColorPalette.from(it, config.paletteReductionRate)
-        },
         buildList {
             if (config.shouldMutateColors) {
-                add(ColorMutation(50))
+                add(FilterColorMutation(50))
             }
             if (config.shouldNormalize) {
-                add(ColorNormalization())
+                add(FilterColorNormalization())
+            }
+            if (config.reductionRate != 0) {
+                add(FilterReducedColorSpace(config.reductionRate))
+            }
+            if (paletteImage != null) {
+                add(
+                    FilterColorPalette(
+                        ColorPalette.from(
+                            paletteImage,
+                            config.paletteReductionRate
+                        )
+                    )
+                )
             }
         },
         if (config.isCompatPalette) {

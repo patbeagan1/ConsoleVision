@@ -2,20 +2,15 @@ package dev.patbeagan.consolevision
 
 import dev.patbeagan.consolevision.imagefilter.ImageFilter
 import dev.patbeagan.consolevision.style.ColorInt
-import dev.patbeagan.consolevision.style.ansi.ConsoleVision
 import dev.patbeagan.consolevision.style.style
-import dev.patbeagan.consolevision.types.ColorPalette
 import dev.patbeagan.consolevision.types.CompressionStyle
 import dev.patbeagan.consolevision.types.CompressionStyle.UPPER_HALF
 import dev.patbeagan.consolevision.types.List2D
-import dev.patbeagan.consolevision.types.reduceColorSpaceBy
 
 /**
  * A class that will return an Ansi image frame as a string.
  */
 class FramePrinter(
-    private val reductionRate: Int,
-    private val paletteColors: ColorPalette? = null,
     private val filters: List<ImageFilter> = listOf(),
     private val colorConverter: ColorConverter = ColorConverter.NormalColorConverter(),
     private val compressionStyle: CompressionStyle = UPPER_HALF,
@@ -36,31 +31,12 @@ class FramePrinter(
                 val foreground = y.getOrNull(0) ?: p1
                 val background = if (foreground != p1) p1 else null
                 compressionStyle.symbol.toString().style(
-                    colorForeground = ansiColor(frame, paletteColors, foreground, x),
-                    colorBackground = ansiColor(frame, paletteColors, background, x),
+                    colorForeground = colorConverter.convert(foreground?.let { frame.at(x, it) }),
+                    colorBackground = colorConverter.convert(background?.let { frame.at(x, it) }),
                 ).also { out.append(it) }
             }
             out.append("\n")
         }
         return out.toString()
     }
-
-    private fun ansiColor(
-        colorInts: List2D<ColorInt>,
-        paletteColors: ColorPalette?,
-        y: Int?,
-        x: Int
-    ): ConsoleVision.Color = colorConverter.convert(
-        if (y == null) {
-            // there are an odd number of lines
-            // we'll need to fill with the default color
-            null
-        } else {
-            colorInts
-                .at(x, y)
-                .reduceColorSpaceBy(reductionRate)
-                .let { paletteColors?.matchColor(it) ?: it }
-        }
-    )
-
 }

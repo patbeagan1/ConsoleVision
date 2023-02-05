@@ -4,15 +4,16 @@ import dev.patbeagan.consolevision.ColorConverter
 import dev.patbeagan.consolevision.FramePrinter
 import dev.patbeagan.consolevision.ImageScaler
 import dev.patbeagan.consolevision.getScaleToBoundBy
-import dev.patbeagan.consolevision.imagefilter.ColorMutation
-import dev.patbeagan.consolevision.imagefilter.ColorNormalization
+import dev.patbeagan.consolevision.imagefilter.FilterColorMutation
+import dev.patbeagan.consolevision.imagefilter.FilterColorNormalization
+import dev.patbeagan.consolevision.imagefilter.FilterColorPalette
+import dev.patbeagan.consolevision.imagefilter.FilterReducedColorSpace
 import dev.patbeagan.consolevision.scale
 import dev.patbeagan.consolevision.style.ColorInt
 import dev.patbeagan.consolevision.toList2D
 import dev.patbeagan.consolevision.types.ColorPalette
 import dev.patbeagan.consolevision.types.CompressionStyle
 import dev.patbeagan.consolevision.types.List2D
-import org.junit.Before
 import org.junit.Test
 import java.awt.image.BufferedImage
 import java.io.File
@@ -20,27 +21,15 @@ import javax.imageio.IIOException
 import javax.imageio.ImageIO
 
 internal class ImagePrinterTest {
-    lateinit var framePrinter: FramePrinter
 
     private fun readAsset(s: String): BufferedImage = ImageIO
         .read(File("../assets/$s"))
 
-    @Before
-    fun setup() {
-        framePrinter = FramePrinter(
-            reductionRate = 0,
-        )
-    }
-
     @Test
     fun compatPalette() {
         println(
-            FramePrinter(
-                0,
-                colorConverter = ColorConverter.CompatColorConverter(),
-            ).getFrame(
-                getScaledImage(readAsset(Mona))
-            )
+            FramePrinter(colorConverter = ColorConverter.CompatColorConverter())
+                .getFrame(getScaledImage(readAsset(Mona)))
         )
     }
 
@@ -49,16 +38,18 @@ internal class ImagePrinterTest {
         println("sample image fullsize")
         val directory = File("./")
         println(directory.absolutePath)
-        framePrinter.getFrame(readAsset(ImageSmall).toList2D()).also { println(it) }
+        FramePrinter()
+            .getFrame(
+                readAsset(ImageSmall).toList2D()
+            ).also { println(it) }
     }
 
     @Test
     fun `sample image fullsize normalized`() {
         println("sample image fullsize normalized")
         FramePrinter(
-            reductionRate = 0,
             filters = listOf(
-                ColorNormalization()
+                FilterColorNormalization()
             )
         )
             .getFrame(readAsset(ImageSmall).toList2D()).also { println(it) }
@@ -73,13 +64,11 @@ internal class ImagePrinterTest {
 
         println("Normalized: TRUE")
         FramePrinter(
-            reductionRate = 0,
-            filters = listOf(ColorNormalization()),
+            filters = listOf(FilterColorNormalization()),
         ).getFrame(read1)
             .also { println(it) }
         println("Normalized: FALSE")
         FramePrinter(
-            reductionRate = 0,
         ).getFrame(read2)
             .also { println(it) }
     }
@@ -92,32 +81,29 @@ internal class ImagePrinterTest {
         val read2 = getScaledImage(read)
 
         println("Reduced: TRUE")
-        FramePrinter(
-            8,
-        ).getFrame(read1)
+        FramePrinter(listOf(FilterReducedColorSpace(8)))
+            .getFrame(read1)
             .also { println(it) }
         println("Reduced: FALSE")
         FramePrinter(
-            reductionRate = 0,
         ).getFrame(read2)
             .also { println(it) }
     }
 
     @Test
-    fun `sample image reduced - lenna`() {
-        println("sample image reduced - lenna")
+    fun `sample image reduced - mona`() {
+        println("sample image reduced - mona")
         val read = readAsset(Mona)
         val read1 = getScaledImage(read)
         val read2 = getScaledImage(read)
 
         println("Reduced: TRUE")
         FramePrinter(
-            40,
+            listOf(FilterReducedColorSpace(40)),
         ).getFrame(read1)
             .also { println(it) }
         println("Reduced: FALSE")
         FramePrinter(
-            reductionRate = 0,
         ).getFrame(read2)
             .also { println(it) }
     }
@@ -131,7 +117,6 @@ internal class ImagePrinterTest {
     fun `sample image compressed dots`() {
         println("sample image compressed dots")
         FramePrinter(
-            reductionRate = 0,
             compressionStyle = CompressionStyle.DOTS_HIGH
         ).getFrame(
             readAsset(ImageSmall).toList2D(),
@@ -141,7 +126,7 @@ internal class ImagePrinterTest {
     @Test
     fun `sample image compressed`() {
         println("sample image compressed")
-        framePrinter.getFrame(
+        FramePrinter().getFrame(
             readAsset(ImageSmall).toList2D()
         ).also { println(it) }
     }
@@ -155,11 +140,10 @@ internal class ImagePrinterTest {
             return
         }
         FramePrinter(
-            reductionRate = 0,
             colorConverter = ColorConverter.CompatColorConverter(),
             filters = listOf(
-                ColorNormalization(),
-                ColorMutation(50)
+                FilterColorNormalization(),
+                FilterColorMutation(50)
             )
         ).getFrame(image.toList2D())
             .also { println(it) }
@@ -171,7 +155,7 @@ internal class ImagePrinterTest {
         val read = readAsset(ImageLarge)
 
         val (scale, transformOp) = read.getScaleToBoundBy(90, 90)
-        framePrinter.getFrame(
+        FramePrinter().getFrame(
             read.scale(scale, transformOp).toList2D()
         ).also { println(it) }
     }
@@ -199,13 +183,17 @@ internal class ImagePrinterTest {
                 println(e)
                 null
             }
-        }.forEach { (first, second) ->
+        }.forEach { (name, image) ->
+            image!!
             val (scale, transformOp) = read.getScaleToBoundBy(70, 70)
-            println(first)
+            println(name)
             FramePrinter(
-                reductionRate = 0,
                 compressionStyle = CompressionStyle.UPPER_HALF,
-                paletteColors = second?.toList2D()?.let { ColorPalette.from(it, 0) },
+                filters = listOf(
+                    FilterColorPalette(
+                        image.toList2D().let { ColorPalette.from(it, 0) }
+                    )
+                )
             ).getFrame(
                 read.scale(scale, transformOp).toList2D()
             ).also { println(it) }

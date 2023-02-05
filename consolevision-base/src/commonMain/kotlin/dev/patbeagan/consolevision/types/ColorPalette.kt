@@ -1,5 +1,6 @@
 package dev.patbeagan.consolevision.types
 
+import dev.patbeagan.consolevision.imagefilter.FilterReducedColorSpace.Companion.reduceColorSpaceBy
 import dev.patbeagan.consolevision.style.ColorInt
 import kotlin.jvm.JvmInline
 
