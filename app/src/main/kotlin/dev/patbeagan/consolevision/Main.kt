@@ -5,18 +5,11 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.withFrameNanos
-import androidx.compose.ui.ImageComposeScene
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -25,13 +18,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
-import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.toComposeImageBitmap
-import androidx.compose.ui.use
 import androidx.compose.ui.window.application
+import dev.patbeagan.consolevision.compose.TerminalCanvas
+import dev.patbeagan.consolevision.compose.rememberFrameRate
 import dev.patbeagan.consolevision.style.ansi.ConsoleVision
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.runBlocking
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.CommandLineParser
@@ -39,8 +31,6 @@ import org.apache.commons.cli.HelpFormatter
 import org.apache.commons.cli.Options
 import org.apache.commons.cli.ParseException
 import org.apache.commons.cli.PosixParser
-import org.jetbrains.skia.Bitmap
-import org.jetbrains.skiko.toBufferedImage
 import java.awt.geom.AffineTransform
 import java.awt.image.AffineTransformOp
 import java.awt.image.BufferedImage
@@ -119,61 +109,6 @@ fun main() = runBlocking {
         }
 
 //        println(AnsiConstants.CURSOR_TO_START + "framerate: $frameRate\nframe: ${count++}")
-    }
-}
-
-@Composable
-private fun rememberFrameRate(): State<Int> {
-    val frameRate = remember { mutableStateOf(0) }
-    LaunchedEffect(Unit) {
-        var frameCount = 0
-        var prevTime = withFrameNanos { it }
-
-        while (isActive) {
-            withFrameNanos {
-                frameCount++
-
-                val seconds = (it - prevTime) / 1E9 // 1E9 nanoseconds is 1 second
-                if (seconds >= 1) {
-                    frameRate.value = ((frameCount / seconds).toInt())
-                    prevTime = it
-                    frameCount = 0
-                }
-            }
-        }
-    }
-    return frameRate
-}
-
-/**
- * Creates a canvas which will render colorized output to the terminal
- * via ANSI escape codes.
- */
-@Composable
-fun TerminalCanvas(
-    modifier: Modifier = Modifier,
-    consoleVisionRuntime: ConsoleVisionRuntime,
-    width: Int = 80,
-    height: Int = 72,
-    onRender: (String) -> Unit = { println(it) },
-    content: DrawScope.() -> Unit,
-) {
-    ImageComposeScene(
-        width,
-        height,
-    ) {
-        Canvas(
-            modifier.fillMaxSize()
-        ) {
-            content()
-        }
-    }.use { scene ->
-        scene.render()
-            .use { Bitmap.makeFromImage(it) }
-            .toBufferedImage()
-            .toList2D()
-            .let { consoleVisionRuntime.printFrame(it) }
-            .also { onRender(it) }
     }
 }
 
