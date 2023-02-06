@@ -81,16 +81,30 @@ Initial functionality that allowed for playing videos has been taken out. The vi
 
 ## Roadmap
 
-- [] Convert all functionality to multiplatform
-- [] Display as [quad blocks](https://en.wikipedia.org/wiki/Block_Elements)
-- [] Create graphics library
-- [] Standardize screen size
-- [] Handle click events
-- [] Handle keyboard input
-- [] More filters
-- [] Widget library
-- [] Publish to package managers
-- [] Only rerender screen diff
-- [] Verify terminal compatibility
-- [] Gif support
-- [] Pass compression style in as an argument
+Done
+- Convert to compose
+
+
+In progress
+
+- Convert all functionality to multiplatform
+- Verify terminal compatibility
+- Only rerender screen diff
+  - scanlines, 
+  - individual pixels
+- reduce cpu strain
+    - limit FPS
+- Text support
+
+
+Todo
+
+- More filters
+- Display as [quad blocks](https://en.wikipedia.org/wiki/Block_Elements), similar to chafa
+- Standardize screen size
+- Handle click events
+- Handle keyboard input
+- Widget library
+- Publish to package managers
+- Gif support
+- Pass compression style in as an argument
