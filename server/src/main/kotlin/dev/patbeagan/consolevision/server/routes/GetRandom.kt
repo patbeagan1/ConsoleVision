@@ -26,13 +26,13 @@ class GetRandom : RouteHandler {
         val image = ImageIO.read(randomImage)
         val text = ConsoleVisionRuntime(
             paletteImage = null,
-            ConsoleVisionRuntime.Config(
+            config = ConsoleVisionRuntime.Config(
                 reductionRate = 0,
                 paletteReductionRate = 0,
                 isCompatPalette = false,
                 shouldNormalize = false,
             )
-        ).printFrame(image.toList2D())
+        ).getFrame(image.toList2D())
         val nameWithoutExtension = randomImage.nameWithoutExtension
         logger.info(nameWithoutExtension)
         call.respondText("$text$nameWithoutExtension\n")

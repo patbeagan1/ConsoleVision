@@ -87,13 +87,13 @@ class PostUpdateRoute : RouteHandler {
                             if (scaledImage != null) {
                                 val printFrame = ConsoleVisionRuntime(
                                     paletteImage = null,
-                                    ConsoleVisionRuntime.Config(
+                                    config = ConsoleVisionRuntime.Config(
                                         reductionRate = 0,
                                         paletteReductionRate = 0,
                                         isCompatPalette = false,
                                         shouldNormalize = false,
                                     )
-                                ).printFrame(scaledImage.toList2D())
+                                ).getFrame(scaledImage.toList2D())
 
                                 printFrame.let {
                                     val md5Hex = DigestUtils.md5Hex(scaledImage.getByteData())

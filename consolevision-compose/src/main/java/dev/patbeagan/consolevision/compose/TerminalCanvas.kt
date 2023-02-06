@@ -39,7 +39,7 @@ fun TerminalCanvas(
             .use { Bitmap.makeFromImage(it) }
             .toBufferedImage()
             .toList2D()
-            .let { consoleVisionRuntime.printFrame(it) }
+            .let { consoleVisionRuntime.getFrame(it) }
             .also { onRender(it) }
     }
 }

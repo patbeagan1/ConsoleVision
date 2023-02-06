@@ -1,7 +1,7 @@
 package dev.patbeagan.consolevision.util
 
 import dev.patbeagan.consolevision.ColorConverter
-import dev.patbeagan.consolevision.FramePrinter
+import dev.patbeagan.consolevision.FrameProvider
 import dev.patbeagan.consolevision.ImageScaler
 import dev.patbeagan.consolevision.getScaleToBoundBy
 import dev.patbeagan.consolevision.imagefilter.FilterColorMutation
@@ -28,7 +28,7 @@ internal class ImagePrinterTest {
     @Test
     fun compatPalette() {
         println(
-            FramePrinter(colorConverter = ColorConverter.CompatColorConverter())
+            FrameProvider(colorConverter = ColorConverter.CompatColorConverter())
                 .getFrame(getScaledImage(readAsset(Mona)))
         )
     }
@@ -38,7 +38,7 @@ internal class ImagePrinterTest {
         println("sample image fullsize")
         val directory = File("./")
         println(directory.absolutePath)
-        FramePrinter()
+        FrameProvider()
             .getFrame(
                 readAsset(ImageSmall).toList2D()
             ).also { println(it) }
@@ -47,7 +47,7 @@ internal class ImagePrinterTest {
     @Test
     fun `sample image fullsize normalized`() {
         println("sample image fullsize normalized")
-        FramePrinter(
+        FrameProvider(
             filters = listOf(
                 FilterColorNormalization()
             )
@@ -63,12 +63,12 @@ internal class ImagePrinterTest {
         val read2 = getScaledImage(read)
 
         println("Normalized: TRUE")
-        FramePrinter(
+        FrameProvider(
             filters = listOf(FilterColorNormalization()),
         ).getFrame(read1)
             .also { println(it) }
         println("Normalized: FALSE")
-        FramePrinter(
+        FrameProvider(
         ).getFrame(read2)
             .also { println(it) }
     }
@@ -81,11 +81,11 @@ internal class ImagePrinterTest {
         val read2 = getScaledImage(read)
 
         println("Reduced: TRUE")
-        FramePrinter(listOf(FilterReducedColorSpace(8)))
-            .getFrame(read1)
-            .also { println(it) }
+        FrameProvider(
+            filters = listOf(FilterReducedColorSpace(8))
+        ).getFrame(read1).also { println(it) }
         println("Reduced: FALSE")
-        FramePrinter(
+        FrameProvider(
         ).getFrame(read2)
             .also { println(it) }
     }
@@ -98,12 +98,12 @@ internal class ImagePrinterTest {
         val read2 = getScaledImage(read)
 
         println("Reduced: TRUE")
-        FramePrinter(
-            listOf(FilterReducedColorSpace(40)),
+        FrameProvider(
+            filters = listOf(FilterReducedColorSpace(40)),
         ).getFrame(read1)
             .also { println(it) }
         println("Reduced: FALSE")
-        FramePrinter(
+        FrameProvider(
         ).getFrame(read2)
             .also { println(it) }
     }
@@ -116,7 +116,7 @@ internal class ImagePrinterTest {
     @Test
     fun `sample image compressed dots`() {
         println("sample image compressed dots")
-        FramePrinter(
+        FrameProvider(
             compressionStyle = CompressionStyle.DOTS_HIGH
         ).getFrame(
             readAsset(ImageSmall).toList2D(),
@@ -126,7 +126,7 @@ internal class ImagePrinterTest {
     @Test
     fun `sample image compressed`() {
         println("sample image compressed")
-        FramePrinter().getFrame(
+        FrameProvider().getFrame(
             readAsset(ImageSmall).toList2D()
         ).also { println(it) }
     }
@@ -139,7 +139,7 @@ internal class ImagePrinterTest {
             print("Image not found")
             return
         }
-        FramePrinter(
+        FrameProvider(
             colorConverter = ColorConverter.CompatColorConverter(),
             filters = listOf(
                 FilterColorNormalization(),
@@ -155,7 +155,7 @@ internal class ImagePrinterTest {
         val read = readAsset(ImageLarge)
 
         val (scale, transformOp) = read.getScaleToBoundBy(90, 90)
-        FramePrinter().getFrame(
+        FrameProvider().getFrame(
             read.scale(scale, transformOp).toList2D()
         ).also { println(it) }
     }
@@ -187,7 +187,7 @@ internal class ImagePrinterTest {
             image!!
             val (scale, transformOp) = read.getScaleToBoundBy(70, 70)
             println(name)
-            FramePrinter(
+            FrameProvider(
                 compressionStyle = CompressionStyle.UPPER_HALF,
                 filters = listOf(
                     FilterColorPalette(

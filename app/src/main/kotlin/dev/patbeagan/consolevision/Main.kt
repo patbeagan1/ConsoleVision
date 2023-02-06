@@ -55,7 +55,7 @@ val mona: ImageBitmap by lazy {
 }
 
 val consoleVisionRuntime = ConsoleVisionRuntime(
-    null, ConsoleVisionRuntime.Config(
+    ConsoleVisionRuntime.Config(
         reductionRate = 0,
         paletteReductionRate = 0,
         isCompatPalette = false,
@@ -142,16 +142,16 @@ fun main2(args: Array<String>) {
                     return
                 }
                 ConsoleVisionRuntime(
-                    paletteImage = cmd.getOptionValue("p")
-                        ?.let { ImageIO.read(File(it)) }
-                        ?.toList2D(),
-                    ConsoleVisionRuntime.Config(
+                    config = ConsoleVisionRuntime.Config(
                         reductionRate = cmd.getOptionValue("r")?.toInt() ?: 0,
                         paletteReductionRate = cmd.getOptionValue("P")?.toInt() ?: 0,
                         isCompatPalette = cmd.hasOption("c"),
                         shouldNormalize = cmd.hasOption("n"),
-                    )
-                ).printFrame(file.toList2D()).also { println(it) }
+                    ),
+                    paletteImage = cmd.getOptionValue("p")
+                        ?.let { ImageIO.read(File(it)) }
+                        ?.toList2D(),
+                ).getFrame(file.toList2D()).also { println(it) }
             }
         }
     } catch (e: ParseException) {

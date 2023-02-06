@@ -30,13 +30,13 @@ class GetLastImage : RouteHandler {
         call.respondText(
             ConsoleVisionRuntime(
                 paletteImage = null,
-                ConsoleVisionRuntime.Config(
+                config = ConsoleVisionRuntime.Config(
                     reductionRate = 0,
                     paletteReductionRate = 0,
                     isCompatPalette = false,
                     shouldNormalize = false,
                 )
-            ).printFrame(read.toList2D())
+            ).getFrame(read.toList2D())
         )
     }
 }
