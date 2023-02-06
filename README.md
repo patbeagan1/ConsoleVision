@@ -95,6 +95,9 @@ In progress
 - reduce cpu strain
     - limit FPS
 - Text support
+- Demos
+  - Pokedex
+  - Mandelbrot zoom
 
 
 Todo
