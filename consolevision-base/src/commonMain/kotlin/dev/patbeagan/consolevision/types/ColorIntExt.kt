@@ -1,7 +1,6 @@
 package dev.patbeagan.consolevision.types
 
 import dev.patbeagan.consolevision.style.ColorInt
-import dev.patbeagan.consolevision.util.distance
 import kotlin.math.sqrt
 
 /**
