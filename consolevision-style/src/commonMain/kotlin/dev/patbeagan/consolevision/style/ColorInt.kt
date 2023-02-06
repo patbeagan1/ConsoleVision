@@ -66,6 +66,9 @@ value class ColorInt(
                 .or(b)
         )
 
+        /**
+         * Constructs a greyscale color
+         */
         fun from(
             a: Int,
             grey: Int,

@@ -88,6 +88,7 @@ value class CompressedPoint(private val base: Long) : Comparable<CompressedPoint
          * @return the [CompressedPoint] that is created by concatenating these coordinates
          */
         fun from(x: Int, y: Int): CompressedPoint = CompressedPoint(
+            // todo replace with ULong
             // toLong modifies the leading bit to keep the sign, so we have to do it manually
             (x.toLong() shl 32) or (y.toLong() and (2.0.pow(32) - 1).toLong())
         )
