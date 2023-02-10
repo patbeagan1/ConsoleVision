@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":lib"))
+    implementation(project(":consolevision-jvm"))
     implementation(project(":consolevision-compose"))
     implementation(compose.desktop.currentOs)
     // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-core

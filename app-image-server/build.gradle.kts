@@ -17,7 +17,7 @@ dependencies {
     implementation("io.ktor:ktor-server-netty:2.2.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     implementation("org.mod4j.org.apache.commons:cli:1.0.0")
-    implementation(project(":lib"))
+    implementation(project(":consolevision-jvm"))
 }
 
 application {

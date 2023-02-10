@@ -10,6 +10,6 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":lib"))
+    implementation(project(":consolevision-jvm"))
     implementation(compose.desktop.currentOs)
 }

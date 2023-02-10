@@ -8,7 +8,7 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":lib"))
+    implementation(project(":consolevision-jvm"))
 }
 
 application {

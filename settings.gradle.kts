@@ -8,10 +8,10 @@ pluginManagement {
 }
 
 include(":app-demo-compose")
-include(":app-cli-image")
 include(":app-demo-graphics")
-include(":lib")
-include(":server")
+include(":app-image-cli")
+include(":app-image-server")
+include(":consolevision-jvm")
 include(":consolevision-base")
 include(":consolevision-style")
 include(":consolevision-compose")

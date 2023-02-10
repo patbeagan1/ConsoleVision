@@ -10,7 +10,7 @@ repositories {
 
 dependencies {
     implementation("org.mod4j.org.apache.commons:cli:1.0.0")
-    implementation(project(":lib"))
+    implementation(project(":consolevision-jvm"))
 }
 
 application {
