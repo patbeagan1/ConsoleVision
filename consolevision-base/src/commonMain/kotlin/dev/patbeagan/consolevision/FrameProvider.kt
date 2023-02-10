@@ -18,7 +18,7 @@ class FrameProvider(
 
     override fun getFrame(
         frame: List2D<ColorInt>,
-        charList2D: Map<CompressedPoint, Triple<Char, ColorInt?, ColorInt?>>?
+        charList2D: Map<CompressedPoint, Printable>?
     ): String { // todo make this an option
         print(ConsoleVision.Special.cursorToPosition(1, 1))
         filters.forEach { it.invoke(frame) }
@@ -45,21 +45,27 @@ class FrameProvider(
 
     private fun List2D<ColorInt>.renderedText(
         foreground: Int?,
-        charList2D: Map<CompressedPoint, Triple<Char, ColorInt?, ColorInt?>>?,
+        charList2D: Map<CompressedPoint, Printable>?,
         x: Int,
         background: Int?
-    ) = foreground
-        ?.let { charList2D?.get(x coord it) }
-        ?.let { (c, passedForeground, passedBackground) ->
-            c.toString().style(
-                colorForeground = passedForeground
-                    ?.let { colorConverter.convert(it) }
-                    ?: convert(foreground, x),
-                colorBackground = passedBackground
-                    ?.let { colorConverter.convert(it) }
-                    ?: convert(background, x),
-            )
-        }
+    ): String? {
+        foreground ?: return null
+        charList2D ?: return null
+        val printable = charList2D[x coord foreground] ?: return null
+
+        val colorForeground = printable.foreground
+            ?.let { colorConverter.convert(it) }
+            ?: convert(foreground, x)
+
+        val colorBackground = printable.background
+            ?.let { colorConverter.convert(it) }
+            ?: convert(background, x)
+
+        return printable.character.toString().style(
+            colorForeground = colorForeground,
+            colorBackground = colorBackground,
+        )
+    }
 
     private fun List2D<ColorInt>.renderedCompressionCharacter(
         foreground: Int?,
@@ -73,3 +79,9 @@ class FrameProvider(
     private fun List2D<ColorInt>.convert(y: Int?, x: Int) =
         colorConverter.convert(y?.let { at(x, it) })
 }
+
+data class Printable(
+    val character: Char,
+    val foreground: ColorInt?,
+    val background: ColorInt?
+)

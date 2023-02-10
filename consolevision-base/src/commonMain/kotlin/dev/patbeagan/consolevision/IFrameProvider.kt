@@ -8,6 +8,6 @@ interface IFrameProvider {
     fun getFrame(frame: List2D<ColorInt>): String
     fun getFrame(
         frame: List2D<ColorInt>,
-        charList2D: Map<CompressedPoint, Triple<Char, ColorInt?, ColorInt?>>?
+        charList2D: Map<CompressedPoint, Printable>?
     ): String
 }

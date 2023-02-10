@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.use
 import dev.patbeagan.consolevision.ConsoleVisionRuntime
+import dev.patbeagan.consolevision.Printable
 import dev.patbeagan.consolevision.style.ColorInt
 import dev.patbeagan.consolevision.toList2D
 import dev.patbeagan.consolevision.types.CompressedPoint
@@ -16,8 +17,8 @@ import org.jetbrains.skia.Bitmap
 import org.jetbrains.skiko.toBufferedImage
 
 class TextDrawScope {
-    private val charactersMut = mutableMapOf<CompressedPoint, Triple<Char, ColorInt?, ColorInt?>>()
-    val characters: Map<CompressedPoint, Triple<Char, ColorInt?, ColorInt?>> = charactersMut
+    private val charactersMut = mutableMapOf<CompressedPoint, Printable>()
+    val characters: Map<CompressedPoint, Printable> = charactersMut
 
     fun drawText(
         x: Int,
@@ -29,11 +30,7 @@ class TextDrawScope {
         text.forEachIndexed { index, c ->
             val fx = x + index
             val fy = if (y % 2 == 1) y - 1 else y
-            charactersMut[fx coord fy] = Triple(
-                c,
-                colorForeground,
-                colorBackground
-            )
+            charactersMut[fx coord fy] = Printable(c, colorForeground, colorBackground)
         }
     }
 }
