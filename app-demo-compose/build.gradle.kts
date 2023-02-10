@@ -1,5 +1,4 @@
 plugins {
-//    id("application")
     id("com.github.johnrengelman.shadow")
     kotlin("jvm")
     id("org.jetbrains.compose") version "1.2.2"
@@ -12,8 +11,6 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-    implementation("org.mod4j.org.apache.commons:cli:1.0.0")
     implementation(project(":lib"))
     implementation(project(":consolevision-compose"))
     implementation(compose.desktop.currentOs)
@@ -23,10 +20,6 @@ dependencies {
 
 compose.desktop {
     application {
-        mainClass = "MainKt"
+        mainClass = "dev.patbeagan.app.demo.compose.MainKt"
     }
 }
-//
-//application {
-//    mainClass.set("dev.patbeagan.consolevision.MainKt")
-//}

@@ -7,7 +7,9 @@ pluginManagement {
     }
 }
 
-include(":app")
+include(":app-demo-compose")
+include(":app-cli-image")
+include(":app-demo-graphics")
 include(":lib")
 include(":server")
 include(":consolevision-base")

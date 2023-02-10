@@ -33,6 +33,11 @@ value class List2D<T> private constructor(private val value: MutableList<Mutable
         value[y][x] = item
     }
 
+    fun assignSafe(point: CompressedPoint, item: T) {
+        isValidCoordinate(point)
+        value[point.y][point.x] = item
+    }
+
     override fun iterator(): Iterator<T> = iterator {
         this@List2D.traverseInternal(value, {}) { _, _, t -> yield(t) }
     }

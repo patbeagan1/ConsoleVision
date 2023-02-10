@@ -46,6 +46,11 @@ object ConsoleVision {
             "38;2;${colorInt.colorRed};${colorInt.colorGreen};${colorInt.colorBlue}",
             "48;2;${colorInt.colorRed};${colorInt.colorGreen};${colorInt.colorBlue}"
         )
+
+        class CustomDuo(colorForeground: ColorInt, colorBackground: ColorInt) : Color(
+            "38;2;${colorForeground.colorRed};${colorForeground.colorGreen};${colorForeground.colorBlue}",
+            "48;2;${colorBackground.colorRed};${colorBackground.colorGreen};${colorBackground.colorBlue}"
+        )
     }
 
     /**

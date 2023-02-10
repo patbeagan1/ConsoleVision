@@ -1,4 +1,4 @@
-package dev.patbeagan.consolevision
+package dev.patbeagan.app.demo.graphics
 
 import dev.patbeagan.consolevision.style.ColorInt
 import dev.patbeagan.consolevision.style.ansi.ConsoleVision
@@ -13,7 +13,7 @@ import kotlin.math.max
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
-fun mainl() {
+fun main() {
     (1 coord 1).lineByDDATo(3 coord 4)
     getCircleByBresenham(1 coord 1, 3)
 }
