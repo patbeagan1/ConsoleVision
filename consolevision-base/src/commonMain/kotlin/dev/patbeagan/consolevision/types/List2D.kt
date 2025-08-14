@@ -128,7 +128,7 @@ value class List2D<T> private constructor(private val value: MutableList<Mutable
             c.x in 0..value[0].size
 
     /**
-     * A debug method that prints all of the values that are currently in the [List2D]
+     * A debug method that prints all the values that are currently in the [List2D]
      */
     fun printAll(delimiter: String = "\t") {
         traverse({ println() }) { _, _, t -> print("$t$delimiter") }

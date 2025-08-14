@@ -1,1 +1,1 @@
-./gradlew :app:assemble :app:run --args='-f ../assets/Lenna.png -w 80'
+./gradlew :app-image-cli:assemble :app-image-cli:run --args='-f ../assets/Lenna.png -w 80'

@@ -16,6 +16,7 @@ dependencies {
     implementation(compose.desktop.currentOs)
     // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-core
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    implementation("org.testng:testng:7.1.0")
 }
 
 compose.desktop {

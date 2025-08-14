@@ -7,8 +7,8 @@ plugins {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
+    mavenLocal()
 }
 
 version = "0.8.0"
